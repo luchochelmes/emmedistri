@@ -25,6 +25,22 @@ button{font-family:inherit;cursor:pointer}
 input,textarea{font-family:inherit;color:#1C1917}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media (max-width:760px){
+  .admin-login-panel{padding:28px 24px!important;gap:20px!important}
+  .admin-login-heading{font-size:34px!important;max-width:100%!important}
+  .admin-login-form{padding:32px 24px!important}
+  .admin-shell{flex-direction:column!important}
+  .admin-sidebar{width:100%!important;height:auto!important;position:static!important;flex-direction:row!important;align-items:center!important;padding:10px 12px!important;gap:12px!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  .admin-sidebar-top{padding:0!important;flex-shrink:0}
+  .admin-nav{flex-direction:row!important;flex-shrink:0;gap:4px!important}
+  .admin-nav button{white-space:nowrap!important;padding:8px 10px!important}
+  .admin-sidebar-footer{margin-top:0!important;border-top:0!important;border-left:1px solid #3A3430;padding:0 0 0 12px!important;flex-direction:row!important;align-items:center!important;flex-shrink:0;margin-left:auto!important}
+  .admin-sidebar-footer a{display:none}
+  .admin-content-header{padding:14px 16px!important}
+  .admin-content-header h1{font-size:24px!important}
+  .admin-main{padding:16px 16px 40px!important}
+  .admin-table-wrap{margin:0 -16px!important;width:calc(100% + 32px)!important;border-radius:0!important;border-left:0!important;border-right:0!important}
+}
 </style>
 </helmet>
 
@@ -34,15 +50,15 @@ input,textarea{font-family:inherit;color:#1C1917}
 
 <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ false }}">
   <div style="min-height:100vh;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
-    <div style="background:#D62718;color:#FFFFFF;padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:32px">
+    <div class="admin-login-panel" style="background:#D62718;color:#FFFFFF;padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;min-width:0">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="background:#FFFFFF;color:#D62718;font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:1;padding:6px 12px 4px;transform:skewX(-8deg)">EMME</div>
         <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px;line-height:1.05;text-transform:uppercase;letter-spacing:1.5px">Distri<br>buidora</div>
       </div>
-      <div style="font-family:'Barlow Condensed';font-weight:800;font-size:64px;line-height:0.92;text-transform:uppercase;max-width:460px">Panel de administración</div>
+      <div class="admin-login-heading" style="font-family:'Barlow Condensed';font-weight:800;font-size:64px;line-height:0.92;text-transform:uppercase;max-width:460px">Panel de administración</div>
       <div style="font-size:14px;color:#FFE3A0">Nono · Malagueño · Córdoba</div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:center;padding:48px 24px">
+    <div class="admin-login-form" style="display:flex;align-items:center;justify-content:center;padding:48px 24px">
       <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px">
         <div style="font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase">Ingresar</div>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Email
@@ -61,16 +77,16 @@ input,textarea{font-family:inherit;color:#1C1917}
 </sc-if>
 
 <sc-if value="{{ showApp }}" hint-placeholder-val="{{ true }}">
-<div style="display:flex;min-height:100vh">
+<div class="admin-shell" style="display:flex;min-height:100vh">
 
-  <aside style="width:232px;flex-shrink:0;background:#1C1917;color:#E9E3DA;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 14px">
-    <div style="display:flex;align-items:center;gap:8px;padding:0 6px 22px">
+  <aside class="admin-sidebar" style="width:232px;flex-shrink:0;background:#1C1917;color:#E9E3DA;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 14px">
+    <div class="admin-sidebar-top" style="display:flex;align-items:center;gap:8px;padding:0 6px 22px">
       <div style="background:#D62718;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:1;padding:5px 10px 3px;transform:skewX(-8deg)">EMME</div>
       <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#FFC72C">Admin</div>
     </div>
-    <nav style="display:flex;flex-direction:column;gap:2px">
+    <nav class="admin-nav" style="display:flex;flex-direction:column;gap:2px">
       <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
-        <button onClick="{{ n.pick }}" style="border:0;background:{{ n.bg }};color:{{ n.fg }};border-radius:6px;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;text-align:left" style-hover="background:#2E2926">
+        <button onClick="{{ n.pick }}" style="border:0;background:{{ n.bg }};color:{{ n.fg }};border-radius:6px;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;text-align:left;gap:8px" style-hover="background:#2E2926">
           <span>{{ n.label }}</span>
           <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
             <span style="background:{{ n.badgeBg }};color:{{ n.badgeFg }};border-radius:999px;font-size:11px;font-weight:700;padding:2px 7px">{{ n.badge }}</span>
@@ -78,20 +94,20 @@ input,textarea{font-family:inherit;color:#1C1917}
         </button>
       </sc-for>
     </nav>
-    <div style="margin-top:auto;border-top:1px solid #3A3430;padding:14px 6px 0;display:flex;flex-direction:column;gap:10px">
+    <div class="admin-sidebar-footer" style="margin-top:auto;border-top:1px solid #3A3430;padding:14px 6px 0;display:flex;flex-direction:column;gap:10px">
       <a href="index.html" style="color:#FFC72C;font-size:13px;font-weight:600">Ver tienda →</a>
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:32px;height:32px;border-radius:50%;background:#FFC72C;color:#1C1917;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">AD</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#FFC72C;color:#1C1917;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">AD</div>
         <div style="display:flex;flex-direction:column;min-width:0">
-          <span style="font-size:13px;font-weight:600">Administrador</span>
-          <button onClick="{{ logout }}" style="border:0;background:transparent;color:#8E857A;font-size:12px;padding:0;text-align:left">Cerrar sesión</button>
+          <span style="font-size:13px;font-weight:600;white-space:nowrap">Administrador</span>
+          <button onClick="{{ logout }}" style="border:0;background:transparent;color:#8E857A;font-size:12px;padding:0;text-align:left;white-space:nowrap">Cerrar sesión</button>
         </div>
       </div>
     </div>
   </aside>
 
   <div style="flex:1;min-width:0;display:flex;flex-direction:column">
-    <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6;padding:16px 28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10">
+    <header class="admin-content-header" style="background:#FFFFFF;border-bottom:1px solid #E6E0D6;padding:16px 28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10">
       <div style="flex:1 1 240px">
         <h1 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:30px;text-transform:uppercase;line-height:1">{{ title }}</h1>
         <div style="font-size:13px;color:#6B635A;margin-top:3px">{{ subtitle }}</div>
@@ -110,7 +126,7 @@ input,textarea{font-family:inherit;color:#1C1917}
       </sc-if>
     </header>
 
-    <main style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:20px">
+    <main class="admin-main" style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:20px">
 
       <sc-if value="{{ isResumen }}" hint-placeholder-val="{{ true }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
@@ -179,7 +195,7 @@ input,textarea{font-family:inherit;color:#1C1917}
             </sc-for>
           </div>
         </div>
-        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+        <div class="admin-table-wrap" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
           <div style="min-width:1040px">
             <div style="display:grid;grid-template-columns:80px 100px minmax(200px,1.6fr) 150px 110px 60px 110px 120px 140px;gap:12px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
               <span>N°</span><span>Fecha</span><span>Cliente</span><span>Entrega</span><span>Sucursal</span><span>Ítems</span><span>Total</span><span>Pago</span><span>Estado</span>
@@ -216,7 +232,7 @@ input,textarea{font-family:inherit;color:#1C1917}
             <button onClick="{{ t.pick }}" style="border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;white-space:nowrap">{{ t.label }} <span style="opacity:0.65">{{ t.count }}</span></button>
           </sc-for>
         </div>
-        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+        <div class="admin-table-wrap" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
           <div style="min-width:1060px">
             <div style="display:grid;grid-template-columns:52px minmax(240px,2fr) 150px 130px 170px 100px 100px 130px;gap:14px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
               <span></span><span>Producto</span><span>Rubro</span><span>Precio</span><span>Mayorista</span><span>Stock</span><span>Publicado</span><span></span>
@@ -281,7 +297,7 @@ input,textarea{font-family:inherit;color:#1C1917}
       </sc-if>
 
       <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+        <div class="admin-table-wrap" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
           <div style="min-width:860px">
             <div style="display:grid;grid-template-columns:minmax(200px,1.5fr) 140px minmax(180px,1.4fr) 80px 130px 110px;gap:14px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
               <span>Cliente</span><span>Teléfono</span><span>Dirección</span><span>Pedidos</span><span>Total comprado</span><span>Último</span>
