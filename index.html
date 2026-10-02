@@ -48,6 +48,9 @@ input{font-family:inherit}
   .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
+  .header-top{padding-top:10px!important;padding-bottom:10px!important;gap:12px!important}
+  .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .cart-label{display:none}
 }
 </style>
 </helmet>
@@ -74,15 +77,11 @@ input{font-family:inherit}
     </div>
   </div>
 
-  <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6;position:sticky;top:0;z-index:20">
-    <div style="max-width:1320px;margin:0 auto;padding:16px 24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+  <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6">
+    <div class="header-top" style="max-width:1320px;margin:0 auto;padding:14px 24px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap">
       <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:52px;width:auto;display:block;border-radius:4px">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:44px;width:auto;display:block;border-radius:4px">
       </a>
-      <div style="flex:1 1 320px;display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
-        <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:12px 14px;font-size:15px;min-width:0;background:transparent"></input>
-        <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 20px;font-weight:600;font-size:14px">Buscar</button>
-      </div>
       <div style="display:flex;flex-direction:column;gap:4px">
         <span style="font-size:11px;color:#6B635A;text-transform:uppercase;letter-spacing:1px;font-weight:600">Tu sucursal</span>
         <div style="display:flex;background:#F1ECE3;border-radius:6px;padding:3px;gap:3px">
@@ -91,12 +90,19 @@ input{font-family:inherit}
           </sc-for>
         </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button onClick="{{ openCart }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:11px 16px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px" style-hover="background:#A81B10">
-          <span>Carrito</span>
-          <span style="background:#FFC72C;color:#1C1917;border-radius:999px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 6px">{{ cartCount }}</span>
-        </button>
+    </div>
+  </header>
+
+  <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
+    <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
+      <div style="flex:1;min-width:0;display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
+        <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:11px 14px;font-size:15px;min-width:0;background:transparent"></input>
+        <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 18px;font-weight:600;font-size:14px;flex-shrink:0">Buscar</button>
       </div>
+      <button onClick="{{ openCart }}" style="flex-shrink:0;border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:11px 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px" style-hover="background:#A81B10">
+        <span class="cart-label">Carrito</span>
+        <span style="background:#FFC72C;color:#1C1917;border-radius:999px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 6px">{{ cartCount }}</span>
+      </button>
     </div>
     <nav style="background:#D62718">
       <div style="max-width:1320px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none">
@@ -106,7 +112,7 @@ input{font-family:inherit}
         <button onClick="{{ pickPopulares }}" style="border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 16px;white-space:nowrap;margin-left:auto">Más pedidos</button>
       </div>
     </nav>
-  </header>
+  </div>
 
   <main style="flex:1">
 
