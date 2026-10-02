@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="./firebase-init.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -23,6 +27,10 @@ input,textarea{font-family:inherit;color:#1C1917}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </helmet>
+
+<sc-if value="{{ showAuthLoading }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#6B635A;font-family:'Barlow Condensed';font-size:18px;text-transform:uppercase;letter-spacing:1px">Cargando…</div>
+</sc-if>
 
 <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ false }}">
   <div style="min-height:100vh;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
@@ -226,7 +234,7 @@ input,textarea{font-family:inherit;color:#1C1917}
                 <div style="display:flex;flex-direction:column;gap:2px">
                   <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px;background:#FFFFFF">
                     <span style="padding-left:8px;color:#6B635A;font-size:13px">$</span>
-                    <input value="{{ p.price }}" onChange="{{ p.setPrice }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px 7px 4px;font-size:14px;font-weight:700;background:transparent">
+                    <input value="{{ p.price }}" onChange="{{ p.setPrice }}" onBlur="{{ p.blurPrice }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px 7px 4px;font-size:14px;font-weight:700;background:transparent">
                   </div>
                   <sc-if value="{{ p.hasOld }}" hint-placeholder-val="{{ false }}">
                     <span style="font-size:11px;color:#A81B10;font-weight:700">En oferta · antes {{ p.oldTxt }}</span>
@@ -234,7 +242,7 @@ input,textarea{font-family:inherit;color:#1C1917}
                 </div>
                 <span style="font-size:13px">{{ p.wholeTxt }} <span style="color:#6B635A">desde {{ p.min }}</span></span>
                 <div style="display:flex;align-items:center;border:1px solid {{ p.stockBd }};border-radius:5px;background:#FFFFFF">
-                  <input value="{{ p.stock }}" onChange="{{ p.setStock }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px;font-size:14px;font-weight:600;background:transparent;color:{{ p.stockColor }}">
+                  <input value="{{ p.stock }}" onChange="{{ p.setStock }}" onBlur="{{ p.blurStock }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px;font-size:14px;font-weight:600;background:transparent;color:{{ p.stockColor }}">
                 </div>
                 <button onClick="{{ p.togglePub }}" style="border:0;background:{{ p.pubTrack }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ p.pubAlign }}">
                   <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
@@ -263,7 +271,7 @@ input,textarea{font-family:inherit;color:#1C1917}
               <div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
                 <image-slot id="cat-{{ c.id }}" shape="rect" placeholder=" " style="width:300%;height:300%;transform:scale(0.3334);transform-origin:0 0;display:block"></image-slot>
               </div>
-              <input value="{{ c.name }}" onChange="{{ c.rename }}" style="flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:8px 10px;font-size:15px;font-weight:600;outline:none;background:transparent" style-hover="border-color:#D8D0C4" style-focus="border-color:#1C1917;background:#FFFFFF">
+              <input value="{{ c.name }}" onChange="{{ c.rename }}" onBlur="{{ c.blurRename }}" style="flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:8px 10px;font-size:15px;font-weight:600;outline:none;background:transparent" style-hover="border-color:#D8D0C4" style-focus="border-color:#1C1917;background:#FFFFFF">
               <span style="font-size:13px;color:#6B635A;white-space:nowrap">{{ c.count }} productos</span>
               <button onClick="{{ c.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Eliminar</button>
             </div>
@@ -323,16 +331,9 @@ input,textarea{font-family:inherit;color:#1C1917}
               <input value="{{ cfg.lowStock }}" onChange="{{ cfgSet.lowStock }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
             </label>
           </div>
-          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Usuario y contraseña</div>
-            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Credenciales para ingresar al panel de administración.</div>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Email de acceso
-              <input value="{{ cfg.loginEmail }}" onChange="{{ cfgSet.loginEmail }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-            </label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Contraseña
-              <input value="{{ cfg.loginPassword }}" onChange="{{ cfgSet.loginPassword }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-            </label>
-            <div style="font-size:12px;color:#6B635A">El cambio aplica de inmediato — la próxima vez que inicies sesión vas a usar estos datos.</div>
+            <div style="font-size:13px;color:#6B635A;line-height:1.5">El acceso al panel ahora se maneja desde Firebase (más seguro). Para cambiar la contraseña o agregar otro administrador, entrá a la consola de Firebase → Authentication → Users.</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:16px">
             <sc-for list="{{ sucForms }}" as="s" hint-placeholder-count="3">
@@ -456,7 +457,7 @@ input,textarea{font-family:inherit;color:#1C1917}
           <button onClick="{{ od.togglePaid }}" style="border:1px solid #1C1917;background:#FFFFFF;border-radius:5px;padding:7px 12px;font-size:13px;font-weight:700">{{ od.paidAction }}</button>
         </div>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Nota interna
-          <textarea value="{{ od.note }}" onChange="{{ od.setNote }}" rows="3" placeholder="Ej: entregar por la puerta de atrás" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;resize:vertical;letter-spacing:0;text-transform:none;font-weight:400"></textarea>
+          <textarea value="{{ od.note }}" onChange="{{ od.setNote }}" onBlur="{{ od.blurNote }}" rows="3" placeholder="Ej: entregar por la puerta de atrás" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;resize:vertical;letter-spacing:0;text-transform:none;font-weight:400"></textarea>
         </label>
       </div>
       <div style="border-top:1px solid #E6E0D6;padding:14px 22px;display:flex;gap:8px">
@@ -536,6 +537,20 @@ input,textarea{font-family:inherit;color:#1C1917}
               <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
             </span>
             <span style="font-size:14px;font-weight:600">{{ dPubLabel }}</span>
+          </button>
+        </div>
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+          <button onClick="{{ dToggleVyc }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:8px 12px;display:flex;gap:10px;align-items:center;height:42px">
+            <span style="background:{{ dVycTrack }};width:36px;height:20px;border-radius:999px;padding:2px;display:flex;justify-content:{{ dVycAlign }};flex-shrink:0">
+              <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
+            </span>
+            <span style="font-size:13px;font-weight:600">Verdulería y Carnicería</span>
+          </button>
+          <button onClick="{{ dTogglePopular }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:8px 12px;display:flex;gap:10px;align-items:center;height:42px">
+            <span style="background:{{ dPopularTrack }};width:36px;height:20px;border-radius:999px;padding:2px;display:flex;justify-content:{{ dPopularAlign }};flex-shrink:0">
+              <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
+            </span>
+            <span style="font-size:13px;font-weight:600">Destacado ("Más pedidos")</span>
           </button>
         </div>
         <sc-if value="{{ draftError }}" hint-placeholder-val="{{ false }}">
@@ -708,11 +723,50 @@ input,textarea{font-family:inherit;color:#1C1917}
 </sc-if>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const KEY = 'emme-backoffice-v4';
 const fmt = n => '$' + Math.round(+n || 0).toLocaleString('es-AR');
-const CATS0 = [];
-const P0 = [];
-const CLIENTS = [];
+
+// ---- Seed data: written to Firestore once, the first time an admin logs in
+// against an empty database (see Component.maybeSeed). After that, Firestore
+// is the only source of truth — this data is never read again. ----
+const SEED_CATS = [
+  { id: 'vasos', name: 'Vasos y copas', img: 'vasos.jpg' },
+  { id: 'envases', name: 'Envases y bandejas', img: 'bandejas.jpg' },
+  { id: 'cajas', name: 'Cajas delivery', img: 'caja delivery.jpg' },
+  { id: 'bolsas', name: 'Bolsas', img: 'bolsas.jpg' },
+  { id: 'papel', name: 'Servilletas y papel', img: 'servilletas.jpg' },
+  { id: 'utensilios', name: 'Cubiertos y sorbetes', img: 'cubiertos.jpg' },
+  { id: 'limpieza', name: 'Limpieza', img: 'limpieza.jpg' },
+  { id: 'aluminio', name: 'Aluminio y film', img: 'aluminio.jpg' }
+];
+const SEED_PRODUCTS = [
+  { id: 1042, cat: 'vasos', name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', min: 10, popular: true, vyc: false, desc: 'Vaso térmico de poliestireno expandido, ideal para bebidas calientes y frías. No transmite temperatura y mantiene el pulso firme en el mostrador.', price: 3450, old: 3990, whole: 2980, stock: 64, published: true },
+  { id: 1057, cat: 'vasos', name: 'Vaso plástico cristal 330 cc', pack: 'x 50 u.', min: 10, popular: false, vyc: false, desc: 'Vaso de plástico cristal transparente, resistente para bebidas frías, gaseosas y tragos. Apilable para ahorrar espacio en el local.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 2110, cat: 'envases', name: 'Contenedor PET 500 cc con tapa bisagra', pack: 'x 50 u.', min: 5, popular: false, vyc: true, desc: 'Contenedor transparente con tapa bisagra a presión, apto para delivery de ensaladas, postres y viandas frías.', price: 11900, old: 0, whole: 10350, stock: 8, published: true },
+  { id: 2134, cat: 'envases', name: 'Bandeja expandido 103 blanca', pack: 'x 100 u.', min: 10, popular: false, vyc: true, desc: 'Bandeja de telgopor blanca para carnes, verduras y fiambres. Liviana, higiénica y de bajo costo por unidad.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 3012, cat: 'cajas', name: 'Caja pizza microcorrugada 33 cm', pack: 'x 50 u.', min: 4, popular: true, vyc: false, desc: 'Caja de cartón microcorrugado para pizza grande, resistente a la humedad y al peso. Arma fácil, sin necesidad de cinta.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 3025, cat: 'cajas', name: 'Caja empanada kraft x 6', pack: 'x 100 u.', min: 4, popular: false, vyc: false, desc: 'Caja de cartón kraft con ventana, pensada para el transporte prolijo de 6 empanadas.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 4003, cat: 'bolsas', name: 'Bolsa camiseta 40x50 reforzada', pack: 'x 100 u.', min: 10, popular: false, vyc: true, desc: 'Bolsa camiseta de polietileno reforzado, soporta peso para compras de almacén y verdulería.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 4031, cat: 'bolsas', name: 'Bolsa kraft con manija 30x12x32', pack: 'x 25 u.', min: 6, popular: false, vyc: false, desc: 'Bolsa de papel kraft con manija de cordón, ideal para regalería y locales que buscan una imagen más premium.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 5008, cat: 'papel', name: 'Servilleta 30x30 blanca doble hoja', pack: 'x 100 u.', min: 20, popular: false, vyc: false, desc: 'Servilleta blanca doble hoja, suave y absorbente, formato estándar para mesa y delivery.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 6014, cat: 'utensilios', name: 'Tenedor plástico blanco reforzado', pack: 'x 50 u.', min: 20, popular: false, vyc: false, desc: 'Tenedor descartable reforzado, no se quiebra con comidas consistentes. Apto para uso intensivo.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 7020, cat: 'limpieza', name: 'Lavandina concentrada', pack: 'bidón 5 L', min: 6, popular: false, vyc: true, desc: 'Lavandina concentrada de uso profesional para desinfección de superficies, baños y cocinas.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 7044, cat: 'limpieza', name: 'Detergente limón uso profesional', pack: 'bidón 5 L', min: 6, popular: false, vyc: false, desc: 'Detergente concentrado aroma limón, alto poder desengrasante para cocinas industriales.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 8002, cat: 'aluminio', name: 'Bandeja aluminio F70 con tapa', pack: 'x 100 u.', min: 3, popular: false, vyc: true, desc: 'Bandeja de aluminio con tapa, apta para horno y freezer. Perfecta para viandas y catering.', price: 0, old: 0, whole: 0, stock: 0, published: true },
+  { id: 8015, cat: 'aluminio', name: 'Film PVC 38 cm x 1000 m', pack: 'rollo', min: 3, popular: false, vyc: true, desc: 'Film PVC industrial de 38 cm, rollo de 1000 metros para envolver y conservar alimentos en el mostrador.', price: 0, old: 0, whole: 0, stock: 0, published: true }
+];
+const SEED_CONFIG = {
+  envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
+  aviso: 'Venta mayorista y minorista', lowStock: 12,
+  sucursales: [
+    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
+  ],
+  faqs: [
+    { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y lo enviás para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
+    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
+  ]
+};
 const ST = {
   nuevo: { label: 'Nuevo', bg: '#FFF1C2', fg: '#7A4E00' },
   preparando: { label: 'Preparando', bg: '#FDE3DF', fg: '#A81B10' },
@@ -726,45 +780,74 @@ const DELIV = { retiro: 'Retiro en sucursal', cba: 'Envío Córdoba', traslasier
 const SUCN = { nono: 'Nono', malague: 'Malagueño', altagracia: 'Alta Gracia' };
 const flow = d => d === 'retiro' ? ['nuevo', 'preparando', 'listo', 'entregado'] : ['nuevo', 'preparando', 'enviado', 'entregado'];
 
-function seedOrders() {
-  return [];
+const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+function dayTxt(o) {
+  if (!o.createdAt) return '';
+  const d = new Date(o.createdAt), now = new Date();
+  const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  if (isSameDay(d, now)) return 'Hoy ' + time;
+  const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+  if (isSameDay(d, yesterday)) return 'Ayer ' + time;
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) + ' ' + time;
 }
-const CFG0 = {
-  envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
-  aviso: 'Venta mayorista y minorista', lowStock: 12,
-  sucursales: [
-    { id: 'nono', name: 'Nono', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'malague', name: 'Malagueño', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'altagracia', name: 'Alta Gracia', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
-  ],
-  loginEmail: 'admin@emmedistribuidora.com.ar', loginPassword: 'emme2026',
-  faqs: [
-    { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y lo enviás para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
-    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
-  ]
-};
-function load() {
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.products) return s; } catch (e) {}
-  return { products: P0, orders: seedOrders(), cats: CATS0, config: CFG0 };
-}
-const dayTxt = (o) => (o.day === 0 ? 'Hoy' : o.day === 1 ? 'Ayer' : `${30 - o.day}/09`) + ' ' + o.time;
 const orderTotal = o => o.items.reduce((a, x) => a + x.unit * x.qty, 0) + o.ship;
 const chip = (on) => ({ bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4' });
 const pick = (on) => ({ bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4' });
 
 class Component extends DCLogic {
-  state = (() => {
-    const loaded = load();
-    return { ...loaded, loggedIn: false, view: 'resumen', q: '', orderTab: 'todos', orderSuc: 'todas', prodCat: 'all', openOrder: null, draft: null, draftIsNew: false, draftErr: false, confirmDel: null, bulk: null, newCat: '', toast: '', odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' }, loginEmailInput: loaded.config.loginEmail || '', loginPasswordInput: loaded.config.loginPassword || '', loginError: '', expandedFaq: null };
-  })();
+  state = {
+    products: [], orders: [], cats: [], config: SEED_CONFIG,
+    authReady: false, loggedIn: false, loginEmailInput: '', loginPasswordInput: '', loginError: '',
+    view: 'resumen', q: '', orderTab: 'todos', orderSuc: 'todas', prodCat: 'all',
+    openOrder: null, draft: null, draftIsNew: false, draftErr: false,
+    confirmDel: null, bulk: null, newCat: '', toast: '',
+    odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' },
+    expandedFaq: null, configDraft: null,
+    priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {}
+  };
 
-  componentDidUpdate() {
-    const { products, orders, cats, config } = this.state;
-    try { localStorage.setItem(KEY, JSON.stringify({ products, orders, cats, config })); } catch (e) {}
+  componentDidMount() {
+    this._seedChecked = false;
+    this._unsubs = [
+      auth.onAuthStateChanged(user => {
+        this.setState({ loggedIn: !!user, authReady: true, loginError: '' });
+        if (user) this.maybeSeed();
+      }),
+      db.collection('products').onSnapshot(snap => {
+        this.setState({ products: snap.docs.map(d => d.data()).sort((a, b) => b.id - a.id) });
+      }, err => console.error('products snapshot', err)),
+      db.collection('orders').onSnapshot(snap => {
+        this.setState({ orders: snap.docs.map(d => d.data()).sort((a, b) => b.id - a.id) });
+      }, err => console.error('orders snapshot', err)),
+      db.collection('cats').onSnapshot(snap => {
+        this.setState({ cats: snap.docs.map(d => d.data()) });
+      }, err => console.error('cats snapshot', err)),
+      db.collection('config').doc('site').onSnapshot(doc => {
+        const cfg = doc.exists ? doc.data() : SEED_CONFIG;
+        this.setState({ config: cfg });
+      }, err => console.error('config snapshot', err))
+    ];
   }
+  componentWillUnmount() {
+    (this._unsubs || []).forEach(u => u());
+  }
+  maybeSeed() {
+    if (this._seedChecked) return;
+    this._seedChecked = true;
+    db.collection('config').doc('meta').get().then(doc => {
+      if (doc.exists && doc.data().seeded) return;
+      const batch = db.batch();
+      SEED_PRODUCTS.forEach(p => batch.set(db.collection('products').doc(String(p.id)), p));
+      SEED_CATS.forEach(c => batch.set(db.collection('cats').doc(c.id), c));
+      batch.set(db.collection('config').doc('site'), SEED_CONFIG);
+      batch.set(db.collection('config').doc('meta'), { seeded: true, seededAt: new Date().toISOString() });
+      return batch.commit();
+    }).catch(e => console.error('Seed failed', e));
+  }
+
   flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2400); }
-  updOrder(id, patch) { this.setState(s => ({ orders: s.orders.map(o => o.id === id ? { ...o, ...patch } : o) })); }
-  updProd(id, patch) { this.setState(s => ({ products: s.products.map(p => p.id === id ? { ...p, ...patch } : p) })); }
+  updOrder(id, patch) { db.collection('orders').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
+  updProd(id, patch) { db.collection('products').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
   editProd(p) { this.setState({ draft: { ...p, old: p.old || '' }, draftIsNew: false, draftErr: false }); }
 
   orderVM(o) {
@@ -797,10 +880,11 @@ class Component extends DCLogic {
     const nav = navDefs.map(n => {
       const on = n.id === view;
       return { ...n, hasBadge: !!n.badge, bg: on ? '#2E2926' : 'transparent', fg: on ? '#FFC72C' : '#E9E3DA',
-        badgeBg: n.hot ? '#D62718' : '#3A3430', badgeFg: '#FFFFFF', pick: () => this.setState({ view: n.id, q: '' }) };
+        badgeBg: n.hot ? '#D62718' : '#3A3430', badgeFg: '#FFFFFF',
+        pick: () => this.setState(st => ({ view: n.id, q: '', configDraft: n.id === 'config' ? st.config : st.configDraft })) };
     });
     const titles = {
-      resumen: ['Resumen', 'Actividad de hoy, martes 30 de septiembre'],
+      resumen: ['Resumen', 'Actividad de hoy, ' + new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })],
       pedidos: ['Pedidos', `${orders.length} pedidos · ${pendingCount} para atender`],
       productos: ['Productos', `${products.length} productos · ${products.filter(p => p.published).length} publicados`],
       categorias: ['Rubros', 'Los rubros ordenan el menú y el catálogo de la tienda'],
@@ -808,7 +892,8 @@ class Component extends DCLogic {
       config: ['Configuración', 'Envíos, sucursales y datos de contacto']
     };
 
-    const today = orders.filter(o => o.day === 0 && o.status !== 'cancelado');
+    const now = new Date();
+    const today = orders.filter(o => o.createdAt && isSameDay(new Date(o.createdAt), now) && o.status !== 'cancelado');
     const valid = orders.filter(o => o.status !== 'cancelado');
     const kpis = [
       { label: 'Ventas de hoy', value: fmt(today.reduce((a, o) => a + orderTotal(o), 0)), note: `${today.length} pedidos` },
@@ -835,56 +920,85 @@ class Component extends DCLogic {
     const prodCatTabs = [{ id: 'all', name: 'Todos' }, ...cats].map(c => ({ label: c.name, count: c.id === 'all' ? products.length : products.filter(p => p.cat === c.id).length, ...chip(c.id === s.prodCat), pick: () => this.setState({ prodCat: c.id }) }));
     if (s.prodCat !== 'all') pl = pl.filter(p => p.cat === s.prodCat);
     if (q && view === 'productos') pl = pl.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q));
-    const productRows = pl.map(p => ({
-      ...p, catName: catName(p.cat), hasOld: +p.old > +p.price, oldTxt: fmt(p.old), wholeTxt: fmt(p.whole),
-      stockColor: p.stock === 0 ? '#A81B10' : p.stock < low ? '#7A4E00' : '#1C1917', stockBd: p.stock < low ? '#F0C36A' : '#D8D0C4',
-      pubTrack: p.published ? '#2D6A3A' : '#CFC7BB', pubAlign: p.published ? 'flex-end' : 'flex-start',
-      setPrice: e => this.updProd(p.id, { price: +e.target.value.replace(/\D/g, '') || 0 }),
-      setStock: e => this.updProd(p.id, { stock: +e.target.value.replace(/\D/g, '') || 0 }),
-      togglePub: () => { this.updProd(p.id, { published: !p.published }); this.flash(p.published ? 'Producto oculto de la tienda' : 'Producto publicado'); },
-      edit: () => this.editProd(p), del: () => this.setState({ confirmDel: p.id })
-    }));
+    const productRows = pl.map(p => {
+      const priceVal = s.priceDraft[p.id] !== undefined ? s.priceDraft[p.id] : p.price;
+      const stockVal = s.stockDraft[p.id] !== undefined ? s.stockDraft[p.id] : p.stock;
+      return {
+        ...p, price: priceVal, stock: stockVal, catName: catName(p.cat), hasOld: +p.old > +p.price, oldTxt: fmt(p.old), wholeTxt: fmt(p.whole),
+        stockColor: p.stock === 0 ? '#A81B10' : p.stock < low ? '#7A4E00' : '#1C1917', stockBd: p.stock < low ? '#F0C36A' : '#D8D0C4',
+        pubTrack: p.published ? '#2D6A3A' : '#CFC7BB', pubAlign: p.published ? 'flex-end' : 'flex-start',
+        setPrice: e => { const v = e.target.value; this.setState(st => ({ priceDraft: { ...st.priceDraft, [p.id]: v } })); },
+        setStock: e => { const v = e.target.value; this.setState(st => ({ stockDraft: { ...st.stockDraft, [p.id]: v } })); },
+        blurPrice: () => {
+          if (s.priceDraft[p.id] === undefined) return;
+          this.updProd(p.id, { price: +String(s.priceDraft[p.id]).replace(/\D/g, '') || 0 });
+          this.setState(st => { const d = { ...st.priceDraft }; delete d[p.id]; return { priceDraft: d }; });
+        },
+        blurStock: () => {
+          if (s.stockDraft[p.id] === undefined) return;
+          this.updProd(p.id, { stock: +String(s.stockDraft[p.id]).replace(/\D/g, '') || 0 });
+          this.setState(st => { const d = { ...st.stockDraft }; delete d[p.id]; return { stockDraft: d }; });
+        },
+        togglePub: () => { this.updProd(p.id, { published: !p.published }); this.flash(p.published ? 'Producto oculto de la tienda' : 'Producto publicado'); },
+        edit: () => this.editProd(p), del: () => this.setState({ confirmDel: p.id })
+      };
+    });
 
     const catRows = cats.map(c => {
       const count = products.filter(p => p.cat === c.id).length;
-      return { ...c, count, rename: e => { const v = e.target.value; this.setState(st => ({ cats: st.cats.map(x => x.id === c.id ? { ...x, name: v } : x) })); },
-        del: () => { if (count) return this.flash('Primero mové o eliminá sus productos'); this.setState(st => ({ cats: st.cats.filter(x => x.id !== c.id) })); this.flash('Rubro eliminado'); } };
+      const nameVal = s.catNameDraft[c.id] !== undefined ? s.catNameDraft[c.id] : c.name;
+      return {
+        ...c, name: nameVal, count,
+        rename: e => { const v = e.target.value; this.setState(st => ({ catNameDraft: { ...st.catNameDraft, [c.id]: v } })); },
+        blurRename: () => {
+          if (s.catNameDraft[c.id] === undefined) return;
+          const v = s.catNameDraft[c.id].trim();
+          if (v) db.collection('cats').doc(c.id).update({ name: v }).catch(e => this.flash('Error al guardar: ' + e.message));
+          this.setState(st => { const d = { ...st.catNameDraft }; delete d[c.id]; return { catNameDraft: d }; });
+        },
+        del: () => {
+          if (count) return this.flash('Primero mové o eliminá sus productos');
+          db.collection('cats').doc(c.id).delete().then(() => this.flash('Rubro eliminado')).catch(e => this.flash('Error: ' + e.message));
+        }
+      };
     });
 
     const cmap = {};
     orders.forEach(o => {
-      const k = o.client.phone; const c = cmap[k] || (cmap[k] = { ...o.client, orders: 0, total: 0, lastDay: 99, last: '' });
+      const k = o.client.phone; const c = cmap[k] || (cmap[k] = { ...o.client, orders: 0, total: 0, lastTime: 0, last: '' });
       c.orders++; if (o.status !== 'cancelado') c.total += orderTotal(o);
-      if (o.day < c.lastDay) { c.lastDay = o.day; c.last = dayTxt(o).split(' ')[0]; }
+      const t = o.createdAt ? new Date(o.createdAt).getTime() : 0;
+      if (t > c.lastTime) { c.lastTime = t; c.last = dayTxt(o).split(' ')[0]; }
     });
     let clientRows = Object.values(cmap).sort((a, b) => b.total - a.total).map(c => ({ ...c, totalTxt: fmt(c.total) }));
     if (q && view === 'clientes') clientRows = clientRows.filter(c => c.name.toLowerCase().includes(q) || c.biz.toLowerCase().includes(q));
 
+    const cfgDraft = s.configDraft || config;
     const cfgSet = {};
-    ['envioGratis', 'costoCba', 'costoTras', 'minPedido', 'whatsapp', 'aviso', 'lowStock', 'loginEmail', 'loginPassword'].forEach(f => { cfgSet[f] = e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, [f]: v } })); }; });
-    const sucForms = config.sucursales.map((su, i) => {
+    ['envioGratis', 'costoCba', 'costoTras', 'minPedido', 'whatsapp', 'aviso', 'lowStock'].forEach(f => { cfgSet[f] = e => { const v = e.target.value; this.setState(st => ({ configDraft: { ...(st.configDraft || config), [f]: v } })); }; });
+    const sucForms = cfgDraft.sucursales.map((su, i) => {
       const set = {};
-      ['address', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, sucursales: st.config.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } })); }; });
+      ['address', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } }; }); }; });
       return { ...su, set, track: su.active ? '#2D6A3A' : '#CFC7BB', align: su.active ? 'flex-end' : 'flex-start',
         statusTxt: su.active ? 'Visible en la tienda y disponible para retiro.' : 'Oculta: no aparece en la tienda ni como opción de retiro.',
-        toggle: () => this.setState(st => ({ config: { ...st.config, sucursales: st.config.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } })) };
+        toggle: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } }; }) };
     });
 
-    const faqRows = (config.faqs || []).map(f => {
+    const faqRows = (cfgDraft.faqs || []).map(f => {
       const isOpen = s.expandedFaq === f.id;
       return {
         ...f,
         isOpen, icon: isOpen ? '−' : '+',
         preview: f.q || 'Pregunta sin título',
         toggleOpen: () => this.setState(st => ({ expandedFaq: st.expandedFaq === f.id ? null : f.id })),
-        setQ: e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.map(x => x.id === f.id ? { ...x, q: v } : x) } })); },
-        setA: e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.map(x => x.id === f.id ? { ...x, a: v } : x) } })); },
-        del: () => { this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.filter(x => x.id !== f.id) } })); this.flash('Pregunta eliminada'); }
+        setQ: e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, faqs: base.faqs.map(x => x.id === f.id ? { ...x, q: v } : x) } }; }); },
+        setA: e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, faqs: base.faqs.map(x => x.id === f.id ? { ...x, a: v } : x) } }; }); },
+        del: () => { this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, faqs: base.faqs.filter(x => x.id !== f.id) } }; }); this.flash('Pregunta eliminada'); }
       };
     });
     const addFaq = () => {
       const newId = 'q' + Date.now();
-      this.setState(st => ({ config: { ...st.config, faqs: [...(st.config.faqs || []), { id: newId, q: '', a: '' }] }, expandedFaq: newId }));
+      this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, faqs: [...(base.faqs || []), { id: newId, q: '', a: '' }] }, expandedFaq: newId }; });
     };
 
 
@@ -895,12 +1009,18 @@ class Component extends DCLogic {
       const sub = oo.items.reduce((a, x) => a + x.unit * x.qty, 0);
       const opts = [...flow(oo.delivery), 'cancelado'];
       od = { ...vm, subTxt: fmt(sub), shipTxt: oo.delivery === 'retiro' ? 'Retiro sin cargo' : oo.ship ? fmt(oo.ship) : 'Gratis',
-        addrTxt: oo.delivery === 'retiro' ? `Retira en sucursal ${SUCN[oo.suc]}` : oo.client.addr, note: oo.note,
+        addrTxt: oo.delivery === 'retiro' ? `Retira en sucursal ${SUCN[oo.suc]}` : oo.client.addr,
+        note: s.noteDraft[oo.id] !== undefined ? s.noteDraft[oo.id] : oo.note,
         lines: oo.items.map(x => ({ ...x, unitTxt: fmt(x.unit) + ' c/u', lineTxt: fmt(x.unit * x.qty) })),
         statusBtns: opts.map(id => { const on = id === oo.status, t = ST[id]; return { label: t.label, bg: on ? t.bg : '#FFFFFF', fg: on ? t.fg : '#1C1917', bd: on ? t.fg : '#D8D0C4', pick: () => this.updOrder(oo.id, { status: id }) }; }),
         paidAction: oo.paid ? 'Marcar como no cobrado' : 'Marcar como cobrado',
         togglePaid: () => this.updOrder(oo.id, { paid: !oo.paid }),
-        setNote: e => this.updOrder(oo.id, { note: e.target.value }),
+        setNote: e => { const v = e.target.value; this.setState(st => ({ noteDraft: { ...st.noteDraft, [oo.id]: v } })); },
+        blurNote: () => {
+          if (s.noteDraft[oo.id] === undefined) return;
+          this.updOrder(oo.id, { note: s.noteDraft[oo.id] });
+          this.setState(st => { const d = { ...st.noteDraft }; delete d[oo.id]; return { noteDraft: d }; });
+        },
         print: () => this.flash('Prototipo: acá se genera el remito en PDF') };
     }
 
@@ -955,18 +1075,15 @@ class Component extends DCLogic {
     };
 
     return {
-      showLogin: !s.loggedIn, showApp: s.loggedIn,
+      showAuthLoading: !s.authReady, showLogin: s.authReady && !s.loggedIn, showApp: s.authReady && s.loggedIn,
       loginEmailInput: s.loginEmailInput, onLoginEmail: e => this.setState({ loginEmailInput: e.target.value, loginError: '' }),
       loginPasswordInput: s.loginPasswordInput, onLoginPassword: e => this.setState({ loginPasswordInput: e.target.value, loginError: '' }),
       loginError: s.loginError, hasLoginError: !!s.loginError,
       login: () => {
-        if (s.loginEmailInput.trim().toLowerCase() === (s.config.loginEmail || '').toLowerCase() && s.loginPasswordInput === s.config.loginPassword) {
-          this.setState({ loggedIn: true, loginError: '' });
-        } else {
-          this.setState({ loginError: 'Email o contraseña incorrectos.' });
-        }
+        auth.signInWithEmailAndPassword(s.loginEmailInput.trim(), s.loginPasswordInput)
+          .catch(() => this.setState({ loginError: 'Email o contraseña incorrectos.' }));
       },
-      logout: () => this.setState({ loggedIn: false }),
+      logout: () => auth.signOut(),
       nav, title: titles[view][0], subtitle: titles[view][1],
       showSearch: ['pedidos', 'productos', 'clientes'].includes(view),
       searchPh: view === 'pedidos' ? 'Buscar por N° o cliente' : view === 'productos' ? 'Buscar por nombre o código' : 'Buscar cliente',
@@ -978,9 +1095,17 @@ class Component extends DCLogic {
       orderTabs, sucTabs, orderRows: ol.map(o => this.orderVM(o)), noOrders: !ol.length,
       prodCatTabs, productRows, noProducts: !productRows.length,
       catRows, newCat: s.newCat, onNewCat: e => this.setState({ newCat: e.target.value }),
-      addCat: () => { const n = s.newCat.trim(); if (!n) return; this.setState(st => ({ cats: [...st.cats, { id: 'c' + Date.now(), name: n }], newCat: '' })); this.flash('Rubro agregado'); },
+      addCat: () => {
+        const n = s.newCat.trim(); if (!n) return;
+        const id = 'c' + Date.now();
+        db.collection('cats').doc(id).set({ id, name: n }).then(() => this.flash('Rubro agregado')).catch(e => this.flash('Error: ' + e.message));
+        this.setState({ newCat: '' });
+      },
       clientRows, noClients: !clientRows.length,
-      cfg: config, cfgSet, sucForms, faqRows, addFaq, saveConfig: () => this.flash('Configuración guardada'),
+      cfg: cfgDraft, cfgSet, sucForms, faqRows, addFaq,
+      saveConfig: () => {
+        db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
+      },
       orderOpen: !!oo, od, closeOrder: () => this.setState({ openOrder: null }),
       draftOpen: !!s.draft, d, dSet, draftIsEdit: !!s.draft && !s.draftIsNew,
       draftTitle: s.draftIsNew ? 'Nuevo producto' : 'Editar producto', saveLabel: s.draftIsNew ? 'Crear producto' : 'Guardar cambios',
@@ -990,18 +1115,28 @@ class Component extends DCLogic {
       hasOffPreview: offOk, offPreview: offOk ? '-' + Math.round((1 - d.price / d.old) * 100) + '%' : '',
       dPubTrack: d.published ? '#2D6A3A' : '#CFC7BB', dPubAlign: d.published ? 'flex-end' : 'flex-start', dPubLabel: d.published ? 'Publicado en la tienda' : 'Oculto',
       dTogglePub: () => this.setState(st => ({ draft: { ...st.draft, published: !st.draft.published } })),
+      dVycTrack: d.vyc ? '#2D6A3A' : '#CFC7BB', dVycAlign: d.vyc ? 'flex-end' : 'flex-start', dVycLabel: d.vyc ? 'Sí, en Verdulería y Carnicería' : 'No',
+      dToggleVyc: () => this.setState(st => ({ draft: { ...st.draft, vyc: !st.draft.vyc } })),
+      dPopularTrack: d.popular ? '#2D6A3A' : '#CFC7BB', dPopularAlign: d.popular ? 'flex-end' : 'flex-start', dPopularLabel: d.popular ? 'Sí, destacado' : 'No',
+      dTogglePopular: () => this.setState(st => ({ draft: { ...st.draft, popular: !st.draft.popular } })),
       closeDraft: () => this.setState({ draft: null }),
-      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true } }),
+      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true, vyc: false, popular: false } }),
       saveDraft: () => {
         const x = s.draft; if (!String(x.name).trim() || !(+x.price > 0)) return this.setState({ draftErr: true });
-        const clean = { ...x, name: x.name.trim(), price: +x.price, old: +x.old || 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0 };
-        this.setState(st => ({ products: s.draftIsNew ? [clean, ...st.products] : st.products.map(p => p.id === x.id ? clean : p), draft: null }));
-        this.flash(s.draftIsNew ? 'Producto creado' : 'Cambios guardados');
+        const clean = { ...x, name: x.name.trim(), price: +x.price, old: +x.old || 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0, vyc: !!x.vyc, popular: !!x.popular };
+        db.collection('products').doc(String(clean.id)).set(clean)
+          .then(() => this.flash(s.draftIsNew ? 'Producto creado' : 'Cambios guardados'))
+          .catch(e => this.flash('Error: ' + e.message));
+        this.setState({ draft: null });
       },
       draftDelete: () => this.setState({ confirmDel: s.draft.id }),
       confirmOpen: !!toDel, confirmName: toDel ? toDel.name : '',
       cancelDel: () => this.setState({ confirmDel: null }),
-      doDel: () => { this.setState(st => ({ products: st.products.filter(p => p.id !== st.confirmDel), confirmDel: null, draft: null })); this.flash('Producto eliminado'); },
+      doDel: () => {
+        db.collection('products').doc(String(s.confirmDel)).delete()
+          .then(() => this.flash('Producto eliminado')).catch(e => this.flash('Error: ' + e.message));
+        this.setState({ confirmDel: null, draft: null });
+      },
       odraftOpen: !!od2, nd, ndSet, ndDeliveryOpts, ndSucOpts, ndPayOpts, ndTotalTxt, ndHasLines, ndNoLines: !ndHasLines,
       ndNeedsShip: !!od2 && od2.delivery !== 'retiro', ndError: s.odraftErr,
       nameBd2: s.odraftErr && !String(nd.clientName || '').trim() ? '#D62718' : '#D8D0C4',
@@ -1022,18 +1157,17 @@ class Component extends DCLogic {
         const dft = s.odraft;
         if (!dft || !String(dft.clientName).trim() || !dft.lines.length) return this.setState({ odraftErr: true });
         const newId = Math.max(...s.orders.map(o => o.id), 10200) + 1;
-        const now = new Date();
-        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         const order = {
-          id: newId, day: 0, time,
+          id: newId, createdAt: new Date().toISOString(),
           client: { name: dft.clientName.trim(), biz: dft.clientBiz.trim(), phone: dft.clientPhone.trim(), addr: dft.clientAddr.trim() },
           delivery: dft.delivery, suc: dft.suc,
           items: dft.lines.map(l => ({ pid: l.pid, name: l.name, pack: l.pack, qty: l.qty, unit: l.unit })),
           ship: dft.delivery === 'retiro' ? 0 : (+dft.ship || 0),
           pay: dft.pay, paid: dft.paid, status: 'nuevo', note: dft.note.trim()
         };
-        this.setState(st => ({ orders: [order, ...st.orders], odraft: null }));
-        this.flash('Pedido creado');
+        db.collection('orders').doc(String(newId)).set(order)
+          .then(() => this.flash('Pedido creado')).catch(e => this.flash('Error: ' + e.message));
+        this.setState({ odraft: null });
       },
       bulkOpen: !!s.bulk, bulk, openBulk: () => this.setState({ bulk: { cat: s.prodCat, pct: '10' } }), closeBulk: () => this.setState({ bulk: null }),
       bulkCats: [{ id: 'all', name: 'Todos los productos' }, ...cats].map(c => ({ ...c, ...pick(c.id === bulk.cat), pick: () => this.setState(st => ({ bulk: { ...st.bulk, cat: c.id } })) })),
@@ -1041,8 +1175,14 @@ class Component extends DCLogic {
       bulkPreview: ex ? `Se actualizan ${bulkTargets.length} productos (precio minorista, mayorista y anterior), redondeado a $10. Ejemplo: ${ex.name} pasa de ${fmt(ex.price)} a ${fmt(r10(ex.price * (1 + pct / 100)))}.` : 'No hay productos en este rubro.',
       applyBulk: () => {
         const f = 1 + pct / 100;
-        this.setState(st => ({ products: st.products.map(p => bulkTargets.find(t => t.id === p.id) ? { ...p, price: r10(p.price * f), whole: r10(p.whole * f), old: p.old ? r10(p.old * f) : 0 } : p), bulk: null }));
-        this.flash(`Precios actualizados ${pct > 0 ? '+' : ''}${pct}% en ${bulkTargets.length} productos`);
+        const batch = db.batch();
+        bulkTargets.forEach(p => {
+          batch.update(db.collection('products').doc(String(p.id)), { price: r10(p.price * f), whole: r10(p.whole * f), old: p.old ? r10(p.old * f) : 0 });
+        });
+        batch.commit()
+          .then(() => this.flash(`Precios actualizados ${pct > 0 ? '+' : ''}${pct}% en ${bulkTargets.length} productos`))
+          .catch(e => this.flash('Error: ' + e.message));
+        this.setState({ bulk: null });
       },
       hasToast: !!s.toast, toast: s.toast
     };

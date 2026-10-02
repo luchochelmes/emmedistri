@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="./firebase-init.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -47,6 +51,10 @@ input{font-family:inherit}
 }
 </style>
 </helmet>
+
+<sc-if value="{{ showLoading }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:100;background:#F7F4EE;display:flex;align-items:center;justify-content:center;color:#6B635A;font-family:'Barlow Condensed';font-size:18px;text-transform:uppercase;letter-spacing:1px">Cargando catálogo…</div>
+</sc-if>
 
 <div style="min-height:100vh;display:flex;flex-direction:column">
 
@@ -616,82 +624,62 @@ input{font-family:inherit}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;promos&quot;,&quot;completo&quot;],&quot;default&quot;:&quot;promos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showMayorista&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Precios&quot;}}">
-const CATS = [
-  { id: 'vasos', name: 'Vasos y copas', img: 'vasos.jpg' },
-  { id: 'envases', name: 'Envases y bandejas', img: 'bandejas.jpg' },
-  { id: 'cajas', name: 'Cajas delivery', img: 'caja delivery.jpg' },
-  { id: 'bolsas', name: 'Bolsas', img: 'bolsas.jpg' },
-  { id: 'papel', name: 'Servilletas y papel', img: 'servilletas.jpg' },
-  { id: 'utensilios', name: 'Cubiertos y sorbetes', img: 'cubiertos.jpg' },
-  { id: 'limpieza', name: 'Limpieza', img: 'limpieza.jpg' },
-  { id: 'aluminio', name: 'Aluminio y film', img: 'aluminio.jpg' }
-];
-const COUNTS = { vasos: 86, envases: 142, cajas: 58, bolsas: 74, papel: 39, utensilios: 47, limpieza: 112, aluminio: 31 };
-const PRODUCTS = [
-  { id: 1042, cat: 'vasos', name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', min: 10, popular: true, desc: 'Vaso térmico de poliestireno expandido, ideal para bebidas calientes y frías. No transmite temperatura y mantiene el pulso firme en el mostrador.' },
-  { id: 1057, cat: 'vasos', name: 'Vaso plástico cristal 330 cc', pack: 'x 50 u.', min: 10, desc: 'Vaso de plástico cristal transparente, resistente para bebidas frías, gaseosas y tragos. Apilable para ahorrar espacio en el local.' },
-  { id: 2110, cat: 'envases', name: 'Contenedor PET 500 cc con tapa bisagra', pack: 'x 50 u.', min: 5, vyc: true, desc: 'Contenedor transparente con tapa bisagra a presión, apto para delivery de ensaladas, postres y viandas frías.' },
-  { id: 2134, cat: 'envases', name: 'Bandeja expandido 103 blanca', pack: 'x 100 u.', min: 10, vyc: true, desc: 'Bandeja de telgopor blanca para carnes, verduras y fiambres. Liviana, higiénica y de bajo costo por unidad.' },
-  { id: 3012, cat: 'cajas', name: 'Caja pizza microcorrugada 33 cm', pack: 'x 50 u.', min: 4, popular: true, desc: 'Caja de cartón microcorrugado para pizza grande, resistente a la humedad y al peso. Arma fácil, sin necesidad de cinta.' },
-  { id: 3025, cat: 'cajas', name: 'Caja empanada kraft x 6', pack: 'x 100 u.', min: 4, desc: 'Caja de cartón kraft con ventana, pensada para el transporte prolijo de 6 empanadas.' },
-  { id: 4003, cat: 'bolsas', name: 'Bolsa camiseta 40x50 reforzada', pack: 'x 100 u.', min: 10, vyc: true, desc: 'Bolsa camiseta de polietileno reforzado, soporta peso para compras de almacén y verdulería.' },
-  { id: 4031, cat: 'bolsas', name: 'Bolsa kraft con manija 30x12x32', pack: 'x 25 u.', min: 6, desc: 'Bolsa de papel kraft con manija de cordón, ideal para regalería y locales que buscan una imagen más premium.' },
-  { id: 5008, cat: 'papel', name: 'Servilleta 30x30 blanca doble hoja', pack: 'x 100 u.', min: 20, desc: 'Servilleta blanca doble hoja, suave y absorbente, formato estándar para mesa y delivery.' },
-  { id: 6014, cat: 'utensilios', name: 'Tenedor plástico blanco reforzado', pack: 'x 50 u.', min: 20, desc: 'Tenedor descartable reforzado, no se quiebra con comidas consistentes. Apto para uso intensivo.' },
-  { id: 7020, cat: 'limpieza', name: 'Lavandina concentrada', pack: 'bidón 5 L', min: 6, vyc: true, desc: 'Lavandina concentrada de uso profesional para desinfección de superficies, baños y cocinas.' },
-  { id: 7044, cat: 'limpieza', name: 'Detergente limón uso profesional', pack: 'bidón 5 L', min: 6, desc: 'Detergente concentrado aroma limón, alto poder desengrasante para cocinas industriales.' },
-  { id: 8002, cat: 'aluminio', name: 'Bandeja aluminio F70 con tapa', pack: 'x 100 u.', min: 3, vyc: true, desc: 'Bandeja de aluminio con tapa, apta para horno y freezer. Perfecta para viandas y catering.' },
-  { id: 8015, cat: 'aluminio', name: 'Film PVC 38 cm x 1000 m', pack: 'rollo', min: 3, vyc: true, desc: 'Film PVC industrial de 38 cm, rollo de 1000 metros para envolver y conservar alimentos en el mostrador.' }
-];
-const relatedFor = p => {
-  const sameCat = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
-  const rest = PRODUCTS.filter(x => x.cat !== p.cat && x.id !== p.id);
+const relatedFor = (products, p) => {
+  const sameCat = products.filter(x => x.cat === p.cat && x.id !== p.id);
+  const rest = products.filter(x => x.cat !== p.cat && x.id !== p.id);
   return [...sameCat, ...rest].slice(0, 4);
 };
-const SUCURSALES = [
-  { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h' },
-  { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h' },
-  { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h' }
-].map(s => ({
-  ...s,
-  mapUrl: 'https://maps.google.com/maps?q=' + encodeURIComponent(s.address + ', ' + s.zone) + '&z=16&output=embed',
-  dirHref: 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.address + ', ' + s.zone),
-  waHref: 'https://wa.me/5493515173319?text=' + encodeURIComponent(`Hola! Te escribo por la sucursal ${s.name}.`)
-}));
-const DEFAULT_FAQS = [
-  { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y enviálo para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
-  { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
-];
-function loadFaqs() {
-  try {
-    const s = JSON.parse(localStorage.getItem('emme-backoffice-v4'));
-    if (s && s.config && Array.isArray(s.config.faqs) && s.config.faqs.length) return s.config.faqs;
-  } catch (e) {}
-  return DEFAULT_FAQS;
-}
-const DEFAULT_OFFERS = [
-  { id: 1042, name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', price: 3450, oldPrice: 3990 }
-];
-function loadOffers() {
-  try {
-    const s = JSON.parse(localStorage.getItem('emme-backoffice-v4'));
-    if (s && Array.isArray(s.products)) {
-      return s.products
-        .filter(p => p.published !== false && +p.old > +p.price)
-        .map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old }));
-    }
-  } catch (e) {}
-  return DEFAULT_OFFERS;
-}
+const DEFAULT_CONFIG = {
+  envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
+  aviso: 'Venta mayorista y minorista', lowStock: 12,
+  sucursales: [
+    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
+  ],
+  faqs: [
+    { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y enviálo para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
+    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
+  ]
+};
 class Component extends DCLogic {
-  state = { cart: {}, qtys: {}, cat: 'all', query: '', sucursal: 'malague', delivery: 'retiro', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', faqList: loadFaqs(), openFaq: null, offersList: loadOffers() };
+  state = {
+    products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
+    cart: {}, qtys: {}, cat: 'all', query: '', sucursal: 'malague', delivery: 'retiro', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', openFaq: null
+  };
+
+  componentDidMount() {
+    this._unsubs = [
+      db.collection('products').onSnapshot(snap => {
+        this.setState({ products: snap.docs.map(d => d.data()).filter(p => p.published !== false), dataReady: true });
+      }, err => console.error('products snapshot', err)),
+      db.collection('cats').onSnapshot(snap => {
+        this.setState({ cats: snap.docs.map(d => d.data()) });
+      }, err => console.error('cats snapshot', err)),
+      db.collection('config').doc('site').onSnapshot(doc => {
+        if (doc.exists) this.setState({ config: doc.data() });
+      }, err => console.error('config snapshot', err))
+    ];
+  }
+  componentWillUnmount() { (this._unsubs || []).forEach(u => u()); }
 
   setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
   scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
   pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
 
   renderVals() {
-    const { cart, qtys, cat, query, sucursal, delivery, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, faqList, openFaq, offersList } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, sucursal, delivery, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, openFaq } = this.state;
+    const PRODUCTS = productsRaw;
+    const CATS = cats;
+    const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
+    const SUCURSALES = (config.sucursales || []).filter(s => s.active !== false).map(s => ({
+      ...s,
+      mapUrl: 'https://maps.google.com/maps?q=' + encodeURIComponent(s.address + ', ' + s.zone) + '&z=16&output=embed',
+      dirHref: 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.address + ', ' + s.zone),
+      waHref: 'https://wa.me/549' + (s.wa || config.whatsapp || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(`Hola! Te escribo por la sucursal ${s.name}.`)
+    }));
+    const faqList = config.faqs || [];
+    const offersList = PRODUCTS.filter(p => +p.old > +p.price).map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old }));
     const showMayorista = this.props.showMayorista ?? true;
     const heroLayout = this.props.heroLayout ?? 'promos';
     const q = query.trim().toLowerCase();
@@ -779,17 +767,18 @@ class Component extends DCLogic {
     const cartEmailBody = encodeURIComponent(orderBody);
 
     const tabDefs = [{ id: 'all', name: 'Todos' }, { id: 'populares', name: 'Más pedidos' }, ...CATS.slice(0, 4), { id: 'limpieza', name: 'Limpieza' }];
-    const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : CATS.find(c => c.id === cat).name;
+    const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
 
     const dp = PRODUCTS.find(x => x.id === productOpen);
     let pd = {};
     if (dp) {
       pd = makeCard(dp, { catName: (CATS.find(c => c.id === dp.cat) || {}).name || '' });
-      pd.related = relatedFor(dp).map(r => ({ ...r, open: () => this.setState({ productOpen: r.id }) }));
+      pd.related = relatedFor(PRODUCTS, dp).map(r => ({ ...r, open: () => this.setState({ productOpen: r.id }) }));
       pd.waText = encodeURIComponent(`Hola! Quiero consultar por: ${dp.name} (Cód. ${dp.id}, ${dp.pack}).`);
     }
 
     return {
+      showLoading: !dataReady,
       showMayorista,
       heroPromos: heroLayout === 'promos', heroFull: heroLayout === 'completo',
       waGenericText, waComboText,
