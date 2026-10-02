@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Emme · Panel de administración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#F4F1EB;color:#1C1917;font-family:Barlow,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#D62718;text-decoration:none}
+a:hover{color:#A81B10;text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit;color:#1C1917}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
+    <div style="background:#D62718;color:#FFFFFF;padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:32px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:#FFFFFF;color:#D62718;font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:1;padding:6px 12px 4px;transform:skewX(-8deg)">EMME</div>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px;line-height:1.05;text-transform:uppercase;letter-spacing:1.5px">Distri<br>buidora</div>
+      </div>
+      <div style="font-family:'Barlow Condensed';font-weight:800;font-size:64px;line-height:0.92;text-transform:uppercase;max-width:460px">Panel de administración</div>
+      <div style="font-size:14px;color:#FFE3A0">Nono · Malagueño · Córdoba</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;padding:48px 24px">
+      <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase">Ingresar</div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Email
+          <input value="{{ loginEmailInput }}" onChange="{{ onLoginEmail }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:11px 12px;font-size:15px;background:#FFFFFF;outline:none" style-focus="border-color:#1C1917">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Contraseña
+          <input type="password" value="{{ loginPasswordInput }}" onChange="{{ onLoginPassword }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:11px 12px;font-size:15px;background:#FFFFFF;outline:none" style-focus="border-color:#1C1917">
+        </label>
+        <sc-if value="{{ hasLoginError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#A81B10;font-weight:600">{{ loginError }}</div>
+        </sc-if>
+        <button onClick="{{ login }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;height:48px;font-weight:700;font-size:15px;margin-top:6px">Entrar al panel</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showApp }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;min-height:100vh">
+
+  <aside style="width:232px;flex-shrink:0;background:#1C1917;color:#E9E3DA;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 14px">
+    <div style="display:flex;align-items:center;gap:8px;padding:0 6px 22px">
+      <div style="background:#D62718;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:1;padding:5px 10px 3px;transform:skewX(-8deg)">EMME</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#FFC72C">Admin</div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+        <button onClick="{{ n.pick }}" style="border:0;background:{{ n.bg }};color:{{ n.fg }};border-radius:6px;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;text-align:left" style-hover="background:#2E2926">
+          <span>{{ n.label }}</span>
+          <sc-if value="{{ n.hasBadge }}" hint-placeholder-val="{{ false }}">
+            <span style="background:{{ n.badgeBg }};color:{{ n.badgeFg }};border-radius:999px;font-size:11px;font-weight:700;padding:2px 7px">{{ n.badge }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="margin-top:auto;border-top:1px solid #3A3430;padding:14px 6px 0;display:flex;flex-direction:column;gap:10px">
+      <a href="index.html" style="color:#FFC72C;font-size:13px;font-weight:600">Ver tienda →</a>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#FFC72C;color:#1C1917;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">AD</div>
+        <div style="display:flex;flex-direction:column;min-width:0">
+          <span style="font-size:13px;font-weight:600">Administrador</span>
+          <button onClick="{{ logout }}" style="border:0;background:transparent;color:#8E857A;font-size:12px;padding:0;text-align:left">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6;padding:16px 28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10">
+      <div style="flex:1 1 240px">
+        <h1 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:30px;text-transform:uppercase;line-height:1">{{ title }}</h1>
+        <div style="font-size:13px;color:#6B635A;margin-top:3px">{{ subtitle }}</div>
+      </div>
+      <sc-if value="{{ showSearch }}" hint-placeholder-val="{{ false }}">
+        <input value="{{ q }}" onChange="{{ onQ }}" placeholder="{{ searchPh }}" style="flex:0 1 320px;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;background:#FFFFFF" style-focus="border-color:#1C1917">
+      </sc-if>
+      <sc-if value="{{ isProductos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:8px">
+          <button onClick="{{ openBulk }}" style="border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 14px;font-weight:700;font-size:14px;white-space:nowrap">Aumento masivo</button>
+          <button onClick="{{ newProduct }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:700;font-size:14px;white-space:nowrap" style-hover="background:#A81B10">+ Nuevo producto</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isPedidos }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ newOrder }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:700;font-size:14px;white-space:nowrap" style-hover="background:#A81B10">+ Nuevo pedido</button>
+      </sc-if>
+    </header>
+
+    <main style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:20px">
+
+      <sc-if value="{{ isResumen }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:18px 20px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">{{ k.label }}</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:38px;line-height:1;margin-top:8px">{{ k.value }}</div>
+              <div style="font-size:13px;color:#6B635A;margin-top:4px">{{ k.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px;align-items:start">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #EFE9DF">
+              <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Pedidos para atender</div>
+              <button onClick="{{ goPedidos }}" style="border:0;background:transparent;color:#D62718;font-weight:700;font-size:13px;padding:0">Ver todos →</button>
+            </div>
+            <sc-for list="{{ pendingOrders }}" as="o" hint-placeholder-count="4">
+              <div style="display:flex;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid #F3EEE6">
+                <button onClick="{{ o.open }}" style="flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:14px;font-weight:600">#{{ o.id }} · {{ o.clientName }}</span>
+                  <span style="font-size:12px;color:#6B635A">{{ o.dateTxt }} · {{ o.deliveryTxt }} · {{ o.totalTxt }}</span>
+                </button>
+                <span style="background:{{ o.stBg }};color:{{ o.stFg }};border-radius:4px;font-size:12px;font-weight:700;padding:4px 8px;white-space:nowrap">{{ o.stLabel }}</span>
+                <sc-if value="{{ o.hasNext }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ o.advance }}" style="border:1px solid #1C1917;background:#FFFFFF;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:700;white-space:nowrap">{{ o.nextLabel }}</button>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noPending }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:28px 20px;color:#6B635A;font-size:14px">No hay pedidos pendientes.</div>
+            </sc-if>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #EFE9DF">
+              <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Stock bajo</div>
+              <span style="font-size:12px;color:#6B635A">Menos de {{ lowStock }} bultos</span>
+            </div>
+            <sc-for list="{{ lowStockList }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid #F3EEE6">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:600">{{ p.name }}</div>
+                  <div style="font-size:12px;color:#6B635A;font-family:'JetBrains Mono'">Cód. {{ p.id }} · {{ p.pack }}</div>
+                </div>
+                <span style="font-weight:700;font-size:14px;color:{{ p.stockColor }}">{{ p.stockTxt }}</span>
+                <button onClick="{{ p.edit }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Editar</button>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noLowStock }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:28px 20px;color:#6B635A;font-size:14px">Todo el stock está en orden.</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPedidos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ orderTabs }}" as="t" hint-placeholder-count="6">
+              <button onClick="{{ t.pick }}" style="border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;white-space:nowrap">{{ t.label }} <span style="opacity:0.65">{{ t.count }}</span></button>
+            </sc-for>
+          </div>
+          <div style="display:flex;background:#E9E3DA;border-radius:6px;padding:3px;gap:3px">
+            <sc-for list="{{ sucTabs }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.pick }}" style="border:0;border-radius:4px;padding:6px 12px;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+          <div style="min-width:1040px">
+            <div style="display:grid;grid-template-columns:80px 100px minmax(200px,1.6fr) 150px 110px 60px 110px 120px 140px;gap:12px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
+              <span>N°</span><span>Fecha</span><span>Cliente</span><span>Entrega</span><span>Sucursal</span><span>Ítems</span><span>Total</span><span>Pago</span><span>Estado</span>
+            </div>
+            <sc-for list="{{ orderRows }}" as="o" hint-placeholder-count="8">
+              <button onClick="{{ o.open }}" style="width:100%;border:0;border-bottom:1px solid #F3EEE6;background:#FFFFFF;display:grid;grid-template-columns:80px 100px minmax(200px,1.6fr) 150px 110px 60px 110px 120px 140px;gap:12px;padding:12px 20px;text-align:left;align-items:center;font-size:14px" style-hover="background:#FBF8F3">
+                <span style="font-family:'JetBrains Mono';font-size:13px;font-weight:500">#{{ o.id }}</span>
+                <span style="color:#6B635A;font-size:13px">{{ o.dateTxt }}</span>
+                <span style="display:flex;flex-direction:column;min-width:0">
+                  <span style="font-weight:600">{{ o.clientName }}</span>
+                  <span style="font-size:12px;color:#6B635A">{{ o.clientBiz }}</span>
+                </span>
+                <span style="font-size:13px">{{ o.deliveryTxt }}</span>
+                <span style="font-size:13px">{{ o.sucTxt }}</span>
+                <span style="font-size:13px">{{ o.itemCount }}</span>
+                <span style="font-weight:700">{{ o.totalTxt }}</span>
+                <span style="display:flex;flex-direction:column">
+                  <span style="font-size:13px">{{ o.pay }}</span>
+                  <span style="font-size:11px;font-weight:700;color:{{ o.paidColor }}">{{ o.paidTxt }}</span>
+                </span>
+                <span><span style="background:{{ o.stBg }};color:{{ o.stFg }};border-radius:4px;font-size:12px;font-weight:700;padding:4px 8px;white-space:nowrap">{{ o.stLabel }}</span></span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noOrders }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 20px;text-align:center;color:#6B635A;font-size:14px">No hay pedidos con estos filtros.</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isProductos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ prodCatTabs }}" as="t" hint-placeholder-count="9">
+            <button onClick="{{ t.pick }}" style="border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;white-space:nowrap">{{ t.label }} <span style="opacity:0.65">{{ t.count }}</span></button>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+          <div style="min-width:1060px">
+            <div style="display:grid;grid-template-columns:52px minmax(240px,2fr) 150px 130px 170px 100px 100px 130px;gap:14px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
+              <span></span><span>Producto</span><span>Rubro</span><span>Precio</span><span>Mayorista</span><span>Stock</span><span>Publicado</span><span></span>
+            </div>
+            <sc-for list="{{ productRows }}" as="p" hint-placeholder-count="8">
+              <div style="display:grid;grid-template-columns:52px minmax(240px,2fr) 150px 130px 170px 100px 100px 130px;gap:14px;padding:10px 20px;border-bottom:1px solid #F3EEE6;align-items:center;font-size:14px">
+                <div style="width:52px;height:52px;border-radius:6px;overflow:hidden;background:#F1ECE3">
+                  <image-slot id="prod-{{ p.id }}" shape="rect" placeholder=" " style="width:300%;height:300%;transform:scale(0.3334);transform-origin:0 0;display:block"></image-slot>
+                </div>
+                <div style="min-width:0">
+                  <div style="font-weight:600;line-height:1.25">{{ p.name }}</div>
+                  <div style="font-size:12px;color:#6B635A;font-family:'JetBrains Mono';margin-top:2px">Cód. {{ p.id }} · {{ p.pack }}</div>
+                </div>
+                <span style="font-size:13px">{{ p.catName }}</span>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px;background:#FFFFFF">
+                    <span style="padding-left:8px;color:#6B635A;font-size:13px">$</span>
+                    <input value="{{ p.price }}" onChange="{{ p.setPrice }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px 7px 4px;font-size:14px;font-weight:700;background:transparent">
+                  </div>
+                  <sc-if value="{{ p.hasOld }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:11px;color:#A81B10;font-weight:700">En oferta · antes {{ p.oldTxt }}</span>
+                  </sc-if>
+                </div>
+                <span style="font-size:13px">{{ p.wholeTxt }} <span style="color:#6B635A">desde {{ p.min }}</span></span>
+                <div style="display:flex;align-items:center;border:1px solid {{ p.stockBd }};border-radius:5px;background:#FFFFFF">
+                  <input value="{{ p.stock }}" onChange="{{ p.setStock }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:7px 8px;font-size:14px;font-weight:600;background:transparent;color:{{ p.stockColor }}">
+                </div>
+                <button onClick="{{ p.togglePub }}" style="border:0;background:{{ p.pubTrack }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ p.pubAlign }}">
+                  <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
+                </button>
+                <div style="display:flex;gap:6px;justify-content:flex-end">
+                  <button onClick="{{ p.edit }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Editar</button>
+                  <button onClick="{{ p.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Eliminar</button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noProducts }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 20px;text-align:center;color:#6B635A;font-size:14px">No hay productos para mostrar.</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCategorias }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;max-width:760px">
+          <div style="display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid #EFE9DF">
+            <input value="{{ newCat }}" onChange="{{ onNewCat }}" placeholder="Nombre del nuevo rubro" style="flex:1;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            <button onClick="{{ addCat }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:0 16px;font-weight:700;font-size:14px">Agregar rubro</button>
+          </div>
+          <sc-for list="{{ catRows }}" as="c" hint-placeholder-count="8">
+            <div style="display:flex;gap:12px;align-items:center;padding:10px 20px;border-bottom:1px solid #F3EEE6">
+              <div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
+                <image-slot id="cat-{{ c.id }}" shape="rect" placeholder=" " style="width:300%;height:300%;transform:scale(0.3334);transform-origin:0 0;display:block"></image-slot>
+              </div>
+              <input value="{{ c.name }}" onChange="{{ c.rename }}" style="flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:8px 10px;font-size:15px;font-weight:600;outline:none;background:transparent" style-hover="border-color:#D8D0C4" style-focus="border-color:#1C1917;background:#FFFFFF">
+              <span style="font-size:13px;color:#6B635A;white-space:nowrap">{{ c.count }} productos</span>
+              <button onClick="{{ c.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Eliminar</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:13px;color:#6B635A;max-width:760px">Solo se pueden eliminar rubros sin productos. El nombre se actualiza en la tienda al guardar.</div>
+      </sc-if>
+
+      <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow-x:auto">
+          <div style="min-width:860px">
+            <div style="display:grid;grid-template-columns:minmax(200px,1.5fr) 140px minmax(180px,1.4fr) 80px 130px 110px;gap:14px;padding:12px 20px;border-bottom:1px solid #E6E0D6;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">
+              <span>Cliente</span><span>Teléfono</span><span>Dirección</span><span>Pedidos</span><span>Total comprado</span><span>Último</span>
+            </div>
+            <sc-for list="{{ clientRows }}" as="c" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:minmax(200px,1.5fr) 140px minmax(180px,1.4fr) 80px 130px 110px;gap:14px;padding:12px 20px;border-bottom:1px solid #F3EEE6;align-items:center;font-size:14px">
+                <span style="display:flex;flex-direction:column"><span style="font-weight:600">{{ c.name }}</span><span style="font-size:12px;color:#6B635A">{{ c.biz }}</span></span>
+                <a href="#" style="font-size:13px;font-weight:600">{{ c.phone }}</a>
+                <span style="font-size:13px;color:#6B635A">{{ c.addr }}</span>
+                <span>{{ c.orders }}</span>
+                <span style="font-weight:700">{{ c.totalTxt }}</span>
+                <span style="font-size:13px;color:#6B635A">{{ c.last }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noClients }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 20px;text-align:center;color:#6B635A;font-size:14px">Todavía no hay clientes. Van a ir apareciendo acá a medida que carguen pedidos.</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;align-items:start">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Envíos y tienda</div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío gratis desde ($)
+              <input value="{{ cfg.envioGratis }}" onChange="{{ cfgSet.envioGratis }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío Córdoba capital ($)
+                <input value="{{ cfg.costoCba }}" onChange="{{ cfgSet.costoCba }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío Traslasierra ($)
+                <input value="{{ cfg.costoTras }}" onChange="{{ cfgSet.costoTras }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+              </label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Pedido mínimo ($, 0 = sin mínimo)
+              <input value="{{ cfg.minPedido }}" onChange="{{ cfgSet.minPedido }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">WhatsApp de pedidos
+              <input value="{{ cfg.whatsapp }}" onChange="{{ cfgSet.whatsapp }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Aviso de la barra amarilla
+              <input value="{{ cfg.aviso }}" onChange="{{ cfgSet.aviso }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Alerta de stock bajo (bultos)
+              <input value="{{ cfg.lowStock }}" onChange="{{ cfgSet.lowStock }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Usuario y contraseña</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Credenciales para ingresar al panel de administración.</div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Email de acceso
+              <input value="{{ cfg.loginEmail }}" onChange="{{ cfgSet.loginEmail }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Contraseña
+              <input value="{{ cfg.loginPassword }}" onChange="{{ cfgSet.loginPassword }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <div style="font-size:12px;color:#6B635A">El cambio aplica de inmediato — la próxima vez que inicies sesión vas a usar estos datos.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <sc-for list="{{ sucForms }}" as="s" hint-placeholder-count="3">
+              <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Sucursal {{ s.name }}</div>
+                  <button onClick="{{ s.toggle }}" style="border:0;background:{{ s.track }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ s.align }}">
+                    <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
+                  </button>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
+                  <input value="{{ s.address }}" onChange="{{ s.set.address }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                </label>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Lunes a viernes
+                    <input value="{{ s.week }}" onChange="{{ s.set.week }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Sábados
+                    <input value="{{ s.sat }}" onChange="{{ s.set.sat }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                  </label>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">WhatsApp de la sucursal
+                  <input value="{{ s.wa }}" onChange="{{ s.set.wa }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                </label>
+                <div style="font-size:12px;color:#6B635A">{{ s.statusTxt }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;grid-column:1 / -1">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Preguntas frecuentes</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Esto se muestra en la tienda, en la sección "Preguntas frecuentes".</div>
+            <sc-for list="{{ faqRows }}" as="f" hint-placeholder-count="2">
+              <div style="border:1px solid #E6E0D6;border-radius:8px;overflow:hidden">
+                <button onClick="{{ f.toggleOpen }}" style="width:100%;border:0;background:#FFFFFF;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;font-size:14px;font-weight:600;color:#1C1917">
+                  <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.preview }}</span>
+                  <span style="flex-shrink:0;width:22px;height:22px;border-radius:999px;background:#F1ECE3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">{{ f.icon }}</span>
+                </button>
+                <sc-if value="{{ f.isOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid #F3EEE6">
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A;margin-top:10px">Pregunta
+                      <input value="{{ f.q }}" onChange="{{ f.setQ }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;font-weight:600;outline:none" style-focus="border-color:#1C1917">
+                    </label>
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Respuesta
+                      <textarea value="{{ f.a }}" onChange="{{ f.setA }}" rows="2" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;resize:vertical"></textarea>
+                    </label>
+                    <button onClick="{{ f.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar pregunta</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <button onClick="{{ addFaq }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar pregunta</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button onClick="{{ saveConfig }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;padding:12px 20px;font-weight:700;font-size:14px">Guardar cambios</button>
+          <span style="font-size:13px;color:#6B635A">Los cambios se guardan en este navegador (prototipo).</span>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ orderOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end">
+    <div onClick="{{ closeOrder }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.45);animation:fadeIn .2s ease"></div>
+    <aside style="position:relative;width:min(540px,100%);height:100%;background:#FFFFFF;display:flex;flex-direction:column;animation:slideIn .25s ease">
+      <div style="padding:18px 22px;border-bottom:1px solid #E6E0D6;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div>
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:28px;text-transform:uppercase;line-height:1">Pedido #{{ od.id }}</div>
+          <div style="font-size:13px;color:#6B635A;margin-top:4px">{{ od.dateTxt }} · {{ od.deliveryTxt }} · {{ od.sucTxt }}</div>
+        </div>
+        <button onClick="{{ closeOrder }}" style="border:0;background:#F1ECE3;border-radius:5px;padding:8px 12px;font-weight:600;font-size:13px">Cerrar</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Estado</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ od.statusBtns }}" as="b" hint-placeholder-count="5">
+              <button onClick="{{ b.pick }}" style="border:1.5px solid {{ b.bd }};background:{{ b.bg }};color:{{ b.fg }};border-radius:5px;padding:7px 11px;font-size:13px;font-weight:600;white-space:nowrap">{{ b.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;background:#FBF8F3;border-radius:8px;padding:14px 16px;font-size:14px">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:12px;color:#6B635A">Cliente</span>
+            <span style="font-weight:600">{{ od.clientName }}</span>
+            <span style="font-size:13px;color:#6B635A">{{ od.clientBiz }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:12px;color:#6B635A">Contacto</span>
+            <a href="#" style="font-weight:600">WhatsApp {{ od.phone }}</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;grid-column:span 2">
+            <span style="font-size:12px;color:#6B635A">Entrega</span>
+            <span style="font-weight:600">{{ od.addrTxt }}</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A;margin-bottom:6px">Productos</div>
+          <sc-for list="{{ od.lines }}" as="l" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F3EEE6;font-size:14px">
+              <div style="min-width:0">
+                <div style="font-weight:600">{{ l.qty }} × {{ l.name }}</div>
+                <div style="font-size:12px;color:#6B635A">{{ l.unitTxt }} · {{ l.pack }}</div>
+              </div>
+              <span style="font-weight:700;white-space:nowrap">{{ l.lineTxt }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex;flex-direction:column;gap:6px;padding-top:12px;font-size:14px">
+            <div style="display:flex;justify-content:space-between;color:#6B635A"><span>Subtotal</span><span>{{ od.subTxt }}</span></div>
+            <div style="display:flex;justify-content:space-between;color:#6B635A"><span>Envío</span><span>{{ od.shipTxt }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">Total</span><span style="font-family:'Barlow Condensed';font-weight:800;font-size:30px">{{ od.totalTxt }}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid #E6E0D6;border-radius:8px;padding:12px 14px">
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:14px;font-weight:600">{{ od.pay }}</span>
+            <span style="font-size:12px;font-weight:700;color:{{ od.paidColor }}">{{ od.paidTxt }}</span>
+          </div>
+          <button onClick="{{ od.togglePaid }}" style="border:1px solid #1C1917;background:#FFFFFF;border-radius:5px;padding:7px 12px;font-size:13px;font-weight:700">{{ od.paidAction }}</button>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Nota interna
+          <textarea value="{{ od.note }}" onChange="{{ od.setNote }}" rows="3" placeholder="Ej: entregar por la puerta de atrás" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;resize:vertical;letter-spacing:0;text-transform:none;font-weight:400"></textarea>
+        </label>
+      </div>
+      <div style="border-top:1px solid #E6E0D6;padding:14px 22px;display:flex;gap:8px">
+        <sc-if value="{{ od.hasNext }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ od.advance }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:46px;font-weight:700;font-size:14px" style-hover="background:#A81B10">{{ od.nextLabel }}</button>
+        </sc-if>
+        <button onClick="{{ od.print }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;height:46px;padding:0 16px;font-weight:600;font-size:14px;white-space:nowrap">Imprimir remito</button>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+
+<sc-if value="{{ draftOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end">
+    <div onClick="{{ closeDraft }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.45);animation:fadeIn .2s ease"></div>
+    <aside style="position:relative;width:min(560px,100%);height:100%;background:#FFFFFF;display:flex;flex-direction:column;animation:slideIn .25s ease">
+      <div style="padding:18px 22px;border-bottom:1px solid #E6E0D6;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:28px;text-transform:uppercase;line-height:1">{{ draftTitle }}</div>
+        <button onClick="{{ closeDraft }}" style="border:0;background:#F1ECE3;border-radius:5px;padding:8px 12px;font-weight:600;font-size:13px">Cancelar</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px;align-items:start">
+          <div style="width:140px;height:140px;border-radius:8px;overflow:hidden;background:#F1ECE3">
+            <image-slot id="prod-{{ d.id }}" shape="rect" placeholder="Arrastrá la foto"></image-slot>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Nombre del producto
+              <input value="{{ d.name }}" onChange="{{ dSet.name }}" placeholder="Ej: Vaso térmico 240 cc" style="border:1px solid {{ nameBd }};border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:15px;font-weight:600;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Código
+                <input value="{{ d.id }}" readonly style="border:1px solid #E6E0D6;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;background:#F7F4EE;font-family:'JetBrains Mono'">
+              </label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Presentación
+                <input value="{{ d.pack }}" onChange="{{ dSet.pack }}" placeholder="x 50 u." style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+              </label>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:12px;font-weight:600;color:#6B635A">Rubro</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ draftCats }}" as="c" hint-placeholder-count="8">
+              <button onClick="{{ c.pick }}" style="border:1.5px solid {{ c.bd }};background:{{ c.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ c.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Descripción
+          <textarea value="{{ d.desc }}" onChange="{{ dSet.desc }}" rows="4" placeholder="Material, medidas, usos recomendados" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;resize:vertical;line-height:1.45" style-focus="border-color:#1C1917"></textarea>
+        </label>
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Precios</div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio minorista ($)
+              <input value="{{ d.price }}" onChange="{{ dSet.price }}" inputmode="numeric" style="border:1px solid {{ priceBd }};border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:15px;font-weight:700;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio anterior ($, para oferta)
+              <input value="{{ d.old }}" onChange="{{ dSet.old }}" inputmode="numeric" placeholder="Vacío = sin oferta" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio mayorista ($)
+              <input value="{{ d.whole }}" onChange="{{ dSet.whole }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Mayorista desde (bultos)
+              <input value="{{ d.min }}" onChange="{{ dSet.min }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+          </div>
+          <sc-if value="{{ hasOffPreview }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13px;background:#FFF4D1;border-radius:5px;padding:8px 10px">En la tienda se va a mostrar con la etiqueta <strong>{{ offPreview }}</strong>.</div>
+          </sc-if>
+        </div>
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Stock (bultos)
+            <input value="{{ d.stock }}" onChange="{{ dSet.stock }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+          <button onClick="{{ dTogglePub }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:8px 12px;display:flex;gap:10px;align-items:center;height:42px">
+            <span style="background:{{ dPubTrack }};width:36px;height:20px;border-radius:999px;padding:2px;display:flex;justify-content:{{ dPubAlign }}">
+              <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
+            </span>
+            <span style="font-size:14px;font-weight:600">{{ dPubLabel }}</span>
+          </button>
+        </div>
+        <sc-if value="{{ draftError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#A81B10;font-weight:600">Completá el nombre y el precio minorista.</div>
+        </sc-if>
+      </div>
+      <div style="border-top:1px solid #E6E0D6;padding:14px 22px;display:flex;gap:8px">
+        <button onClick="{{ saveDraft }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:46px;font-weight:700;font-size:14px" style-hover="background:#A81B10">{{ saveLabel }}</button>
+        <sc-if value="{{ draftIsEdit }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ draftDelete }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:6px;height:46px;padding:0 16px;font-weight:600;font-size:14px">Eliminar</button>
+        </sc-if>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+
+<sc-if value="{{ odraftOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end">
+    <div onClick="{{ closeOrderDraft }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.45);animation:fadeIn .2s ease"></div>
+    <aside style="position:relative;width:min(560px,100%);height:100%;background:#FFFFFF;display:flex;flex-direction:column;animation:slideIn .25s ease">
+      <div style="padding:18px 22px;border-bottom:1px solid #E6E0D6;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:28px;text-transform:uppercase;line-height:1">Nuevo pedido</div>
+        <button onClick="{{ closeOrderDraft }}" style="border:0;background:#F1ECE3;border-radius:5px;padding:8px 12px;font-weight:600;font-size:13px">Cancelar</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Cliente</div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Nombre
+            <input value="{{ nd.clientName }}" onChange="{{ ndSet.clientName }}" placeholder="Nombre y apellido" style="border:1px solid {{ nameBd2 }};border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Negocio (opcional)
+            <input value="{{ nd.clientBiz }}" onChange="{{ ndSet.clientBiz }}" placeholder="Ej: Rotisería Don Tito" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Teléfono
+            <input value="{{ nd.clientPhone }}" onChange="{{ ndSet.clientPhone }}" placeholder="351 000-0000" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
+            <input value="{{ nd.clientAddr }}" onChange="{{ ndSet.clientAddr }}" placeholder="Calle y número" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Entrega</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ ndDeliveryOpts }}" as="d" hint-placeholder-count="3">
+            <button onClick="{{ d.pick }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ d.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ ndSucOpts }}" as="su" hint-placeholder-count="3">
+            <button onClick="{{ su.pick }}" style="border:1.5px solid {{ su.bd }};background:{{ su.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ su.label }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ ndNeedsShip }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A;max-width:180px">Costo de envío ($)
+            <input value="{{ nd.ship }}" onChange="{{ ndSet.ship }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
+        </sc-if>
+
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Productos</div>
+        <div style="display:grid;grid-template-columns:minmax(0,2fr) 68px 96px auto;gap:8px;align-items:end">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Producto
+            <select value="{{ nl.pid }}" onChange="{{ onLinePid }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 8px;font-size:14px;outline:none;background:#FFFFFF">
+              <option value="">Elegir…</option>
+              <sc-for list="{{ allProducts }}" as="p" hint-placeholder-count="6">
+                <option value="{{ p.id }}">{{ p.name }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Cant.
+            <input value="{{ nl.qty }}" onChange="{{ onLineQty }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 8px;font-size:14px;outline:none">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio ($)
+            <input value="{{ nl.unit }}" onChange="{{ onLineUnit }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 8px;font-size:14px;outline:none">
+          </label>
+          <button onClick="{{ addLine }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;height:42px;padding:0 14px;font-weight:700;font-size:13px;white-space:nowrap">Agregar</button>
+        </div>
+
+        <sc-if value="{{ ndHasLines }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ nd.lines }}" as="l" hint-placeholder-count="2">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F3EEE6;font-size:14px">
+                <span style="flex:1;min-width:0">{{ l.qty }} × {{ l.name }}</span>
+                <span style="font-weight:700;white-space:nowrap">{{ l.lineTxt }}</span>
+                <button onClick="{{ l.remove }}" style="border:0;background:transparent;color:#A81B10;font-size:12px;text-decoration:underline;padding:0">Quitar</button>
+              </div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;padding-top:10px;font-weight:700;font-size:15px">
+              <span>Total</span><span>{{ ndTotalTxt }}</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ ndNoLines }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#6B635A">Todavía no agregaste productos.</div>
+        </sc-if>
+
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Pago</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ ndPayOpts }}" as="pa" hint-placeholder-count="3">
+              <button onClick="{{ pa.pick }}" style="border:1.5px solid {{ pa.bd }};background:{{ pa.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ pa.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ ndTogglePaid }}" style="align-self:flex-start;border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:8px 12px;display:flex;gap:10px;align-items:center">
+            <span style="background:{{ ndPaidTrack }};width:36px;height:20px;border-radius:999px;padding:2px;display:flex;justify-content:{{ ndPaidAlign }}">
+              <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
+            </span>
+            <span style="font-size:14px;font-weight:600">{{ ndPaidLabel }}</span>
+          </button>
+        </div>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Nota interna
+          <textarea value="{{ nd.note }}" onChange="{{ ndSet.note }}" rows="2" placeholder="Opcional" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;resize:vertical;letter-spacing:0;text-transform:none;font-weight:400"></textarea>
+        </label>
+
+        <sc-if value="{{ ndError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#A81B10;font-weight:600">Completá el nombre del cliente y agregá al menos un producto.</div>
+        </sc-if>
+      </div>
+      <div style="border-top:1px solid #E6E0D6;padding:14px 22px">
+        <button onClick="{{ saveOrder }}" style="width:100%;border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:46px;font-weight:700;font-size:14px" style-hover="background:#A81B10">Crear pedido</button>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+    <div onClick="{{ cancelDel }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.5);animation:fadeIn .15s ease"></div>
+    <div style="position:relative;background:#FFFFFF;border-radius:10px;padding:24px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;text-transform:uppercase">¿Eliminar producto?</div>
+      <div style="font-size:14px;line-height:1.5;color:#3D3732">Vas a eliminar <strong>{{ confirmName }}</strong>. Deja de aparecer en la tienda. Los pedidos anteriores lo conservan.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onClick="{{ cancelDel }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:600;font-size:14px">Cancelar</button>
+        <button onClick="{{ doDel }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:700;font-size:14px">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ bulkOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+    <div onClick="{{ closeBulk }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.5);animation:fadeIn .15s ease"></div>
+    <div style="position:relative;background:#FFFFFF;border-radius:10px;padding:24px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;text-transform:uppercase">Aumento masivo de precios</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:12px;font-weight:600;color:#6B635A">Aplicar a</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ bulkCats }}" as="c" hint-placeholder-count="9">
+            <button onClick="{{ c.pick }}" style="border:1.5px solid {{ c.bd }};background:{{ c.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ c.name }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Porcentaje (usá negativo para bajar)
+        <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:6px;max-width:180px">
+          <input value="{{ bulk.pct }}" onChange="{{ onBulkPct }}" inputmode="numeric" style="border:0;outline:none;width:100%;padding:10px 12px;font-size:18px;font-weight:700;background:transparent">
+          <span style="padding-right:12px;font-size:16px;font-weight:700">%</span>
+        </div>
+      </label>
+      <div style="font-size:13px;background:#FBF8F3;border-radius:6px;padding:10px 12px;min-width:0;width:100%;line-height:1.5">{{ bulkPreview }}</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onClick="{{ closeBulk }}" style="border:1px solid #D8D0C4;background:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:600;font-size:14px">Cancelar</button>
+        <button onClick="{{ applyBulk }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:700;font-size:14px">Aplicar aumento</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;background:#1C1917;color:#FFFFFF;padding:12px 18px;border-radius:6px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:fadeIn .2s ease">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const KEY = 'emme-backoffice-v4';
+const fmt = n => '$' + Math.round(+n || 0).toLocaleString('es-AR');
+const CATS0 = [];
+const P0 = [];
+const CLIENTS = [];
+const ST = {
+  nuevo: { label: 'Nuevo', bg: '#FFF1C2', fg: '#7A4E00' },
+  preparando: { label: 'Preparando', bg: '#FDE3DF', fg: '#A81B10' },
+  listo: { label: 'Listo p/ retirar', bg: '#E1ECF8', fg: '#1F4E86' },
+  enviado: { label: 'En camino', bg: '#E1ECF8', fg: '#1F4E86' },
+  entregado: { label: 'Entregado', bg: '#E2F0E4', fg: '#2D6A3A' },
+  cancelado: { label: 'Cancelado', bg: '#EEE9E2', fg: '#6B635A' }
+};
+const NEXT_LABEL = { preparando: 'Empezar a preparar', listo: 'Marcar listo para retirar', enviado: 'Despachar pedido', entregado: 'Marcar entregado' };
+const DELIV = { retiro: 'Retiro en sucursal', cba: 'Envío Córdoba', traslasierra: 'Envío Traslasierra' };
+const SUCN = { nono: 'Nono', malague: 'Malagueño', altagracia: 'Alta Gracia' };
+const flow = d => d === 'retiro' ? ['nuevo', 'preparando', 'listo', 'entregado'] : ['nuevo', 'preparando', 'enviado', 'entregado'];
+
+function seedOrders() {
+  return [];
+}
+const CFG0 = {
+  envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
+  aviso: 'Venta mayorista y minorista', lowStock: 12,
+  sucursales: [
+    { id: 'nono', name: 'Nono', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'malague', name: 'Malagueño', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'altagracia', name: 'Alta Gracia', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
+  ],
+  loginEmail: 'admin@emmedistribuidora.com.ar', loginPassword: 'emme2026',
+  faqs: [
+    { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y lo enviás para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
+    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
+  ]
+};
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.products) return s; } catch (e) {}
+  return { products: P0, orders: seedOrders(), cats: CATS0, config: CFG0 };
+}
+const dayTxt = (o) => (o.day === 0 ? 'Hoy' : o.day === 1 ? 'Ayer' : `${30 - o.day}/09`) + ' ' + o.time;
+const orderTotal = o => o.items.reduce((a, x) => a + x.unit * x.qty, 0) + o.ship;
+const chip = (on) => ({ bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4' });
+const pick = (on) => ({ bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4' });
+
+class Component extends DCLogic {
+  state = (() => {
+    const loaded = load();
+    return { ...loaded, loggedIn: false, view: 'resumen', q: '', orderTab: 'todos', orderSuc: 'todas', prodCat: 'all', openOrder: null, draft: null, draftIsNew: false, draftErr: false, confirmDel: null, bulk: null, newCat: '', toast: '', odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' }, loginEmailInput: loaded.config.loginEmail || '', loginPasswordInput: loaded.config.loginPassword || '', loginError: '', expandedFaq: null };
+  })();
+
+  componentDidUpdate() {
+    const { products, orders, cats, config } = this.state;
+    try { localStorage.setItem(KEY, JSON.stringify({ products, orders, cats, config })); } catch (e) {}
+  }
+  flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  updOrder(id, patch) { this.setState(s => ({ orders: s.orders.map(o => o.id === id ? { ...o, ...patch } : o) })); }
+  updProd(id, patch) { this.setState(s => ({ products: s.products.map(p => p.id === id ? { ...p, ...patch } : p) })); }
+  editProd(p) { this.setState({ draft: { ...p, old: p.old || '' }, draftIsNew: false, draftErr: false }); }
+
+  orderVM(o) {
+    const st = ST[o.status], f = flow(o.delivery), idx = f.indexOf(o.status);
+    const next = idx >= 0 && idx < f.length - 1 ? f[idx + 1] : null;
+    return {
+      id: o.id, dateTxt: dayTxt(o), clientName: o.client.name, clientBiz: o.client.biz, phone: o.client.phone,
+      deliveryTxt: DELIV[o.delivery], sucTxt: SUCN[o.suc], itemCount: o.items.reduce((a, x) => a + x.qty, 0),
+      totalTxt: fmt(orderTotal(o)), pay: o.pay, paidTxt: o.paid ? 'Cobrado' : 'Pendiente de cobro', paidColor: o.paid ? '#2D6A3A' : '#A81B10',
+      stLabel: st.label, stBg: st.bg, stFg: st.fg, hasNext: !!next, nextLabel: next ? NEXT_LABEL[next] : '',
+      advance: () => { if (next) { this.updOrder(o.id, { status: next }); this.flash(`Pedido #${o.id}: ${ST[next].label}`); } },
+      open: () => this.setState({ openOrder: o.id })
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const { products, orders, cats, config, view } = s;
+    const q = s.q.trim().toLowerCase();
+    const low = +config.lowStock || 0;
+    const catName = id => (cats.find(c => c.id === id) || {}).name || 'Sin rubro';
+    const pendingCount = orders.filter(o => o.status === 'nuevo' || o.status === 'preparando').length;
+    const newCount = orders.filter(o => o.status === 'nuevo').length;
+
+    const navDefs = [
+      { id: 'resumen', label: 'Resumen' }, { id: 'pedidos', label: 'Pedidos', badge: newCount, hot: true },
+      { id: 'productos', label: 'Productos', badge: products.length }, { id: 'categorias', label: 'Rubros' },
+      { id: 'clientes', label: 'Clientes' }, { id: 'config', label: 'Configuración' }
+    ];
+    const nav = navDefs.map(n => {
+      const on = n.id === view;
+      return { ...n, hasBadge: !!n.badge, bg: on ? '#2E2926' : 'transparent', fg: on ? '#FFC72C' : '#E9E3DA',
+        badgeBg: n.hot ? '#D62718' : '#3A3430', badgeFg: '#FFFFFF', pick: () => this.setState({ view: n.id, q: '' }) };
+    });
+    const titles = {
+      resumen: ['Resumen', 'Actividad de hoy, martes 30 de septiembre'],
+      pedidos: ['Pedidos', `${orders.length} pedidos · ${pendingCount} para atender`],
+      productos: ['Productos', `${products.length} productos · ${products.filter(p => p.published).length} publicados`],
+      categorias: ['Rubros', 'Los rubros ordenan el menú y el catálogo de la tienda'],
+      clientes: ['Clientes', 'Armado a partir de los pedidos recibidos'],
+      config: ['Configuración', 'Envíos, sucursales y datos de contacto']
+    };
+
+    const today = orders.filter(o => o.day === 0 && o.status !== 'cancelado');
+    const valid = orders.filter(o => o.status !== 'cancelado');
+    const kpis = [
+      { label: 'Ventas de hoy', value: fmt(today.reduce((a, o) => a + orderTotal(o), 0)), note: `${today.length} pedidos` },
+      { label: 'Para atender', value: String(pendingCount), note: `${newCount} nuevos sin revisar` },
+      { label: 'Ticket promedio', value: fmt(valid.reduce((a, o) => a + orderTotal(o), 0) / (valid.length || 1)), note: 'Últimos 6 días' },
+      { label: 'Por cobrar', value: fmt(valid.filter(o => !o.paid).reduce((a, o) => a + orderTotal(o), 0)), note: `${valid.filter(o => !o.paid).length} pedidos` }
+    ];
+    const pendingOrders = orders.filter(o => ['nuevo', 'preparando', 'listo', 'enviado'].includes(o.status)).map(o => this.orderVM(o));
+    const lowStockList = products.filter(p => p.stock < low).sort((a, b) => a.stock - b.stock).map(p => ({
+      ...p, stockTxt: p.stock === 0 ? 'Sin stock' : `${p.stock} u.`, stockColor: p.stock === 0 ? '#A81B10' : '#7A4E00', edit: () => this.editProd(p)
+    }));
+
+    const tabIds = ['todos', 'nuevo', 'preparando', 'listo', 'enviado', 'entregado', 'cancelado'];
+    let ol = orders;
+    if (s.orderSuc !== 'todas') ol = ol.filter(o => o.suc === s.orderSuc);
+    const orderTabs = tabIds.map(id => ({ label: id === 'todos' ? 'Todos' : ST[id].label, count: id === 'todos' ? ol.length : ol.filter(o => o.status === id).length, ...chip(id === s.orderTab), pick: () => this.setState({ orderTab: id }) }));
+    if (s.orderTab !== 'todos') ol = ol.filter(o => o.status === s.orderTab);
+    if (q && view === 'pedidos') ol = ol.filter(o => String(o.id).includes(q) || o.client.name.toLowerCase().includes(q) || o.client.biz.toLowerCase().includes(q));
+    const sucTabs = [['todas', 'Todas'], ['nono', 'Nono'], ['malague', 'Malagueño'], ['altagracia', 'Alta Gracia']].map(([id, label]) => {
+      const on = id === s.orderSuc; return { label, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#D62718' : '#6B635A', pick: () => this.setState({ orderSuc: id }) };
+    });
+
+    let pl = products;
+    const prodCatTabs = [{ id: 'all', name: 'Todos' }, ...cats].map(c => ({ label: c.name, count: c.id === 'all' ? products.length : products.filter(p => p.cat === c.id).length, ...chip(c.id === s.prodCat), pick: () => this.setState({ prodCat: c.id }) }));
+    if (s.prodCat !== 'all') pl = pl.filter(p => p.cat === s.prodCat);
+    if (q && view === 'productos') pl = pl.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q));
+    const productRows = pl.map(p => ({
+      ...p, catName: catName(p.cat), hasOld: +p.old > +p.price, oldTxt: fmt(p.old), wholeTxt: fmt(p.whole),
+      stockColor: p.stock === 0 ? '#A81B10' : p.stock < low ? '#7A4E00' : '#1C1917', stockBd: p.stock < low ? '#F0C36A' : '#D8D0C4',
+      pubTrack: p.published ? '#2D6A3A' : '#CFC7BB', pubAlign: p.published ? 'flex-end' : 'flex-start',
+      setPrice: e => this.updProd(p.id, { price: +e.target.value.replace(/\D/g, '') || 0 }),
+      setStock: e => this.updProd(p.id, { stock: +e.target.value.replace(/\D/g, '') || 0 }),
+      togglePub: () => { this.updProd(p.id, { published: !p.published }); this.flash(p.published ? 'Producto oculto de la tienda' : 'Producto publicado'); },
+      edit: () => this.editProd(p), del: () => this.setState({ confirmDel: p.id })
+    }));
+
+    const catRows = cats.map(c => {
+      const count = products.filter(p => p.cat === c.id).length;
+      return { ...c, count, rename: e => { const v = e.target.value; this.setState(st => ({ cats: st.cats.map(x => x.id === c.id ? { ...x, name: v } : x) })); },
+        del: () => { if (count) return this.flash('Primero mové o eliminá sus productos'); this.setState(st => ({ cats: st.cats.filter(x => x.id !== c.id) })); this.flash('Rubro eliminado'); } };
+    });
+
+    const cmap = {};
+    orders.forEach(o => {
+      const k = o.client.phone; const c = cmap[k] || (cmap[k] = { ...o.client, orders: 0, total: 0, lastDay: 99, last: '' });
+      c.orders++; if (o.status !== 'cancelado') c.total += orderTotal(o);
+      if (o.day < c.lastDay) { c.lastDay = o.day; c.last = dayTxt(o).split(' ')[0]; }
+    });
+    let clientRows = Object.values(cmap).sort((a, b) => b.total - a.total).map(c => ({ ...c, totalTxt: fmt(c.total) }));
+    if (q && view === 'clientes') clientRows = clientRows.filter(c => c.name.toLowerCase().includes(q) || c.biz.toLowerCase().includes(q));
+
+    const cfgSet = {};
+    ['envioGratis', 'costoCba', 'costoTras', 'minPedido', 'whatsapp', 'aviso', 'lowStock', 'loginEmail', 'loginPassword'].forEach(f => { cfgSet[f] = e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, [f]: v } })); }; });
+    const sucForms = config.sucursales.map((su, i) => {
+      const set = {};
+      ['address', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, sucursales: st.config.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } })); }; });
+      return { ...su, set, track: su.active ? '#2D6A3A' : '#CFC7BB', align: su.active ? 'flex-end' : 'flex-start',
+        statusTxt: su.active ? 'Visible en la tienda y disponible para retiro.' : 'Oculta: no aparece en la tienda ni como opción de retiro.',
+        toggle: () => this.setState(st => ({ config: { ...st.config, sucursales: st.config.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } })) };
+    });
+
+    const faqRows = (config.faqs || []).map(f => {
+      const isOpen = s.expandedFaq === f.id;
+      return {
+        ...f,
+        isOpen, icon: isOpen ? '−' : '+',
+        preview: f.q || 'Pregunta sin título',
+        toggleOpen: () => this.setState(st => ({ expandedFaq: st.expandedFaq === f.id ? null : f.id })),
+        setQ: e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.map(x => x.id === f.id ? { ...x, q: v } : x) } })); },
+        setA: e => { const v = e.target.value; this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.map(x => x.id === f.id ? { ...x, a: v } : x) } })); },
+        del: () => { this.setState(st => ({ config: { ...st.config, faqs: st.config.faqs.filter(x => x.id !== f.id) } })); this.flash('Pregunta eliminada'); }
+      };
+    });
+    const addFaq = () => {
+      const newId = 'q' + Date.now();
+      this.setState(st => ({ config: { ...st.config, faqs: [...(st.config.faqs || []), { id: newId, q: '', a: '' }] }, expandedFaq: newId }));
+    };
+
+
+    const oo = orders.find(o => o.id === s.openOrder);
+    let od = {};
+    if (oo) {
+      const vm = this.orderVM(oo);
+      const sub = oo.items.reduce((a, x) => a + x.unit * x.qty, 0);
+      const opts = [...flow(oo.delivery), 'cancelado'];
+      od = { ...vm, subTxt: fmt(sub), shipTxt: oo.delivery === 'retiro' ? 'Retiro sin cargo' : oo.ship ? fmt(oo.ship) : 'Gratis',
+        addrTxt: oo.delivery === 'retiro' ? `Retira en sucursal ${SUCN[oo.suc]}` : oo.client.addr, note: oo.note,
+        lines: oo.items.map(x => ({ ...x, unitTxt: fmt(x.unit) + ' c/u', lineTxt: fmt(x.unit * x.qty) })),
+        statusBtns: opts.map(id => { const on = id === oo.status, t = ST[id]; return { label: t.label, bg: on ? t.bg : '#FFFFFF', fg: on ? t.fg : '#1C1917', bd: on ? t.fg : '#D8D0C4', pick: () => this.updOrder(oo.id, { status: id }) }; }),
+        paidAction: oo.paid ? 'Marcar como no cobrado' : 'Marcar como cobrado',
+        togglePaid: () => this.updOrder(oo.id, { paid: !oo.paid }),
+        setNote: e => this.updOrder(oo.id, { note: e.target.value }),
+        print: () => this.flash('Prototipo: acá se genera el remito en PDF') };
+    }
+
+    const d = s.draft || {};
+    const dSet = {};
+    ['name', 'pack', 'desc', 'price', 'old', 'whole', 'min', 'stock'].forEach(f => { dSet[f] = e => { const v = e.target.value; this.setState(st => ({ draft: { ...st.draft, [f]: v } })); }; });
+    const offOk = +d.old > +d.price && +d.price > 0;
+
+    const bulk = s.bulk || { cat: 'all', pct: '10' };
+    const bulkTargets = products.filter(p => bulk.cat === 'all' || p.cat === bulk.cat);
+    const pct = parseFloat(String(bulk.pct).replace(',', '.')) || 0;
+    const ex = bulkTargets[0];
+    const r10 = n => Math.round(n / 10) * 10;
+
+    const toDel = products.find(p => p.id === s.confirmDel);
+
+    const od2 = s.odraft;
+    let nd = {}, ndSet = {}, ndDeliveryOpts = [], ndSucOpts = [], ndPayOpts = [], ndTotalTxt = '$0', ndHasLines = false;
+    if (od2) {
+      ['clientName', 'clientBiz', 'clientPhone', 'clientAddr', 'note', 'ship'].forEach(f => {
+        ndSet[f] = e => { const v = e.target.value; this.setState(st => ({ odraft: { ...st.odraft, [f]: v } })); };
+      });
+      nd = {
+        ...od2,
+        lines: od2.lines.map((l, i) => ({
+          ...l, lineTxt: fmt(l.unit * l.qty),
+          remove: () => this.setState(st => ({ odraft: { ...st.odraft, lines: st.odraft.lines.filter((_, j) => j !== i) } }))
+        }))
+      };
+      ndHasLines = od2.lines.length > 0;
+      ndTotalTxt = fmt(od2.lines.reduce((a, l) => a + l.unit * l.qty, 0) + (od2.delivery === 'retiro' ? 0 : (+od2.ship || 0)));
+      ndDeliveryOpts = [
+        { id: 'retiro', label: 'Retiro en sucursal' }, { id: 'cba', label: 'Envío Córdoba' }, { id: 'traslasierra', label: 'Envío Traslasierra' }
+      ].map(dd => ({ ...dd, ...pick(dd.id === od2.delivery), pick: () => this.setState(st => ({ odraft: { ...st.odraft, delivery: dd.id } })) }));
+      ndSucOpts = config.sucursales.map(su => ({ id: su.id, label: su.name, ...pick(su.id === od2.suc), pick: () => this.setState(st => ({ odraft: { ...st.odraft, suc: su.id } })) }));
+      ndPayOpts = ['Efectivo', 'Transferencia', 'Mercado Pago'].map(p => ({ label: p, ...pick(p === od2.pay), pick: () => this.setState(st => ({ odraft: { ...st.odraft, pay: p } })) }));
+    }
+    const nl = s.oline;
+    const onLinePid = e => {
+      const pid = e.target.value; const prod = products.find(p => String(p.id) === pid);
+      this.setState(st => ({ oline: { ...st.oline, pid, unit: prod ? String(prod.price) : st.oline.unit } }));
+    };
+    const addLine = () => {
+      const prod = products.find(p => String(p.id) === s.oline.pid);
+      const qty = +s.oline.qty || 0;
+      if (!prod || qty <= 0) return;
+      const unit = +s.oline.unit || prod.price;
+      this.setState(st => ({
+        odraft: { ...st.odraft, lines: [...st.odraft.lines, { pid: prod.id, name: prod.name, pack: prod.pack, qty, unit }] },
+        oline: { pid: '', qty: '1', unit: '' }
+      }));
+    };
+
+    return {
+      showLogin: !s.loggedIn, showApp: s.loggedIn,
+      loginEmailInput: s.loginEmailInput, onLoginEmail: e => this.setState({ loginEmailInput: e.target.value, loginError: '' }),
+      loginPasswordInput: s.loginPasswordInput, onLoginPassword: e => this.setState({ loginPasswordInput: e.target.value, loginError: '' }),
+      loginError: s.loginError, hasLoginError: !!s.loginError,
+      login: () => {
+        if (s.loginEmailInput.trim().toLowerCase() === (s.config.loginEmail || '').toLowerCase() && s.loginPasswordInput === s.config.loginPassword) {
+          this.setState({ loggedIn: true, loginError: '' });
+        } else {
+          this.setState({ loginError: 'Email o contraseña incorrectos.' });
+        }
+      },
+      logout: () => this.setState({ loggedIn: false }),
+      nav, title: titles[view][0], subtitle: titles[view][1],
+      showSearch: ['pedidos', 'productos', 'clientes'].includes(view),
+      searchPh: view === 'pedidos' ? 'Buscar por N° o cliente' : view === 'productos' ? 'Buscar por nombre o código' : 'Buscar cliente',
+      q: s.q, onQ: e => this.setState({ q: e.target.value }),
+      isResumen: view === 'resumen', isPedidos: view === 'pedidos', isProductos: view === 'productos',
+      isCategorias: view === 'categorias', isClientes: view === 'clientes', isConfig: view === 'config',
+      kpis, pendingOrders, noPending: !pendingOrders.length, lowStockList, noLowStock: !lowStockList.length, lowStock: low,
+      goPedidos: () => this.setState({ view: 'pedidos' }),
+      orderTabs, sucTabs, orderRows: ol.map(o => this.orderVM(o)), noOrders: !ol.length,
+      prodCatTabs, productRows, noProducts: !productRows.length,
+      catRows, newCat: s.newCat, onNewCat: e => this.setState({ newCat: e.target.value }),
+      addCat: () => { const n = s.newCat.trim(); if (!n) return; this.setState(st => ({ cats: [...st.cats, { id: 'c' + Date.now(), name: n }], newCat: '' })); this.flash('Rubro agregado'); },
+      clientRows, noClients: !clientRows.length,
+      cfg: config, cfgSet, sucForms, faqRows, addFaq, saveConfig: () => this.flash('Configuración guardada'),
+      orderOpen: !!oo, od, closeOrder: () => this.setState({ openOrder: null }),
+      draftOpen: !!s.draft, d, dSet, draftIsEdit: !!s.draft && !s.draftIsNew,
+      draftTitle: s.draftIsNew ? 'Nuevo producto' : 'Editar producto', saveLabel: s.draftIsNew ? 'Crear producto' : 'Guardar cambios',
+      nameBd: s.draftErr && !String(d.name || '').trim() ? '#D62718' : '#D8D0C4',
+      priceBd: s.draftErr && !(+d.price > 0) ? '#D62718' : '#D8D0C4', draftError: s.draftErr,
+      draftCats: cats.map(c => ({ ...c, ...pick(c.id === d.cat), pick: () => this.setState(st => ({ draft: { ...st.draft, cat: c.id } })) })),
+      hasOffPreview: offOk, offPreview: offOk ? '-' + Math.round((1 - d.price / d.old) * 100) + '%' : '',
+      dPubTrack: d.published ? '#2D6A3A' : '#CFC7BB', dPubAlign: d.published ? 'flex-end' : 'flex-start', dPubLabel: d.published ? 'Publicado en la tienda' : 'Oculto',
+      dTogglePub: () => this.setState(st => ({ draft: { ...st.draft, published: !st.draft.published } })),
+      closeDraft: () => this.setState({ draft: null }),
+      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true } }),
+      saveDraft: () => {
+        const x = s.draft; if (!String(x.name).trim() || !(+x.price > 0)) return this.setState({ draftErr: true });
+        const clean = { ...x, name: x.name.trim(), price: +x.price, old: +x.old || 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0 };
+        this.setState(st => ({ products: s.draftIsNew ? [clean, ...st.products] : st.products.map(p => p.id === x.id ? clean : p), draft: null }));
+        this.flash(s.draftIsNew ? 'Producto creado' : 'Cambios guardados');
+      },
+      draftDelete: () => this.setState({ confirmDel: s.draft.id }),
+      confirmOpen: !!toDel, confirmName: toDel ? toDel.name : '',
+      cancelDel: () => this.setState({ confirmDel: null }),
+      doDel: () => { this.setState(st => ({ products: st.products.filter(p => p.id !== st.confirmDel), confirmDel: null, draft: null })); this.flash('Producto eliminado'); },
+      odraftOpen: !!od2, nd, ndSet, ndDeliveryOpts, ndSucOpts, ndPayOpts, ndTotalTxt, ndHasLines, ndNoLines: !ndHasLines,
+      ndNeedsShip: !!od2 && od2.delivery !== 'retiro', ndError: s.odraftErr,
+      nameBd2: s.odraftErr && !String(nd.clientName || '').trim() ? '#D62718' : '#D8D0C4',
+      ndPaidTrack: od2 && od2.paid ? '#2D6A3A' : '#CFC7BB', ndPaidAlign: od2 && od2.paid ? 'flex-end' : 'flex-start',
+      ndPaidLabel: od2 && od2.paid ? 'Cobrado' : 'No cobrado',
+      ndTogglePaid: () => this.setState(st => ({ odraft: { ...st.odraft, paid: !st.odraft.paid } })),
+      nl, onLinePid, addLine,
+      onLineQty: e => { const v = e.target.value; this.setState(st => ({ oline: { ...st.oline, qty: v } })); },
+      onLineUnit: e => { const v = e.target.value; this.setState(st => ({ oline: { ...st.oline, unit: v } })); },
+      allProducts: products,
+      newOrder: () => this.setState({
+        odraftErr: false,
+        odraft: { clientName: '', clientBiz: '', clientPhone: '', clientAddr: '', delivery: 'retiro', suc: (config.sucursales[0] || {}).id || 'nono', pay: 'Efectivo', paid: false, note: '', ship: '0', lines: [] },
+        oline: { pid: '', qty: '1', unit: '' }
+      }),
+      closeOrderDraft: () => this.setState({ odraft: null }),
+      saveOrder: () => {
+        const dft = s.odraft;
+        if (!dft || !String(dft.clientName).trim() || !dft.lines.length) return this.setState({ odraftErr: true });
+        const newId = Math.max(...s.orders.map(o => o.id), 10200) + 1;
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const order = {
+          id: newId, day: 0, time,
+          client: { name: dft.clientName.trim(), biz: dft.clientBiz.trim(), phone: dft.clientPhone.trim(), addr: dft.clientAddr.trim() },
+          delivery: dft.delivery, suc: dft.suc,
+          items: dft.lines.map(l => ({ pid: l.pid, name: l.name, pack: l.pack, qty: l.qty, unit: l.unit })),
+          ship: dft.delivery === 'retiro' ? 0 : (+dft.ship || 0),
+          pay: dft.pay, paid: dft.paid, status: 'nuevo', note: dft.note.trim()
+        };
+        this.setState(st => ({ orders: [order, ...st.orders], odraft: null }));
+        this.flash('Pedido creado');
+      },
+      bulkOpen: !!s.bulk, bulk, openBulk: () => this.setState({ bulk: { cat: s.prodCat, pct: '10' } }), closeBulk: () => this.setState({ bulk: null }),
+      bulkCats: [{ id: 'all', name: 'Todos los productos' }, ...cats].map(c => ({ ...c, ...pick(c.id === bulk.cat), pick: () => this.setState(st => ({ bulk: { ...st.bulk, cat: c.id } })) })),
+      onBulkPct: e => { const v = e.target.value; this.setState(st => ({ bulk: { ...st.bulk, pct: v } })); },
+      bulkPreview: ex ? `Se actualizan ${bulkTargets.length} productos (precio minorista, mayorista y anterior), redondeado a $10. Ejemplo: ${ex.name} pasa de ${fmt(ex.price)} a ${fmt(r10(ex.price * (1 + pct / 100)))}.` : 'No hay productos en este rubro.',
+      applyBulk: () => {
+        const f = 1 + pct / 100;
+        this.setState(st => ({ products: st.products.map(p => bulkTargets.find(t => t.id === p.id) ? { ...p, price: r10(p.price * f), whole: r10(p.whole * f), old: p.old ? r10(p.old * f) : 0 } : p), bulk: null }));
+        this.flash(`Precios actualizados ${pct > 0 ? '+' : ''}${pct}% en ${bulkTargets.length} productos`);
+      },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

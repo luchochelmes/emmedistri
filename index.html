@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Emme Distribuidora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#F7F4EE;color:#1C1917;font-family:Barlow,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#D62718;text-decoration:none}
+a:hover{color:#A81B10;text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.carousel-track{position:relative}
+.carousel-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 42px 8px;scrollbar-width:none}
+.carousel-row::-webkit-scrollbar{display:none}
+.carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,0.96);border:1px solid #D8D0C4;box-shadow:0 4px 14px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:#1C1917;cursor:pointer;padding:0}
+.carousel-arrow.left{left:4px}
+.carousel-arrow.right{right:4px}
+.carousel-card{flex:0 0 240px}
+.mini-row{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+.mini-row::-webkit-scrollbar{display:none}
+.mini-card{flex:0 0 132px}
+@media (max-width:640px){
+  .carousel-row{padding:4px 34px 8px}
+  .carousel-card{flex:0 0 68vw}
+  .carousel-arrow{width:32px;height:32px;font-size:15px}
+  main h1{font-size:30px!important}
+  main h2{font-size:24px!important}
+  .hero-badge{max-width:calc(100% - 24px)!important;left:12px!important;right:12px!important;bottom:12px!important;padding:16px 18px!important}
+  .promo-title{font-size:24px!important}
+  .step-num{font-size:32px!important}
+  .sucursales-grid{grid-template-columns:1fr!important}
+  .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
+  .topbar-extra{display:none!important}
+  .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
+}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+  <div class="topbar" style="background:#FFC72C;color:#1C1917;font-size:13px;font-weight:600">
+    <div style="max-width:1320px;margin:0 auto;padding:8px 24px;display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap">
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <span>Venta mayorista y minorista</span>
+        <span class="topbar-extra">Envíos en Córdoba capital y Traslasierra</span>
+        <span class="topbar-extra">Precio según mayorista, minorista o consumidor final</span>
+      </div>
+      <div style="display:flex;gap:20px">
+        <a href="#sucursales" class="topbar-extra" style="color:#1C1917">Sucursales</a>
+        <a href="#como-comprar" class="topbar-extra" style="color:#1C1917">Cómo comprar</a>
+        <a href="#contacto" class="topbar-extra" style="color:#1C1917">Contacto</a>
+        <a href="https://wa.me/5493515173319" target="_blank" rel="noopener" style="color:#1C1917">WhatsApp 351 517-3319</a>
+      </div>
+    </div>
+  </div>
+
+  <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6;position:sticky;top:0;z-index:20">
+    <div style="max-width:1320px;margin:0 auto;padding:16px 24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+      <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:52px;width:auto;display:block;border-radius:4px">
+      </a>
+      <div style="flex:1 1 320px;display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
+        <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:12px 14px;font-size:15px;min-width:0;background:transparent"></input>
+        <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 20px;font-weight:600;font-size:14px">Buscar</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:11px;color:#6B635A;text-transform:uppercase;letter-spacing:1px;font-weight:600">Tu sucursal</span>
+        <div style="display:flex;background:#F1ECE3;border-radius:6px;padding:3px;gap:3px">
+          <sc-for list="{{ sucursalOpts }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.pick }}" style="border:0;border-radius:4px;padding:6px 12px;font-size:13px;font-weight:600;background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onClick="{{ openCart }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:11px 16px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px" style-hover="background:#A81B10">
+          <span>Carrito</span>
+          <span style="background:#FFC72C;color:#1C1917;border-radius:999px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 6px">{{ cartCount }}</span>
+        </button>
+      </div>
+    </div>
+    <nav style="background:#D62718">
+      <div style="max-width:1320px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none">
+        <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 14px;white-space:nowrap" style-hover="background:#A81B10">{{ c.name }}</button>
+        </sc-for>
+        <button onClick="{{ pickPopulares }}" style="border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 16px;white-space:nowrap;margin-left:auto">Más pedidos</button>
+      </div>
+    </nav>
+  </header>
+
+  <main style="flex:1">
+
+    <section style="padding-top:24px">
+      <sc-if value="{{ heroPromos }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;min-height:440px;overflow:hidden;background:#2A2522">
+          <image-slot id="hero-media" shape="rect" src="hero.jpg" placeholder="Foto o video del depósito / local (1920×900)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+          <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top, rgba(28,25,23,.82) 0%, rgba(28,25,23,0) 62%),linear-gradient(135deg, rgba(28,25,23,.4) 0%, rgba(28,25,23,0) 55%),repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 2px, transparent 2px, transparent 16px)"></div>
+          <div class="hero-badge" style="position:absolute;left:max(24px, calc((100% - 1320px)/2 + 24px));right:24px;bottom:32px;max-width:460px;background:rgba(28,25,23,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#FFFFFF;padding:24px 26px;border-radius:6px;border:1px solid rgba(255,255,255,.12);pointer-events:none">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;color:#FFC72C">Directo al mostrador de tu negocio</div>
+            <h1 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:52px;line-height:0.95;text-transform:uppercase;text-wrap:balance">Descartables, envases y limpieza al por mayor</h1>
+            <div style="display:flex;gap:10px;margin-top:18px;pointer-events:auto">
+              <button onClick="{{ goCatalog }}" style="border:0;background:#FFC72C;color:#1C1917;padding:12px 18px;border-radius:5px;font-weight:700;font-size:14px">Ver catálogo</button>
+              <a href="#sucursales" style="border:2px solid #FFFFFF;color:#FFFFFF;padding:10px 16px;border-radius:5px;font-weight:700;font-size:14px;text-decoration:none">Sucursales</a>
+            </div>
+          </div>
+        </div>
+        <div style="max-width:1320px;margin:0 auto;padding:16px 24px 0">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-left:4px solid #D62718;border-radius:10px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#D62718">Tu precio, a medida</div>
+              <div style="font-size:16px;color:#1C1917;margin-top:3px">Mayorista, minorista o consumidor final: cotizá en 1 mensaje</div>
+            </div>
+            <a href="https://wa.me/5493515173319?text={{ waGenericText }}" target="_blank" rel="noopener" style="border:0;background:#D62718;color:#FFFFFF;padding:10px 18px;border-radius:5px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap">Cotizar por WhatsApp</a>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ heroFull }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;min-height:540px;overflow:hidden;background:#2A2522">
+          <image-slot id="hero-media-full" shape="rect" src="hero.jpg" placeholder="Foto o video del depósito / local (1920×800)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+          <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top, rgba(28,25,23,.82) 0%, rgba(28,25,23,0) 62%),linear-gradient(135deg, rgba(28,25,23,.4) 0%, rgba(28,25,23,0) 55%),repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 2px, transparent 2px, transparent 16px)"></div>
+          <div class="hero-badge" style="position:absolute;left:max(32px, calc((100% - 1320px)/2 + 32px));right:32px;bottom:32px;max-width:560px;background:rgba(28,25,23,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#FFFFFF;padding:28px 30px;border-radius:6px;border:1px solid rgba(255,255,255,.12);pointer-events:none">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;color:#FFC72C">Directo al mostrador de tu negocio</div>
+            <h1 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:60px;line-height:0.95;text-transform:uppercase;text-wrap:balance">Descartables, envases y limpieza al por mayor</h1>
+            <div style="display:flex;gap:10px;margin-top:18px;pointer-events:auto">
+              <button onClick="{{ goCatalog }}" style="border:0;background:#FFC72C;color:#1C1917;padding:12px 18px;border-radius:5px;font-weight:700;font-size:14px">Ver catálogo</button>
+              <a href="#sucursales" style="border:2px solid #FFFFFF;color:#FFFFFF;padding:10px 16px;border-radius:5px;font-weight:700;font-size:14px;text-decoration:none">Sucursales</a>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:16px 24px 0">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px">
+        <div style="padding:18px 20px;border-right:1px solid #E6E0D6">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Precio mayorista</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">Te cotizamos según cantidad y tipo de cliente</div>
+        </div>
+        <div style="padding:18px 20px;border-right:1px solid #E6E0D6">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Envío en 24/48 h</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">Córdoba capital, Malagueño y Traslasierra</div>
+        </div>
+        <div style="padding:18px 20px;border-right:1px solid #E6E0D6">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Retiro en sucursal</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">Tu pedido listo en 2 horas hábiles</div>
+        </div>
+        <div style="padding:18px 20px">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Medios de pago</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">Transferencia, Mercado Pago o efectivo</div>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ hasOffers }}" hint-placeholder-val="{{ true }}">
+    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <div style="background:#D62718;border-radius:10px 10px 0 0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.5px;color:#FFFFFF">🔥 Ofertas de la semana</div>
+      </div>
+      <div class="carousel-track" style="background:#FFFFFF;border:1px solid #E6E0D6;border-top:0;border-radius:0 0 10px 10px;padding-top:6px">
+        <button onClick="{{ offersLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
+        <button onClick="{{ offersRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
+        <div id="offers-carousel" class="carousel-row">
+          <sc-for list="{{ offerProducts }}" as="p" hint-placeholder-count="2">
+            <article class="carousel-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start">
+              <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
+                <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                <div style="position:absolute;top:10px;left:10px;background:#D62718;color:#FFFFFF;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Oferta</div>
+              </div>
+              <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
+                <div style="font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">{{ p.pack }}</div>
+                <div style="font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</div>
+                <div style="display:flex;align-items:baseline;gap:8px">
+                  <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;color:#D62718">{{ p.priceTxt }}</span>
+                  <sc-if value="{{ p.hasOldPrice }}" hint-placeholder-val="{{ true }}">
+                    <span style="font-size:13px;color:#6B635A;text-decoration:line-through">{{ p.oldPriceTxt }}</span>
+                  </sc-if>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
+                  <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                    <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
+                    <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
+                    <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
+                  </div>
+                  <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px;flex-wrap:wrap">
+        <h2 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:36px;text-transform:uppercase;line-height:1">Comprá por rubro</h2>
+        <button onClick="{{ pickAll }}" style="border:0;background:transparent;color:#D62718;font-weight:700;font-size:14px;padding:0">Ver todos los productos →</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+        <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.pick }}" style="border:1px solid #E6E0D6;background:#FFFFFF;border-radius:10px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:10px" style-hover="border-color:#D62718">
+            <div style="width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:#F1ECE3">
+              <image-slot id="cat-{{ c.id }}" shape="rect" src="{{ c.img }}" placeholder="{{ c.name }}"></image-slot>
+            </div>
+            <div style="padding:0 4px 4px">
+              <div style="font-family:'Barlow Condensed';font-weight:700;font-size:18px;text-transform:uppercase;line-height:1.05;color:#1C1917">{{ c.name }}</div>
+              <div style="font-size:12px;color:#6B635A;margin-top:2px">{{ c.count }} artículos</div>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <div style="background:#1C1917;color:#FFFFFF;border-radius:10px 10px 0 0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.5px">Verdulería y Carnicería</div>
+        <button onClick="{{ pickVyc }}" style="border:0;background:transparent;color:#FFC72C;font-weight:700;font-size:13px;padding:0">Ver todo →</button>
+      </div>
+      <div class="carousel-track" style="background:#FFFFFF;border:1px solid #E6E0D6;border-top:0;border-radius:0 0 10px 10px;padding-top:6px">
+        <button onClick="{{ vycLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
+        <button onClick="{{ vycRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
+        <div id="vyc-carousel" class="carousel-row">
+          <sc-for list="{{ vycProducts }}" as="p" hint-placeholder-count="6">
+            <article class="carousel-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start">
+              <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
+                <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
+                  <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                </div>
+              </button>
+              <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">
+                  <span>Cód. {{ p.code }}</span>
+                  <span>{{ p.pack }}</span>
+                </div>
+                <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</button>
+                <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
+                  <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                    <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
+                    <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
+                    <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
+                  </div>
+                  <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalogo" style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:36px;text-transform:uppercase;line-height:1">{{ catalogTitle }}</h2>
+          <div style="font-size:14px;color:#6B635A;margin-top:4px">{{ resultsTxt }}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+            <button onClick="{{ t.pick }}" style="border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }};border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;white-space:nowrap">{{ t.name }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div class="{{ carouselTrackClass }}">
+        <sc-if value="{{ isCarousel }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ carouselLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
+          <button onClick="{{ carouselRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
+        </sc-if>
+        <div id="featured-carousel" class="{{ carouselRowClass }}" style="{{ productsGridStyle }}">
+          <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+            <article class="{{ p.cardClass }}" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;{{ p.cardExtra }}">
+            <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
+              <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
+                <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                <sc-if value="{{ p.popular }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;top:10px;left:10px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
+                </sc-if>
+              </div>
+            </button>
+            <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">
+                <span>Cód. {{ p.code }}</span>
+                <span>{{ p.pack }}</span>
+              </div>
+              <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</button>
+              <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;color:#D62718;font-weight:700;font-size:12.5px">Ver detalle →</button>
+              <sc-if value="{{ showMayorista }}" hint-placeholder-val="{{ true }}">
+                <div style="background:#FFF4D1;border-radius:5px;padding:7px 9px;font-size:12.5px;line-height:1.3">
+                  <strong style="color:#A81B10">Precio mayorista</strong> llevando {{ p.min }}+ artículos
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
+                <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                  <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
+                  <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
+                  <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
+                </div>
+                <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
+              </div>
+            </div>
+          </article>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px;text-align:center;background:#FFFFFF;border:1px dashed #D8D0C4;border-radius:10px;color:#6B635A">No encontramos productos para esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.</div>
+      </sc-if>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <div style="background:#FFC72C;border-radius:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));overflow:hidden">
+        <div style="padding:36px 36px;display:flex;flex-direction:column;gap:14px;justify-content:center">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Para rotiserías, pizzerías y heladerías</div>
+          <h2 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:46px;line-height:0.95;text-transform:uppercase;text-wrap:balance">Armá tu combo mensual y congelá el precio 30 días</h2>
+          <p style="margin:0;font-size:16px;line-height:1.5;max-width:460px">Mandanos tu lista y te pasamos un presupuesto con precio mayorista, fecha de entrega fija y factura A o B.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="https://wa.me/5493515173319?text={{ waComboText }}" target="_blank" rel="noopener" style="background:#1C1917;color:#FFFFFF;padding:12px 18px;border-radius:5px;font-weight:700;font-size:14px;text-decoration:none">Pedir presupuesto por WhatsApp</a>
+          </div>
+        </div>
+        <div style="min-height:300px;position:relative">
+          <image-slot id="combo-banner" shape="rect" fit="contain" src="armando pedido.jpg" placeholder="Foto de combo / pedido armado" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+        </div>
+      </div>
+    </section>
+
+    <section id="sucursales" style="max-width:1320px;margin:0 auto;padding:56px 24px 0">
+      <h2 style="margin:0 0 18px;font-family:'Barlow Condensed';font-weight:800;font-size:36px;text-transform:uppercase;line-height:1">Nuestras sucursales</h2>
+      <div class="sucursales-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">
+        <sc-for list="{{ sucursales }}" as="s" hint-placeholder-count="3">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+            <div style="padding:24px;display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="display:inline-block;background:#D62718;color:#FFFFFF;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:3px">{{ s.tag }}</div>
+                <div style="font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase;line-height:1;margin-top:10px">{{ s.name }}</div>
+                <div style="font-size:14px;color:#6B635A;margin-top:4px">{{ s.zone }}</div>
+              </div>
+              <div style="font-size:14px;line-height:1.55">
+                <div><strong>Dirección:</strong> {{ s.address }}</div>
+                <div><strong>Lun a vie:</strong> {{ s.week }}</div>
+                <div><strong>Sábados:</strong> {{ s.sat }}</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto">
+                <a href="{{ s.waHref }}" target="_blank" rel="noopener" style="background:#1C1917;color:#FFFFFF;padding:10px 14px;border-radius:5px;font-weight:700;font-size:13px;text-decoration:none">WhatsApp {{ s.name }}</a>
+                <a href="{{ s.dirHref }}" target="_blank" rel="noopener" style="border:1px solid #1C1917;color:#1C1917;padding:9px 14px;border-radius:5px;font-weight:700;font-size:13px;text-decoration:none">Cómo llegar</a>
+              </div>
+            </div>
+            <div style="min-height:240px;position:relative;background:#F1ECE3">
+              <iframe src="{{ s.mapUrl }}" style="position:absolute;inset:0;width:100%;height:100%;border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa {{ s.name }}"></iframe>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="como-comprar" style="max-width:1320px;margin:0 auto;padding:56px 24px 0">
+      <h2 style="margin:0 0 18px;font-family:'Barlow Condensed';font-weight:800;font-size:36px;text-transform:uppercase;line-height:1">Cómo comprar</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+        <div style="border-top:4px solid #D62718;padding-top:14px">
+          <div class="step-num" style="font-family:'Barlow Condensed';font-weight:800;font-size:44px;color:#D62718;line-height:1">01</div>
+          <div style="font-weight:700;font-size:17px;margin-top:6px">Armá tu pedido</div>
+          <div style="font-size:14px;color:#6B635A;line-height:1.5;margin-top:4px">Sumá productos al carrito. Al llegar a la cantidad indicada, accedés a precio mayorista.</div>
+        </div>
+        <div style="border-top:4px solid #D62718;padding-top:14px">
+          <div class="step-num" style="font-family:'Barlow Condensed';font-weight:800;font-size:44px;color:#D62718;line-height:1">02</div>
+          <div style="font-weight:700;font-size:17px;margin-top:6px">Elegí envío o retiro</div>
+          <div style="font-size:14px;color:#6B635A;line-height:1.5;margin-top:4px">Retirá gratis en Nono o Malagueño, o recibilo en tu negocio.</div>
+        </div>
+        <div style="border-top:4px solid #D62718;padding-top:14px">
+          <div class="step-num" style="font-family:'Barlow Condensed';font-weight:800;font-size:44px;color:#D62718;line-height:1">03</div>
+          <div style="font-weight:700;font-size:17px;margin-top:6px">Confirmamos por WhatsApp</div>
+          <div style="font-size:14px;color:#6B635A;line-height:1.5;margin-top:4px">Te respondemos con el precio, stock y horario de entrega.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" style="max-width:1320px;margin:0 auto;padding:56px 24px 0">
+      <h2 style="margin:0 0 18px;font-family:'Barlow Condensed';font-weight:800;font-size:36px;text-transform:uppercase;line-height:1">Preguntas frecuentes</h2>
+      <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;max-width:820px">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="2">
+          <div style="border-bottom:1px solid #EFE9DF">
+            <button onClick="{{ f.toggle }}" style="width:100%;border:0;background:transparent;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;cursor:pointer">
+              <span style="font-weight:600;font-size:15px">{{ f.q }}</span>
+              <span style="font-size:20px;color:#D62718;flex-shrink:0">{{ f.icon }}</span>
+            </button>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px 18px;font-size:14px;line-height:1.55;color:#3D3732">{{ f.a }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="contacto" style="max-width:1320px;margin:0 auto;padding:56px 24px 64px">
+      <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));overflow:hidden">
+        <div style="background:#1C1917;color:#FFFFFF;padding:36px;display:flex;flex-direction:column;gap:16px;justify-content:center">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#FFC72C">Estamos para ayudarte</div>
+            <h2 style="margin:8px 0 0;font-family:'Barlow Condensed';font-weight:800;font-size:38px;text-transform:uppercase;line-height:0.95">Contactanos</h2>
+          </div>
+          <p style="margin:0;font-size:14px;line-height:1.55;color:#B8AFA3;max-width:360px">Contanos qué necesitás y te respondemos con precios, disponibilidad y forma de entrega. También podés escribirnos directo por WhatsApp.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;margin-top:8px">
+            <a href="https://wa.me/5493515173319" target="_blank" rel="noopener" style="color:#FFFFFF;display:flex;align-items:center;gap:10px">
+              <span style="background:#25D366;color:#FFFFFF;border-radius:999px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px">✆</span>
+              WhatsApp 351 517-3319
+            </a>
+            <a href="mailto:info@centrixgroupsas.com" style="color:#FFFFFF;display:flex;align-items:center;gap:10px">
+              <span style="background:#FFC72C;color:#1C1917;border-radius:999px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px">@</span>
+              info@centrixgroupsas.com
+            </a>
+          </div>
+        </div>
+        <div style="padding:36px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6B635A">Nombre</label>
+            <input value="{{ contactName }}" onChange="{{ onContactName }}" placeholder="Tu nombre" style="border:1.5px solid #D8D0C4;border-radius:6px;padding:11px 12px;font-size:14px;outline:none"></input>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6B635A">Email</label>
+            <input value="{{ contactEmail }}" onChange="{{ onContactEmail }}" placeholder="tu@email.com" style="border:1.5px solid #D8D0C4;border-radius:6px;padding:11px 12px;font-size:14px;outline:none"></input>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6B635A">Mensaje</label>
+            <textarea value="{{ contactMsg }}" onChange="{{ onContactMsg }}" placeholder="Contanos qué productos necesitás" style="border:1.5px solid #D8D0C4;border-radius:6px;padding:11px 12px;font-size:14px;outline:none;min-height:110px;resize:vertical;font-family:inherit"></textarea>
+          </div>
+          <button onClick="{{ sendEmail }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:46px;font-weight:700;font-size:14px;margin-top:6px" style-hover="background:#A81B10">Enviar por email</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a href="https://wa.me/5493515173319" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp" style="position:fixed;right:22px;bottom:22px;z-index:40;background:#25D366;color:#FFFFFF;width:58px;height:58px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,0.25)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#FFFFFF"><path d="M16.004 2.667c-7.363 0-13.333 5.97-13.333 13.333 0 2.353.615 4.56 1.693 6.475L2.667 29.333l7.038-1.846a13.27 13.27 0 0 0 6.299 1.6h.006c7.363 0 13.333-5.97 13.333-13.333S23.367 2.667 16.004 2.667zm0 24.4h-.005a11.05 11.05 0 0 1-5.635-1.543l-.404-.24-4.178 1.096 1.115-4.073-.263-.418a11.02 11.02 0 0 1-1.69-5.89c0-6.106 4.966-11.07 11.065-11.07 2.956 0 5.735 1.153 7.826 3.246a10.99 10.99 0 0 1 3.238 7.828c-.002 6.106-4.968 11.064-11.07 11.064zm6.07-8.287c-.333-.166-1.966-.97-2.271-1.08-.305-.11-.527-.166-.75.167-.222.333-.86 1.08-1.054 1.302-.194.222-.389.25-.722.083-.333-.166-1.406-.518-2.679-1.652-.99-.883-1.66-1.974-1.854-2.307-.194-.333-.02-.513.146-.679.15-.15.333-.389.5-.583.166-.194.222-.333.333-.556.11-.222.055-.417-.028-.583-.083-.166-.75-1.807-1.028-2.474-.27-.65-.545-.562-.75-.573l-.639-.011c-.222 0-.583.083-.888.417-.305.333-1.166 1.14-1.166 2.78 0 1.64 1.194 3.226 1.361 3.448.166.222 2.351 3.59 5.695 5.035.796.343 1.417.548 1.901.702.799.254 1.526.218 2.101.132.641-.096 1.966-.804 2.244-1.581.278-.777.278-1.443.194-1.581-.083-.139-.305-.222-.638-.389z"/></svg>
+  </a>
+
+  <footer style="background:#1C1917;color:#E9E3DA">
+    <div style="max-width:1320px;margin:0 auto;padding:48px 24px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px">
+      <div>
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:64px;width:auto;display:block;border-radius:4px">
+        <p style="font-size:14px;line-height:1.55;color:#B8AFA3;margin:14px 0 0;max-width:280px">Distribuidora de descartables, envases, bolsas y artículos de limpieza en Córdoba.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;color:#FFC72C;margin-bottom:4px">Rubros</div>
+        <sc-for list="{{ footerCats }}" as="c" hint-placeholder-count="5">
+          <a href="#catalogo" style="color:#E9E3DA">{{ c.name }}</a>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;color:#FFC72C;margin-bottom:4px">Ayuda</div>
+        <a href="#como-comprar" style="color:#E9E3DA">Cómo comprar</a>
+        <a href="#como-comprar" style="color:#E9E3DA">Envíos y zonas</a>
+        <a href="#contacto" style="color:#E9E3DA">Precios mayoristas</a>
+        <a href="#faq" style="color:#E9E3DA">Preguntas frecuentes</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;text-transform:uppercase;color:#FFC72C;margin-bottom:4px">Contacto</div>
+        <a href="https://wa.me/5493515173319" target="_blank" rel="noopener" style="color:#E9E3DA">WhatsApp 351 517-3319</a>
+        <a href="mailto:info@centrixgroupsas.com" style="color:#E9E3DA">info@centrixgroupsas.com</a>
+        <a href="#contacto" style="color:#E9E3DA">Formulario de contacto</a>
+        <a href="https://www.instagram.com/distribuidora_emme/" target="_blank" rel="noopener" style="color:#E9E3DA">Instagram</a>
+        <a href="#" style="color:#E9E3DA">Facebook</a>
+      </div>
+    </div>
+    <div style="max-width:1320px;margin:0 auto;padding:16px 24px 28px;border-top:1px solid #3A3430;font-size:12px;color:#8E857A;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span>© 2026 Emme Distribuidora · Nono, Malagueño y Alta Gracia, Córdoba</span>
+      <span>Precios según tipo de cliente (mayorista, minorista, consumidor final) — cotizá por WhatsApp o email.</span>
+    </div>
+  </footer>
+
+  <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end">
+      <div onClick="{{ closeCart }}" style="position:absolute;inset:0;background:rgba(28,25,23,0.5);animation:fadeIn .2s ease"></div>
+      <aside style="position:relative;width:min(440px,100%);height:100%;background:#FFFFFF;display:flex;flex-direction:column;animation:slideIn .25s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #E6E0D6">
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;text-transform:uppercase">Tu pedido <span style="color:#6B635A;font-weight:600;font-size:18px">({{ cartCount }})</span></div>
+          <button onClick="{{ closeCart }}" style="border:0;background:#F1ECE3;border-radius:5px;padding:8px 12px;font-weight:600;font-size:13px">Cerrar</button>
+        </div>
+        <sc-if value="{{ orderSent }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 28px;text-align:center">
+            <div style="width:64px;height:64px;border-radius:999px;background:#E2F0E4;color:#2D6A3A;display:flex;align-items:center;justify-content:center;font-size:32px">✓</div>
+            <div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:28px;text-transform:uppercase;line-height:1">¡Pedido enviado!</div>
+              <p style="font-size:14px;color:#6B635A;line-height:1.5;margin:10px 0 0;max-width:280px">Te vamos a contactar a la brevedad para confirmar precio, stock y forma de entrega.</p>
+            </div>
+            <button onClick="{{ closeOrderSent }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;padding:12px 22px;font-weight:700;font-size:14px">Seguir comprando</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showCartBody }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:14px 20px;background:#FFF4D1;font-size:13px;font-weight:600">Te confirmamos precio, stock y envío por WhatsApp — sin compromiso.</div>
+        <div style="flex:1;overflow-y:auto;padding:4px 20px">
+          <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:60px 0;text-align:center;color:#6B635A;font-size:15px">Todavía no agregaste productos.</div>
+          </sc-if>
+          <sc-for list="{{ cartItems }}" as="i" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:64px 1fr auto;gap:12px;padding:14px 0;border-bottom:1px solid #EFE9DF;align-items:start">
+              <div style="width:64px;height:64px;border-radius:6px;overflow:hidden;background:#F1ECE3">
+                <image-slot id="prod-{{ i.id }}" shape="rect" placeholder=""></image-slot>
+              </div>
+              <div style="min-width:0">
+                <div style="font-weight:600;font-size:14px;line-height:1.25">{{ i.name }}</div>
+                <div style="font-size:12px;color:#6B635A;margin-top:2px">{{ i.pack }}</div>
+                <sc-if value="{{ i.isWhole }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:11px;font-weight:700;color:#A81B10;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px">Precio mayorista aplicado</div>
+                </sc-if>
+                <sc-if value="{{ i.showNudge }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:#6B635A;margin-top:4px">{{ i.nudge }}</div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                  <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                    <button onClick="{{ i.dec }}" style="border:0;background:transparent;width:28px;height:30px;font-size:16px">−</button>
+                    <span style="min-width:22px;text-align:center;font-weight:700;font-size:13px">{{ i.qty }}</span>
+                    <button onClick="{{ i.inc }}" style="border:0;background:transparent;width:28px;height:30px;font-size:16px">+</button>
+                  </div>
+                  <button onClick="{{ i.remove }}" style="border:0;background:transparent;color:#6B635A;font-size:12px;text-decoration:underline;padding:0">Quitar</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border-top:1px solid #E6E0D6;padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Entrega</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <sc-for list="{{ deliveryOpts }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.pick }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};border-radius:6px;padding:8px 6px;font-size:12px;font-weight:600;line-height:1.2;color:#1C1917">{{ d.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A;margin-top:6px">Tus datos</div>
+          <input value="{{ checkoutName }}" onChange="{{ onCheckoutName }}" placeholder="Nombre y apellido" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
+          <input value="{{ checkoutPhone }}" onChange="{{ onCheckoutPhone }}" placeholder="Teléfono de contacto" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
+          <sc-if value="{{ needsAddress }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ checkoutAddress }}" onChange="{{ onCheckoutAddress }}" placeholder="Dirección de entrega" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
+          </sc-if>
+          <a href="https://wa.me/5493515173319?text={{ waCartText }}" target="_blank" rel="noopener" onClick="{{ checkout }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:50px;font-weight:700;font-size:15px;text-decoration:none;display:flex;align-items:center;justify-content:center" style-hover="background:#A81B10">Enviar pedido por WhatsApp</a>
+          <a href="mailto:info@centrixgroupsas.com?subject={{ cartEmailSubject }}&body={{ cartEmailBody }}" onClick="{{ checkout }}" style="border:1.5px solid #1C1917;color:#1C1917;border-radius:6px;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px">Enviar pedido por email</a>
+          <div style="font-size:12px;color:#6B635A;text-align:center">Te respondemos con precio, stock y forma de pago según tu perfil de cliente.</div>
+        </div>
+        </sc-if>
+      </aside>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:55;background:#FFFFFF;overflow-y:auto">
+      <div style="max-width:1320px;margin:0 auto;padding:0 24px 64px">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#6B635A;padding:16px 0;border-bottom:1px solid #E6E0D6;flex-wrap:wrap">
+          <button onClick="{{ closeDetail }}" style="border:0;background:transparent;color:#6B635A;font-weight:600;padding:0;cursor:pointer">{{ pd.catName }}</button>
+          <span>|</span>
+          <span style="font-weight:700;color:#1C1917">{{ pd.name }}</span>
+          <button onClick="{{ closeDetail }}" style="margin-left:auto;border:0;background:#F1ECE3;border-radius:5px;padding:8px 12px;font-weight:600;font-size:13px;cursor:pointer">Cerrar ✕</button>
+        </div>
+        <div class="product-page-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding-top:32px;align-items:start">
+          <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3;border-radius:10px;overflow:hidden">
+            <image-slot id="prod-{{ pd.id }}" shape="rect" placeholder="Foto: {{ pd.name }}" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+            <sc-if value="{{ pd.popular }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:14px;left:14px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:5px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
+            </sc-if>
+          </div>
+          <div>
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;text-transform:uppercase;line-height:1.04">{{ pd.name }}</div>
+            <div style="font-size:15px;color:#6B635A;margin-top:6px">{{ pd.pack }}</div>
+            <div style="font-size:13px;color:#A8A096;margin-top:14px">Código: {{ pd.code }}</div>
+            <div style="border-top:1px solid #E6E0D6;margin:18px 0"></div>
+            <div style="font-weight:700;font-size:15px">Descripción:</div>
+            <p style="font-size:14.5px;line-height:1.6;color:#3D3732;margin:8px 0 0">{{ pd.desc }}</p>
+            <sc-if value="{{ showMayorista }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#FFF4D1;border-radius:5px;padding:9px 11px;font-size:13px;line-height:1.3;margin-top:18px">
+                <strong style="color:#A81B10">Precio mayorista</strong> llevando {{ pd.min }}+ artículos · consultanos el resto de las listas
+              </div>
+            </sc-if>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                <button onClick="{{ pd.dec }}" style="border:0;background:transparent;width:36px;height:44px;font-size:18px;color:#1C1917">−</button>
+                <span style="min-width:28px;text-align:center;font-weight:700;font-size:15px">{{ pd.qty }}</span>
+                <button onClick="{{ pd.inc }}" style="border:0;background:transparent;width:36px;height:44px;font-size:18px;color:#1C1917">+</button>
+              </div>
+              <button onClick="{{ pd.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px" style-hover="background:#A81B10">{{ pd.addLabel }}</button>
+            </div>
+            <a href="https://wa.me/5493515173319?text={{ pd.waText }}" target="_blank" rel="noopener" style="display:block;text-align:center;border:1.5px solid #1C1917;color:#1C1917;border-radius:5px;height:44px;line-height:44px;font-weight:700;font-size:13.5px;margin-top:8px;text-decoration:none">Consultar este producto por WhatsApp</a>
+          </div>
+        </div>
+        <div style="margin-top:40px">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:22px;text-transform:uppercase;margin-bottom:10px">Productos relacionados</div>
+          <div class="mini-row">
+            <sc-for list="{{ pd.related }}" as="r" hint-placeholder-count="4">
+              <button onClick="{{ r.open }}" class="mini-card" style="border:1px solid #E6E0D6;background:#FFFFFF;border-radius:8px;overflow:hidden;text-align:left;display:flex;flex-direction:column;cursor:pointer">
+                <div style="aspect-ratio:1/1;background:#F1ECE3">
+                  <image-slot id="prod-{{ r.id }}" shape="rect" placeholder="{{ r.name }}"></image-slot>
+                </div>
+                <div style="padding:8px 9px">
+                  <div style="font-size:12px;font-weight:600;line-height:1.25">{{ r.name }}</div>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#1C1917;color:#FFFFFF;padding:12px 16px;border-radius:6px;font-size:14px;display:flex;gap:14px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:fadeIn .2s ease">
+      <span>{{ toast }}</span>
+      <button onClick="{{ openCart }}" style="border:0;background:#FFC72C;color:#1C1917;border-radius:4px;padding:6px 10px;font-weight:700;font-size:13px">Ver carrito</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;promos&quot;,&quot;completo&quot;],&quot;default&quot;:&quot;promos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showMayorista&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Precios&quot;}}">
+const CATS = [
+  { id: 'vasos', name: 'Vasos y copas', img: 'vasos.jpg' },
+  { id: 'envases', name: 'Envases y bandejas', img: 'bandejas.jpg' },
+  { id: 'cajas', name: 'Cajas delivery', img: 'caja delivery.jpg' },
+  { id: 'bolsas', name: 'Bolsas', img: 'bolsas.jpg' },
+  { id: 'papel', name: 'Servilletas y papel', img: 'servilletas.jpg' },
+  { id: 'utensilios', name: 'Cubiertos y sorbetes', img: 'cubiertos.jpg' },
+  { id: 'limpieza', name: 'Limpieza', img: 'limpieza.jpg' },
+  { id: 'aluminio', name: 'Aluminio y film', img: 'aluminio.jpg' }
+];
+const COUNTS = { vasos: 86, envases: 142, cajas: 58, bolsas: 74, papel: 39, utensilios: 47, limpieza: 112, aluminio: 31 };
+const PRODUCTS = [
+  { id: 1042, cat: 'vasos', name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', min: 10, popular: true, desc: 'Vaso térmico de poliestireno expandido, ideal para bebidas calientes y frías. No transmite temperatura y mantiene el pulso firme en el mostrador.' },
+  { id: 1057, cat: 'vasos', name: 'Vaso plástico cristal 330 cc', pack: 'x 50 u.', min: 10, desc: 'Vaso de plástico cristal transparente, resistente para bebidas frías, gaseosas y tragos. Apilable para ahorrar espacio en el local.' },
+  { id: 2110, cat: 'envases', name: 'Contenedor PET 500 cc con tapa bisagra', pack: 'x 50 u.', min: 5, vyc: true, desc: 'Contenedor transparente con tapa bisagra a presión, apto para delivery de ensaladas, postres y viandas frías.' },
+  { id: 2134, cat: 'envases', name: 'Bandeja expandido 103 blanca', pack: 'x 100 u.', min: 10, vyc: true, desc: 'Bandeja de telgopor blanca para carnes, verduras y fiambres. Liviana, higiénica y de bajo costo por unidad.' },
+  { id: 3012, cat: 'cajas', name: 'Caja pizza microcorrugada 33 cm', pack: 'x 50 u.', min: 4, popular: true, desc: 'Caja de cartón microcorrugado para pizza grande, resistente a la humedad y al peso. Arma fácil, sin necesidad de cinta.' },
+  { id: 3025, cat: 'cajas', name: 'Caja empanada kraft x 6', pack: 'x 100 u.', min: 4, desc: 'Caja de cartón kraft con ventana, pensada para el transporte prolijo de 6 empanadas.' },
+  { id: 4003, cat: 'bolsas', name: 'Bolsa camiseta 40x50 reforzada', pack: 'x 100 u.', min: 10, vyc: true, desc: 'Bolsa camiseta de polietileno reforzado, soporta peso para compras de almacén y verdulería.' },
+  { id: 4031, cat: 'bolsas', name: 'Bolsa kraft con manija 30x12x32', pack: 'x 25 u.', min: 6, desc: 'Bolsa de papel kraft con manija de cordón, ideal para regalería y locales que buscan una imagen más premium.' },
+  { id: 5008, cat: 'papel', name: 'Servilleta 30x30 blanca doble hoja', pack: 'x 100 u.', min: 20, desc: 'Servilleta blanca doble hoja, suave y absorbente, formato estándar para mesa y delivery.' },
+  { id: 6014, cat: 'utensilios', name: 'Tenedor plástico blanco reforzado', pack: 'x 50 u.', min: 20, desc: 'Tenedor descartable reforzado, no se quiebra con comidas consistentes. Apto para uso intensivo.' },
+  { id: 7020, cat: 'limpieza', name: 'Lavandina concentrada', pack: 'bidón 5 L', min: 6, vyc: true, desc: 'Lavandina concentrada de uso profesional para desinfección de superficies, baños y cocinas.' },
+  { id: 7044, cat: 'limpieza', name: 'Detergente limón uso profesional', pack: 'bidón 5 L', min: 6, desc: 'Detergente concentrado aroma limón, alto poder desengrasante para cocinas industriales.' },
+  { id: 8002, cat: 'aluminio', name: 'Bandeja aluminio F70 con tapa', pack: 'x 100 u.', min: 3, vyc: true, desc: 'Bandeja de aluminio con tapa, apta para horno y freezer. Perfecta para viandas y catering.' },
+  { id: 8015, cat: 'aluminio', name: 'Film PVC 38 cm x 1000 m', pack: 'rollo', min: 3, vyc: true, desc: 'Film PVC industrial de 38 cm, rollo de 1000 metros para envolver y conservar alimentos en el mostrador.' }
+];
+const relatedFor = p => {
+  const sameCat = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
+  const rest = PRODUCTS.filter(x => x.cat !== p.cat && x.id !== p.id);
+  return [...sameCat, ...rest].slice(0, 4);
+};
+const SUCURSALES = [
+  { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h' },
+  { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h' },
+  { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h' }
+].map(s => ({
+  ...s,
+  mapUrl: 'https://maps.google.com/maps?q=' + encodeURIComponent(s.address + ', ' + s.zone) + '&z=16&output=embed',
+  dirHref: 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.address + ', ' + s.zone),
+  waHref: 'https://wa.me/5493515173319?text=' + encodeURIComponent(`Hola! Te escribo por la sucursal ${s.name}.`)
+}));
+const DEFAULT_FAQS = [
+  { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y enviálo para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
+  { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
+];
+function loadFaqs() {
+  try {
+    const s = JSON.parse(localStorage.getItem('emme-backoffice-v4'));
+    if (s && s.config && Array.isArray(s.config.faqs) && s.config.faqs.length) return s.config.faqs;
+  } catch (e) {}
+  return DEFAULT_FAQS;
+}
+const DEFAULT_OFFERS = [
+  { id: 1042, name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', price: 3450, oldPrice: 3990 }
+];
+function loadOffers() {
+  try {
+    const s = JSON.parse(localStorage.getItem('emme-backoffice-v4'));
+    if (s && Array.isArray(s.products)) {
+      return s.products
+        .filter(p => p.published !== false && +p.old > +p.price)
+        .map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old }));
+    }
+  } catch (e) {}
+  return DEFAULT_OFFERS;
+}
+class Component extends DCLogic {
+  state = { cart: {}, qtys: {}, cat: 'all', query: '', sucursal: 'malague', delivery: 'retiro', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', faqList: loadFaqs(), openFaq: null, offersList: loadOffers() };
+
+  setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
+  scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
+  pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
+
+  renderVals() {
+    const { cart, qtys, cat, query, sucursal, delivery, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, faqList, openFaq, offersList } = this.state;
+    const showMayorista = this.props.showMayorista ?? true;
+    const heroLayout = this.props.heroLayout ?? 'promos';
+    const q = query.trim().toLowerCase();
+
+    let list = PRODUCTS;
+    if (cat === 'populares') list = list.filter(p => p.popular);
+    else if (cat === 'vyc') list = list.filter(p => p.vyc);
+    else if (cat !== 'all') list = list.filter(p => p.cat === cat);
+    if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q));
+
+    const isCarousel = cat === 'all' && !q;
+    if (isCarousel) list = list.slice(0, 10);
+
+    const makeCard = (p, extra) => {
+      const qty = qtys[p.id] || 1;
+      const inCart = cart[p.id] || 0;
+      return {
+        ...p, code: p.id, qty, ...extra,
+        addLabel: inCart ? `Agregar (${inCart} en carrito)` : 'Agregar',
+        openDetail: () => this.setState({ productOpen: p.id }),
+        inc: () => this.setState(s => ({ qtys: { ...s.qtys, [p.id]: (s.qtys[p.id] || 1) + 1 } })),
+        dec: () => this.setState(s => ({ qtys: { ...s.qtys, [p.id]: Math.max(1, (s.qtys[p.id] || 1) - 1) } })),
+        add: () => {
+          this.setCartQty(p.id, inCart + qty);
+          this.setState(s => ({ qtys: { ...s.qtys, [p.id]: 1 }, toast: `${qty} × ${p.name} agregado` }));
+          clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2600);
+        }
+      };
+    };
+    const products = list.map(p => makeCard(p, { cardClass: isCarousel ? 'carousel-card' : '', cardExtra: isCarousel ? 'scroll-snap-align:start' : '' }));
+    const vycProducts = PRODUCTS.filter(p => p.vyc).map(p => makeCard(p, {}));
+
+    const offerProducts = offersList.map(o => {
+      const qty = qtys[o.id] || 1;
+      const inCart = cart[o.id] || 0;
+      return {
+        ...o, code: o.id, qty,
+        priceTxt: '$' + Number(o.price).toLocaleString('es-AR'),
+        oldPriceTxt: o.oldPrice ? '$' + Number(o.oldPrice).toLocaleString('es-AR') : '',
+        hasOldPrice: !!o.oldPrice,
+        addLabel: inCart ? `Agregar (${inCart} en carrito)` : 'Agregar',
+        inc: () => this.setState(s => ({ qtys: { ...s.qtys, [o.id]: (s.qtys[o.id] || 1) + 1 } })),
+        dec: () => this.setState(s => ({ qtys: { ...s.qtys, [o.id]: Math.max(1, (s.qtys[o.id] || 1) - 1) } })),
+        add: () => {
+          this.setCartQty(o.id, inCart + qty);
+          this.setState(s => ({ qtys: { ...s.qtys, [o.id]: 1 }, toast: `${qty} × ${o.name} agregado` }));
+          clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2600);
+        }
+      };
+    });
+
+    const cartItems = Object.entries(cart).map(([id, qty]) => {
+      const p = offersList.find(x => x.id === +id) || PRODUCTS.find(x => x.id === +id);
+      if (!p) return null;
+      const missing = (p.min || 0) - qty;
+      return {
+        id: p.id, name: p.name, pack: p.pack, qty, isWhole: !!p.min && qty >= p.min,
+        price: p.price || null,
+        showNudge: showMayorista && !!p.min && missing > 0 && missing <= Math.ceil(p.min / 2),
+        nudge: `Sumá ${missing} más y accedés a precio mayorista`,
+        inc: () => this.setCartQty(p.id, qty + 1),
+        dec: () => this.setCartQty(p.id, qty - 1),
+        remove: () => this.setCartQty(p.id, 0)
+      };
+    }).filter(Boolean);
+    const count = cartItems.reduce((a, i) => a + i.qty, 0);
+    const isRetiro = delivery === 'retiro';
+
+    const waGenericText = encodeURIComponent('Hola! Quiero cotizar productos de Emme Distribuidora.');
+    const waComboText = encodeURIComponent('Hola! Quiero armar un combo mensual para mi negocio. ¿Me ayudás a cotizarlo?');
+    const cartLines = cartItems.map(i => `• ${i.qty} × ${i.name} (${i.pack})${i.price ? ' — $' + Number(i.price).toLocaleString('es-AR') + ' c/u' : ''}`).join('\n');
+    const sucName = (SUCURSALES.find(s => s.id === sucursal) || {}).name || '';
+    const needsAddress = delivery !== 'retiro';
+    const deliveryTxt = delivery === 'retiro' ? `Retiro en sucursal ${sucName}` : delivery === 'cba' ? 'Envío a Córdoba capital' : 'Envío a Traslasierra';
+    const contactLines = [
+      checkoutName.trim() ? `Nombre: ${checkoutName.trim()}` : '',
+      checkoutPhone.trim() ? `Teléfono: ${checkoutPhone.trim()}` : '',
+      needsAddress && checkoutAddress.trim() ? `Dirección: ${checkoutAddress.trim()}` : ''
+    ].filter(Boolean).join('\n');
+    const orderBody = cartItems.length
+      ? `Hola! Quiero cotizar este pedido:\n${cartLines}\n\nEntrega: ${deliveryTxt}${contactLines ? '\n' + contactLines : ''}\n\n¿Me pasás precio y disponibilidad?`
+      : 'Hola! Quiero cotizar productos de Emme Distribuidora.';
+    const waCartText = encodeURIComponent(orderBody);
+    const cartEmailSubject = encodeURIComponent('Pedido para cotizar — ' + (checkoutName.trim() || 'Cliente'));
+    const cartEmailBody = encodeURIComponent(orderBody);
+
+    const tabDefs = [{ id: 'all', name: 'Todos' }, { id: 'populares', name: 'Más pedidos' }, ...CATS.slice(0, 4), { id: 'limpieza', name: 'Limpieza' }];
+    const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : CATS.find(c => c.id === cat).name;
+
+    const dp = PRODUCTS.find(x => x.id === productOpen);
+    let pd = {};
+    if (dp) {
+      pd = makeCard(dp, { catName: (CATS.find(c => c.id === dp.cat) || {}).name || '' });
+      pd.related = relatedFor(dp).map(r => ({ ...r, open: () => this.setState({ productOpen: r.id }) }));
+      pd.waText = encodeURIComponent(`Hola! Quiero consultar por: ${dp.name} (Cód. ${dp.id}, ${dp.pack}).`);
+    }
+
+    return {
+      showMayorista,
+      heroPromos: heroLayout === 'promos', heroFull: heroLayout === 'completo',
+      waGenericText, waComboText,
+      faqs: faqList.map(f => ({ ...f, open: f.id === openFaq, icon: f.id === openFaq ? '−' : '+', toggle: () => this.setState(s => ({ openFaq: s.openFaq === f.id ? null : f.id })) })),
+      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all' }),
+      goCatalog: () => this.scrollToCatalog(),
+      pickPopulares: () => this.pickCat('populares'),
+      pickVyc: () => this.pickCat('vyc'),
+      vycProducts,
+      vycLeft: () => { const el = document.getElementById('vyc-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
+      vycRight: () => { const el = document.getElementById('vyc-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
+      offerProducts, hasOffers: offerProducts.length > 0,
+      offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
+      offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
+      pickAll: () => this.pickCat('all'),
+      navCats: CATS.map(c => ({ ...c, count: COUNTS[c.id], pick: () => this.pickCat(c.id) })),
+      footerCats: CATS.slice(0, 6),
+      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id }) }; }),
+      catalogTitle: q ? `Resultados para “${query}”` : catName,
+      resultsTxt: `${products.length} productos · consultanos el precio según tu perfil`,
+      products, noResults: products.length === 0,
+      isCarousel,
+      carouselTrackClass: isCarousel ? 'carousel-track' : '',
+      carouselRowClass: isCarousel ? 'carousel-row' : '',
+      productsGridStyle: isCarousel
+        ? ''
+        : 'display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px',
+      carouselLeft: () => { const el = document.getElementById('featured-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
+      carouselRight: () => { const el = document.getElementById('featured-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
+      sucursalOpts: SUCURSALES.map(s => { const on = s.id === sucursal; return { label: s.name, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#D62718' : '#6B635A', pick: () => this.setState({ sucursal: s.id }) }; }),
+      sucursales: SUCURSALES,
+      cartCount: count, cartItems, cartEmpty: cartItems.length === 0, waCartText, cartEmailSubject, cartEmailBody,
+      needsAddress, checkoutName, checkoutPhone, checkoutAddress,
+      onCheckoutName: e => this.setState({ checkoutName: e.target.value }),
+      onCheckoutPhone: e => this.setState({ checkoutPhone: e.target.value }),
+      onCheckoutAddress: e => this.setState({ checkoutAddress: e.target.value }),
+      deliveryOpts: [
+        { id: 'retiro', label: 'Retiro en sucursal' },
+        { id: 'cba', label: 'Envío Córdoba' },
+        { id: 'traslasierra', label: 'Envío Traslasierra' }
+      ].map(d => { const on = d.id === delivery; return { ...d, bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4', pick: () => this.setState({ delivery: d.id }) }; }),
+      cartOpen, openCart: () => this.setState({ cartOpen: true, toast: '' }), closeCart: () => this.setState({ cartOpen: false, orderSent: false }),
+      orderSent, showCartBody: !orderSent,
+      closeOrderSent: () => this.setState({ cartOpen: false, orderSent: false }),
+      checkout: () => { this.setState({ orderSent: true, cart: {} }); },
+      detailOpen: !!dp, pd, closeDetail: () => this.setState({ productOpen: null }),
+      hasToast: !!toast && !cartOpen, toast,
+      contactName, contactEmail, contactMsg,
+      onContactName: e => this.setState({ contactName: e.target.value }),
+      onContactEmail: e => this.setState({ contactEmail: e.target.value }),
+      onContactMsg: e => this.setState({ contactMsg: e.target.value }),
+      sendEmail: () => {
+        const subject = encodeURIComponent('Consulta desde la web — ' + (contactName || 'Cliente'));
+        const body = encodeURIComponent(
+          `Nombre: ${contactName}\nEmail: ${contactEmail}\n\n${contactMsg}`
+        );
+        window.location.href = `mailto:info@centrixgroupsas.com?subject=${subject}&body=${body}`;
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
