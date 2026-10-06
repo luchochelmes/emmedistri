@@ -49,6 +49,7 @@ input{font-family:inherit}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
   .header-top{padding-top:10px!important;padding-bottom:10px!important;gap:12px!important}
+  .header-logo{height:46px!important}
   .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .cart-label{display:none}
 }
@@ -65,7 +66,7 @@ input{font-family:inherit}
     <div style="max-width:1320px;margin:0 auto;padding:8px 24px;display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap">
       <div style="display:flex;gap:24px;flex-wrap:wrap">
         <span>Venta mayorista y minorista</span>
-        <span class="topbar-extra">Envíos en Córdoba capital y Traslasierra</span>
+        <span class="topbar-extra" style="font-weight:800">🚚 Envío SIN CARGO en todos tus pedidos</span>
         <span class="topbar-extra">Precio según mayorista, minorista o consumidor final</span>
       </div>
       <div style="display:flex;gap:20px">
@@ -80,24 +81,38 @@ input{font-family:inherit}
   <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div class="header-top" style="max-width:1320px;margin:0 auto;padding:14px 24px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap">
       <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:60px;width:auto;display:block;border-radius:4px">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:84px;width:auto;display:block;border-radius:4px">
       </a>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <span style="font-size:11px;color:#6B635A;text-transform:uppercase;letter-spacing:1px;font-weight:600">Tu sucursal</span>
-        <div style="display:flex;background:#F1ECE3;border-radius:6px;padding:3px;gap:3px">
-          <sc-for list="{{ sucursalOpts }}" as="s" hint-placeholder-count="3">
-            <button onClick="{{ s.pick }}" style="border:0;border-radius:4px;padding:6px 12px;font-size:13px;font-weight:600;background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }}</button>
-          </sc-for>
-        </div>
+      <div style="display:flex;align-items:center;gap:8px;background:#E2F0E4;border:1.5px solid #2D6A3A;border-radius:999px;padding:8px 16px">
+        <span style="font-size:18px">🚚</span>
+        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.4px;color:#1D4A28">Envío sin cargo en todos tus pedidos</span>
       </div>
     </div>
   </header>
 
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
-      <div style="flex:1;min-width:0;display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
-        <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:11px 14px;font-size:15px;min-width:0;background:transparent"></input>
-        <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 18px;font-weight:600;font-size:14px;flex-shrink:0">Buscar</button>
+      <div style="flex:1;min-width:0;position:relative">
+        <div style="display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
+          <input value="{{ query }}" onChange="{{ onQuery }}" onFocus="{{ onQueryFocus }}" onBlur="{{ onQueryBlur }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:11px 14px;font-size:15px;min-width:0;background:transparent"></input>
+          <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 18px;font-weight:600;font-size:14px;flex-shrink:0">Buscar</button>
+        </div>
+        <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;background:#FFFFFF;border:1px solid #D8D0C4;border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.14);z-index:30;max-height:380px;overflow-y:auto">
+            <sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="4">
+              <button onClick="{{ sg.pick }}" style="width:100%;border:0;background:#FFFFFF;display:flex;align-items:center;gap:10px;padding:9px 14px;text-align:left;border-bottom:1px solid #F3EEE6" style-hover="background:#FBF8F3">
+                <div style="width:36px;height:36px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
+                  <image-slot id="prod-{{ sg.id }}" shape="rect" placeholder=""></image-slot>
+                </div>
+                <span style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600">{{ sg.name }}</span>
+                <span style="font-size:11px;color:#6B635A;font-family:'JetBrains Mono';flex-shrink:0">{{ sg.pack }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noSuggestions }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:16px 14px;font-size:13px;color:#6B635A">Sin resultados para "{{ query }}".</div>
+            </sc-if>
+          </div>
+        </sc-if>
       </div>
       <button onClick="{{ openCart }}" style="flex-shrink:0;border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:11px 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px" style-hover="background:#A81B10">
         <span class="cart-label">Carrito</span>
@@ -119,7 +134,9 @@ input{font-family:inherit}
     <section style="padding-top:24px">
       <sc-if value="{{ heroPromos }}" hint-placeholder-val="{{ true }}">
         <div style="position:relative;min-height:440px;overflow:hidden;background:#2A2522">
-          <image-slot id="hero-media" shape="rect" src="hero.jpg" placeholder="Foto o video del depósito / local (1920×900)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+          <sc-for list="{{ heroSlides }}" as="hs" hint-placeholder-count="1">
+            <image-slot id="hero-media-{{ hs.i }}" shape="rect" src="{{ hs.src }}" placeholder="Foto o video del depósito / local (1920×900)" style="position:absolute;inset:0;width:100%;height:100%;opacity:{{ hs.opacity }};transition:opacity 1.2s ease"></image-slot>
+          </sc-for>
           <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top, rgba(28,25,23,.82) 0%, rgba(28,25,23,0) 62%),linear-gradient(135deg, rgba(28,25,23,.4) 0%, rgba(28,25,23,0) 55%),repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 2px, transparent 2px, transparent 16px)"></div>
           <div class="hero-badge" style="position:absolute;left:max(24px, calc((100% - 1320px)/2 + 24px));right:24px;bottom:32px;max-width:460px;background:rgba(28,25,23,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#FFFFFF;padding:24px 26px;border-radius:6px;border:1px solid rgba(255,255,255,.12);pointer-events:none">
             <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;color:#FFC72C">Directo al mostrador de tu negocio</div>
@@ -129,6 +146,13 @@ input{font-family:inherit}
               <a href="#sucursales" style="border:2px solid #FFFFFF;color:#FFFFFF;padding:10px 16px;border-radius:5px;font-weight:700;font-size:14px;text-decoration:none">Sucursales</a>
             </div>
           </div>
+          <sc-if value="{{ hasMultipleHeroSlides }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5">
+              <sc-for list="{{ heroDots }}" as="hd" hint-placeholder-count="3">
+                <button onClick="{{ hd.pick }}" aria-label="Ir a la imagen {{ hd.n }}" style="width:{{ hd.dotW }};height:8px;border-radius:999px;border:0;background:{{ hd.bg }};padding:0;cursor:pointer;transition:background .2s ease"></button>
+              </sc-for>
+            </div>
+          </sc-if>
         </div>
         <div style="max-width:1320px;margin:0 auto;padding:16px 24px 0">
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-left:4px solid #D62718;border-radius:10px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
@@ -163,8 +187,8 @@ input{font-family:inherit}
           <div style="font-size:14px;color:#6B635A;margin-top:2px">Te cotizamos según cantidad y tipo de cliente</div>
         </div>
         <div style="padding:18px 20px;border-right:1px solid #E6E0D6">
-          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Envío en 24/48 h</div>
-          <div style="font-size:14px;color:#6B635A;margin-top:2px">Córdoba capital, Malagueño y Traslasierra</div>
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase;color:#2D6A3A">🚚 Envío sin cargo</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">En todos tus pedidos, a cualquier zona</div>
         </div>
         <div style="padding:18px 20px;border-right:1px solid #E6E0D6">
           <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Retiro en sucursal</div>
@@ -172,8 +196,36 @@ input{font-family:inherit}
         </div>
         <div style="padding:18px 20px">
           <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Medios de pago</div>
-          <div style="font-size:14px;color:#6B635A;margin-top:2px">Transferencia, Mercado Pago o efectivo</div>
+          <div style="font-size:14px;color:#6B635A;margin-top:2px">Efectivo, transferencia, cheque o e-cheq</div>
         </div>
+      </div>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
+      <h2 style="margin:0 0 4px;font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase;line-height:1">Trabajamos con todo tipo de negocio</h2>
+      <div style="font-size:14px;color:#6B635A;margin-bottom:16px">Armamos tu pedido a medida, sea cual sea tu rubro</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
+        <sc-for list="{{ bizTypes }}" as="b" hint-placeholder-count="9">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+            <span style="font-size:30px">{{ b.icon }}</span>
+            <span style="font-size:13px;font-weight:700;line-height:1.2">{{ b.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width:1320px;margin:0 auto;padding:40px 24px 0">
+      <div style="background:#1C1917;border-radius:10px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+          <span style="background:#FFC72C;color:#1C1917;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">¡Oportunidad!</span>
+          <span style="background:#D62718;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">¡Oferta!</span>
+          <span style="background:#FFC72C;color:#1C1917;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">Ahorrá</span>
+          <span style="background:#D62718;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">Te solucionamos todo</span>
+          <span style="background:#2D6A3A;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">🚚 Envío sin cargo</span>
+        </div>
+        <h2 style="margin:0;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:38px;text-transform:uppercase;line-height:1;text-wrap:balance">¿Tenés negocio? ¡Escribinos!</h2>
+        <p style="margin:0;color:#D8D0C4;font-size:16px;max-width:560px;line-height:1.5">Armá tu carrito y te armamos el presupuesto a tu medida. ¡Aprovechá!</p>
+        <a href="https://wa.me/5493515173319?text={{ waGenericText }}" target="_blank" rel="noopener" style="background:#FFC72C;color:#1C1917;padding:13px 24px;border-radius:6px;font-weight:800;font-size:15px;text-decoration:none;text-transform:uppercase">Armar presupuesto por WhatsApp</a>
       </div>
     </section>
 
@@ -432,6 +484,12 @@ input{font-family:inherit}
               <span style="background:#FFC72C;color:#1C1917;border-radius:999px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px">@</span>
               info@centrixgroupsas.com
             </a>
+            <sc-if value="{{ hasMainSucursal }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <span style="background:#D62718;color:#FFFFFF;border-radius:999px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📍</span>
+                <span>{{ mainSucursalTxt }}<br><span style="color:#FFC72C;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Sede principal · Punto de retiro</span></span>
+              </div>
+            </sc-if>
           </div>
         </div>
         <div style="padding:36px;display:flex;flex-direction:column;gap:12px">
@@ -548,6 +606,14 @@ input{font-family:inherit}
               <button onClick="{{ d.pick }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};border-radius:6px;padding:8px 6px;font-size:12px;font-weight:600;line-height:1.2;color:#1C1917">{{ d.label }}</button>
             </sc-for>
           </div>
+          <sc-if value="{{ needsSucPick }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A;margin-top:4px">¿En qué sucursal retirás?</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ checkoutSucOpts }}" as="cs" hint-placeholder-count="3">
+                <button onClick="{{ cs.pick }}" style="border:1.5px solid {{ cs.bd }};background:{{ cs.bg }};border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:#1C1917;white-space:nowrap">{{ cs.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
           <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A;margin-top:6px">Tus datos</div>
           <input value="{{ checkoutName }}" onChange="{{ onCheckoutName }}" placeholder="Nombre y apellido" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
           <input value="{{ checkoutPhone }}" onChange="{{ onCheckoutPhone }}" placeholder="Teléfono de contacto" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
@@ -630,6 +696,17 @@ input{font-family:inherit}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;promos&quot;,&quot;completo&quot;],&quot;default&quot;:&quot;promos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showMayorista&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Precios&quot;}}">
+const BIZ_TYPES = [
+  { icon: '🥬', label: 'Verdulerías' },
+  { icon: '🥩', label: 'Carnicerías' },
+  { icon: '🏪', label: 'Almacenes' },
+  { icon: '🏬', label: 'Kioscos' },
+  { icon: '🍲', label: 'Casas de comida' },
+  { icon: '🍹', label: 'Bares' },
+  { icon: '🍽️', label: 'Restaurantes' },
+  { icon: '🛒', label: 'Supermercados' },
+  { icon: '🔧', label: 'Ferreterías' }
+];
 const relatedFor = (products, p) => {
   const sameCat = products.filter(x => x.cat === p.cat && x.id !== p.id);
   const rest = products.filter(x => x.cat !== p.cat && x.id !== p.id);
@@ -638,6 +715,7 @@ const relatedFor = (products, p) => {
 const DEFAULT_CONFIG = {
   envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
   aviso: 'Venta mayorista y minorista', lowStock: 12,
+  heroImages: ['hero.jpg'],
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
     { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
@@ -651,7 +729,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', query: '', sucursal: 'malague', delivery: 'retiro', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', openFaq: null
+    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', openFaq: null, heroIndex: 0
   };
 
   componentDidMount() {
@@ -666,15 +744,21 @@ class Component extends DCLogic {
         if (doc.exists) this.setState({ config: doc.data() });
       }, err => console.error('config snapshot', err))
     ];
+    this._heroTimer = setInterval(() => {
+      this.setState(s => {
+        const n = (s.config.heroImages || ['hero.jpg']).length;
+        return n > 1 ? { heroIndex: (s.heroIndex + 1) % n } : {};
+      });
+    }, 5000);
   }
-  componentWillUnmount() { (this._unsubs || []).forEach(u => u()); }
+  componentWillUnmount() { (this._unsubs || []).forEach(u => u()); clearInterval(this._heroTimer); }
 
   setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
   scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
   pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, sucursal, delivery, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, openFaq } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, openFaq, heroIndex } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -684,11 +768,26 @@ class Component extends DCLogic {
       dirHref: 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.address + ', ' + s.zone),
       waHref: 'https://wa.me/549' + (s.wa || config.whatsapp || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(`Hola! Te escribo por la sucursal ${s.name}.`)
     }));
+    const heroImages = (config.heroImages && config.heroImages.length) ? config.heroImages : ['hero.jpg'];
+    const curHeroIndex = heroIndex % heroImages.length;
+    const heroSlides = heroImages.map((src, i) => ({ i, src, opacity: i === curHeroIndex ? 1 : 0 }));
+    const heroDots = heroImages.map((src, i) => ({
+      n: i + 1, dotW: i === curHeroIndex ? '22px' : '8px', bg: i === curHeroIndex ? '#FFC72C' : 'rgba(255,255,255,.55)',
+      pick: () => this.setState({ heroIndex: i })
+    }));
     const faqList = config.faqs || [];
     const offersList = PRODUCTS.filter(p => +p.old > +p.price).map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old }));
     const showMayorista = this.props.showMayorista ?? true;
     const heroLayout = this.props.heroLayout ?? 'promos';
     const q = query.trim().toLowerCase();
+    const suggestions = q ? PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q)).slice(0, 6).map(p => ({
+      id: p.id, name: p.name, pack: p.pack,
+      pick: () => this.setState({ productOpen: p.id, query: '', queryFocused: false })
+    })) : [];
+    const showSuggestions = queryFocused && q.length > 0;
+    const mainSuc = SUCURSALES.find(s => s.id === 'malague');
+    const hasMainSucursal = !!mainSuc;
+    const mainSucursalTxt = mainSuc ? `${mainSuc.address}, ${mainSuc.zone}` : '';
 
     let list = PRODUCTS;
     if (cat === 'populares') list = list.filter(p => p.popular);
@@ -757,7 +856,7 @@ class Component extends DCLogic {
     const waGenericText = encodeURIComponent('Hola! Quiero cotizar productos de Emme Distribuidora.');
     const waComboText = encodeURIComponent('Hola! Quiero armar un combo mensual para mi negocio. ¿Me ayudás a cotizarlo?');
     const cartLines = cartItems.map(i => `• ${i.qty} × ${i.name} (${i.pack})${i.price ? ' — $' + Number(i.price).toLocaleString('es-AR') + ' c/u' : ''}`).join('\n');
-    const sucName = (SUCURSALES.find(s => s.id === sucursal) || {}).name || '';
+    const sucName = (SUCURSALES.find(s => s.id === checkoutSuc) || {}).name || '';
     const needsAddress = delivery !== 'retiro';
     const deliveryTxt = delivery === 'retiro' ? `Retiro en sucursal ${sucName}` : delivery === 'cba' ? 'Envío a Córdoba capital' : 'Envío a Traslasierra';
     const contactLines = [
@@ -790,6 +889,11 @@ class Component extends DCLogic {
       waGenericText, waComboText,
       faqs: faqList.map(f => ({ ...f, open: f.id === openFaq, icon: f.id === openFaq ? '−' : '+', toggle: () => this.setState(s => ({ openFaq: s.openFaq === f.id ? null : f.id })) })),
       query, onQuery: e => this.setState({ query: e.target.value, cat: 'all' }),
+      onQueryFocus: () => this.setState({ queryFocused: true }),
+      onQueryBlur: () => { clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ queryFocused: false }), 180); },
+      showSuggestions, suggestions, noSuggestions: suggestions.length === 0,
+      hasMainSucursal, mainSucursalTxt, bizTypes: BIZ_TYPES,
+      heroSlides, heroDots, hasMultipleHeroSlides: heroImages.length > 1,
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
       pickVyc: () => this.pickCat('vyc'),
@@ -814,13 +918,13 @@ class Component extends DCLogic {
         : 'display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px',
       carouselLeft: () => { const el = document.getElementById('featured-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       carouselRight: () => { const el = document.getElementById('featured-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
-      sucursalOpts: SUCURSALES.map(s => { const on = s.id === sucursal; return { label: s.name, bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#D62718' : '#6B635A', pick: () => this.setState({ sucursal: s.id }) }; }),
       sucursales: SUCURSALES,
       cartCount: count, cartItems, cartEmpty: cartItems.length === 0, waCartText, cartEmailSubject, cartEmailBody,
-      needsAddress, checkoutName, checkoutPhone, checkoutAddress,
+      needsAddress, needsSucPick: delivery === 'retiro', checkoutName, checkoutPhone, checkoutAddress,
       onCheckoutName: e => this.setState({ checkoutName: e.target.value }),
       onCheckoutPhone: e => this.setState({ checkoutPhone: e.target.value }),
       onCheckoutAddress: e => this.setState({ checkoutAddress: e.target.value }),
+      checkoutSucOpts: SUCURSALES.map(s => { const on = s.id === checkoutSuc; return { label: s.name, bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4', pick: () => this.setState({ checkoutSuc: s.id }) }; }),
       deliveryOpts: [
         { id: 'retiro', label: 'Retiro en sucursal' },
         { id: 'cba', label: 'Envío Córdoba' },

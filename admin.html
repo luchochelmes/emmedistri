@@ -323,17 +323,7 @@ input,textarea{font-family:inherit;color:#1C1917}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;align-items:start">
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Envíos y tienda</div>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío gratis desde ($)
-              <input value="{{ cfg.envioGratis }}" onChange="{{ cfgSet.envioGratis }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-            </label>
-            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío Córdoba capital ($)
-                <input value="{{ cfg.costoCba }}" onChange="{{ cfgSet.costoCba }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-              </label>
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Envío Traslasierra ($)
-                <input value="{{ cfg.costoTras }}" onChange="{{ cfgSet.costoTras }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-              </label>
-            </div>
+            <div style="font-size:13px;background:#E2F0E4;border-radius:6px;padding:10px 12px;color:#1D4A28">🚚 El envío se muestra como <strong>sin cargo</strong> en toda la tienda, sin excepciones.</div>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Pedido mínimo ($, 0 = sin mínimo)
               <input value="{{ cfg.minPedido }}" onChange="{{ cfgSet.minPedido }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
             </label>
@@ -354,15 +344,23 @@ input,textarea{font-family:inherit;color:#1C1917}
           <div style="display:flex;flex-direction:column;gap:16px">
             <sc-for list="{{ sucForms }}" as="s" hint-placeholder-count="3">
               <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Sucursal {{ s.name }}</div>
-                  <button onClick="{{ s.toggle }}" style="border:0;background:{{ s.track }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ s.align }}">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+                  <input value="{{ s.name }}" onChange="{{ s.set.name }}" style="border:0;background:transparent;font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase;padding:0;outline:none;min-width:0;flex:1" style-focus="text-decoration:underline">
+                  <button onClick="{{ s.toggle }}" style="border:0;background:{{ s.track }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ s.align }};flex-shrink:0">
                     <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
                   </button>
                 </div>
                 <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
                   <input value="{{ s.address }}" onChange="{{ s.set.address }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
                 </label>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Zona / localidad
+                    <input value="{{ s.zone }}" onChange="{{ s.set.zone }}" placeholder="Para ubicar en el mapa" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                  </label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Etiqueta (badge)
+                    <input value="{{ s.tag }}" onChange="{{ s.set.tag }}" placeholder="Ej: Córdoba capital" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                  </label>
+                </div>
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
                   <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Lunes a viernes
                     <input value="{{ s.week }}" onChange="{{ s.set.week }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
@@ -375,8 +373,21 @@ input,textarea{font-family:inherit;color:#1C1917}
                   <input value="{{ s.wa }}" onChange="{{ s.set.wa }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
                 </label>
                 <div style="font-size:12px;color:#6B635A">{{ s.statusTxt }}</div>
+                <button onClick="{{ s.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar sucursal</button>
               </div>
             </sc-for>
+            <button onClick="{{ addSucursal }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar sucursal</button>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Imágenes del hero</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Rotan automáticamente en la portada de la tienda. Escribí el nombre del archivo (ej: hero.jpg) tal como lo subiste al proyecto.</div>
+            <sc-for list="{{ heroImgRows }}" as="h" hint-placeholder-count="1">
+              <div style="display:flex;gap:8px;align-items:center">
+                <input value="{{ h.src }}" onChange="{{ h.setSrc }}" placeholder="nombre-de-archivo.jpg" style="flex:1;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                <button onClick="{{ h.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:8px 10px;font-size:12px;font-weight:600;flex-shrink:0">Quitar</button>
+              </div>
+            </sc-for>
+            <button onClick="{{ addHeroImg }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar imagen</button>
           </div>
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;grid-column:1 / -1">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Preguntas frecuentes</div>
@@ -530,19 +541,34 @@ input,textarea{font-family:inherit;color:#1C1917}
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio minorista ($)
               <input value="{{ d.price }}" onChange="{{ dSet.price }}" inputmode="numeric" style="border:1px solid {{ priceBd }};border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:15px;font-weight:700;outline:none" style-focus="border-color:#1C1917">
             </label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio anterior ($, para oferta)
-              <input value="{{ d.old }}" onChange="{{ dSet.old }}" inputmode="numeric" placeholder="Vacío = sin oferta" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-            </label>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio mayorista ($)
               <input value="{{ d.whole }}" onChange="{{ dSet.whole }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
             </label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Mayorista desde (bultos)
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Mayorista a partir de (bultos)
               <input value="{{ d.min }}" onChange="{{ dSet.min }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
             </label>
           </div>
-          <sc-if value="{{ hasOffPreview }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:13px;background:#FFF4D1;border-radius:5px;padding:8px 10px">En la tienda se va a mostrar con la etiqueta <strong>{{ offPreview }}</strong>.</div>
-          </sc-if>
+        </div>
+        <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:{{ offerBoxBg }};border:1.5px solid {{ offerBoxBd }};border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px">
+            <button onClick="{{ dToggleOffer }}" style="border:0;background:transparent;padding:0;display:flex;gap:10px;align-items:center;text-align:left">
+              <span style="background:{{ dOfferTrack }};width:36px;height:20px;border-radius:999px;padding:2px;display:flex;justify-content:{{ dOfferAlign }};flex-shrink:0">
+                <span style="width:16px;height:16px;border-radius:50%;background:#FFFFFF;display:block"></span>
+              </span>
+              <span style="font-size:14px;font-weight:700">🔥 ¿Está en oferta?</span>
+            </button>
+            <sc-if value="{{ d.onOffer }}" hint-placeholder-val="{{ false }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Precio anterior ($, se muestra tachado)
+                <input value="{{ d.old }}" onChange="{{ dSet.old }}" inputmode="numeric" placeholder="Ej: un precio más alto que el minorista" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;background:#FFFFFF" style-focus="border-color:#1C1917">
+              </label>
+              <sc-if value="{{ hasOffPreview }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;background:#FFFFFF;border-radius:5px;padding:8px 10px">Se va a mostrar en la tienda, en "Ofertas de la semana", con la etiqueta <strong>{{ offPreview }}</strong>.</div>
+              </sc-if>
+              <sc-if value="{{ offerNeedsPrice }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#A81B10">El precio anterior tiene que ser mayor al precio minorista para que se muestre la oferta.</div>
+              </sc-if>
+            </sc-if>
+          </div>
         </div>
         <div style="border-top:1px solid #EFE9DF;padding-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end">
           <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Stock (bultos)
@@ -769,18 +795,22 @@ const SEED_PRODUCTS = [
   { id: 7044, cat: 'limpieza', name: 'Detergente limón uso profesional', pack: 'bidón 5 L', min: 6, popular: false, vyc: false, desc: 'Detergente concentrado aroma limón, alto poder desengrasante para cocinas industriales.', price: 0, old: 0, whole: 0, stock: 0, published: true },
   { id: 8002, cat: 'aluminio', name: 'Bandeja aluminio F70 con tapa', pack: 'x 100 u.', min: 3, popular: false, vyc: true, desc: 'Bandeja de aluminio con tapa, apta para horno y freezer. Perfecta para viandas y catering.', price: 0, old: 0, whole: 0, stock: 0, published: true },
   { id: 8015, cat: 'aluminio', name: 'Film PVC 38 cm x 1000 m', pack: 'rollo', min: 3, popular: false, vyc: true, desc: 'Film PVC industrial de 38 cm, rollo de 1000 metros para envolver y conservar alimentos en el mostrador.', price: 0, old: 0, whole: 0, stock: 0, published: true }
-];
+].map(p => ({ ...p, onOffer: p.old > 0 }));
 const SEED_CONFIG = {
-  envioGratis: 80000, costoCba: 4500, costoTras: 6500, minPedido: 0, whatsapp: '351 517-3319',
+  minPedido: 0, whatsapp: '351 517-3319',
   aviso: 'Venta mayorista y minorista', lowStock: 12,
+  heroImages: ['hero.jpg'],
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
     { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
+    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
+    { id: 'sancarlosminas', name: 'San Carlos Minas', tag: 'Noroeste de Córdoba', zone: 'San Carlos Minas, Córdoba', address: 'José H. Alonso', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3542-461434', active: true },
+    { id: 'sannicolas', name: 'San Nicolás', tag: 'Córdoba', zone: 'San Nicolás, Córdoba', address: 'Dutari Rodríguez 157', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3541663973', active: true }
   ],
   faqs: [
     { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y lo enviás para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
-    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' }
+    { id: 'f2', q: '¿Hay un pedido mínimo?', a: 'No tenemos un mínimo general. Algunos productos tienen una cantidad a partir de la cual accedés a precio mayorista, eso lo vas a ver en cada producto.' },
+    { id: 'f3', q: '¿Hacen factura A o B?', a: 'Trabajamos principalmente sin factura, como es habitual en la venta de descartables — pero si necesitás factura A o B, consultanos y lo coordinamos.' }
   ]
 };
 const ST = {
@@ -864,7 +894,7 @@ class Component extends DCLogic {
   flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2400); }
   updOrder(id, patch) { db.collection('orders').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
   updProd(id, patch) { db.collection('products').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
-  editProd(p) { this.setState({ draft: { ...p, old: p.old || '' }, draftIsNew: false, draftErr: false }); }
+  editProd(p) { this.setState({ draft: { ...p, old: p.old || '', onOffer: p.onOffer ?? (+p.old > 0) }, draftIsNew: false, draftErr: false }); }
 
   orderVM(o) {
     const st = ST[o.status], f = flow(o.delivery), idx = f.indexOf(o.status);
@@ -991,14 +1021,27 @@ class Component extends DCLogic {
 
     const cfgDraft = s.configDraft || config;
     const cfgSet = {};
-    ['envioGratis', 'costoCba', 'costoTras', 'minPedido', 'whatsapp', 'aviso', 'lowStock'].forEach(f => { cfgSet[f] = e => { const v = e.target.value; this.setState(st => ({ configDraft: { ...(st.configDraft || config), [f]: v } })); }; });
+    ['minPedido', 'whatsapp', 'aviso', 'lowStock'].forEach(f => { cfgSet[f] = e => { const v = e.target.value; this.setState(st => ({ configDraft: { ...(st.configDraft || config), [f]: v } })); }; });
     const sucForms = cfgDraft.sucursales.map((su, i) => {
       const set = {};
-      ['address', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } }; }); }; });
+      ['name', 'address', 'zone', 'tag', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } }; }); }; });
       return { ...su, set, track: su.active ? '#2D6A3A' : '#CFC7BB', align: su.active ? 'flex-end' : 'flex-start',
         statusTxt: su.active ? 'Visible en la tienda y disponible para retiro.' : 'Oculta: no aparece en la tienda ni como opción de retiro.',
-        toggle: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } }; }) };
+        toggle: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } }; }),
+        del: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.filter((x, j) => j !== i) } }; }) };
     });
+    const addSucursal = () => {
+      const id = 'suc' + Date.now();
+      this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: [...base.sucursales, { id, name: 'Nueva sucursal', tag: '', zone: '', address: '', week: '', sat: '', wa: base.whatsapp || '', active: true }] } }; });
+    };
+    const heroImgRows = (cfgDraft.heroImages && cfgDraft.heroImages.length ? cfgDraft.heroImages : ['hero.jpg']).map((src, i) => ({
+      src,
+      setSrc: e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs[i] = v; return { configDraft: { ...base, heroImages: imgs } }; }); },
+      del: () => { this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.splice(i, 1); return { configDraft: { ...base, heroImages: imgs.length ? imgs : ['hero.jpg'] } }; }); }
+    }));
+    const addHeroImg = () => {
+      this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.push(''); return { configDraft: { ...base, heroImages: imgs } }; });
+    };
 
     const faqRows = (cfgDraft.faqs || []).map(f => {
       const isOpen = s.expandedFaq === f.id;
@@ -1043,7 +1086,8 @@ class Component extends DCLogic {
     const d = s.draft || {};
     const dSet = {};
     ['name', 'pack', 'desc', 'price', 'old', 'whole', 'min', 'stock'].forEach(f => { dSet[f] = e => { const v = e.target.value; this.setState(st => ({ draft: { ...st.draft, [f]: v } })); }; });
-    const offOk = +d.old > +d.price && +d.price > 0;
+    const offOk = !!d.onOffer && +d.old > +d.price && +d.price > 0;
+    const offerNeedsPrice = !!d.onOffer && +d.price > 0 && !(+d.old > +d.price);
 
     const bulk = s.bulk || { cat: 'all', pct: '10' };
     const bulkTargets = products.filter(p => bulk.cat === 'all' || p.cat === bulk.cat);
@@ -1118,7 +1162,7 @@ class Component extends DCLogic {
         this.setState({ newCat: '' });
       },
       clientRows, noClients: !clientRows.length,
-      cfg: cfgDraft, cfgSet, sucForms, faqRows, addFaq,
+      cfg: cfgDraft, cfgSet, sucForms, addSucursal, heroImgRows, addHeroImg, faqRows, addFaq,
       saveConfig: () => {
         db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
       },
@@ -1129,6 +1173,10 @@ class Component extends DCLogic {
       priceBd: s.draftErr && !(+d.price > 0) ? '#D62718' : '#D8D0C4', draftError: s.draftErr,
       draftCats: cats.map(c => ({ ...c, ...pick(c.id === d.cat), pick: () => this.setState(st => ({ draft: { ...st.draft, cat: c.id } })) })),
       hasOffPreview: offOk, offPreview: offOk ? '-' + Math.round((1 - d.price / d.old) * 100) + '%' : '',
+      offerNeedsPrice,
+      offerBoxBg: d.onOffer ? '#FFF4D1' : '#FBF8F3', offerBoxBd: d.onOffer ? '#F0C36A' : '#E6E0D6',
+      dOfferTrack: d.onOffer ? '#D62718' : '#CFC7BB', dOfferAlign: d.onOffer ? 'flex-end' : 'flex-start',
+      dToggleOffer: () => this.setState(st => ({ draft: { ...st.draft, onOffer: !st.draft.onOffer, old: st.draft.onOffer ? '' : st.draft.old } })),
       dPubTrack: d.published ? '#2D6A3A' : '#CFC7BB', dPubAlign: d.published ? 'flex-end' : 'flex-start', dPubLabel: d.published ? 'Publicado en la tienda' : 'Oculto',
       dTogglePub: () => this.setState(st => ({ draft: { ...st.draft, published: !st.draft.published } })),
       dVycTrack: d.vyc ? '#2D6A3A' : '#CFC7BB', dVycAlign: d.vyc ? 'flex-end' : 'flex-start', dVycLabel: d.vyc ? 'Sí, en Verdulería y Carnicería' : 'No',
@@ -1136,10 +1184,10 @@ class Component extends DCLogic {
       dPopularTrack: d.popular ? '#2D6A3A' : '#CFC7BB', dPopularAlign: d.popular ? 'flex-end' : 'flex-start', dPopularLabel: d.popular ? 'Sí, destacado' : 'No',
       dTogglePopular: () => this.setState(st => ({ draft: { ...st.draft, popular: !st.draft.popular } })),
       closeDraft: () => this.setState({ draft: null }),
-      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true, vyc: false, popular: false } }),
+      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true, vyc: false, popular: false, onOffer: false } }),
       saveDraft: () => {
         const x = s.draft; if (!String(x.name).trim() || !(+x.price > 0)) return this.setState({ draftErr: true });
-        const clean = { ...x, name: x.name.trim(), price: +x.price, old: +x.old || 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0, vyc: !!x.vyc, popular: !!x.popular };
+        const clean = { ...x, name: x.name.trim(), price: +x.price, old: x.onOffer ? (+x.old || 0) : 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0, vyc: !!x.vyc, popular: !!x.popular, onOffer: !!x.onOffer };
         db.collection('products').doc(String(clean.id)).set(clean)
           .then(() => this.flash(s.draftIsNew ? 'Producto creado' : 'Cambios guardados'))
           .catch(e => this.flash('Error: ' + e.message));
