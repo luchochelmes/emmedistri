@@ -444,6 +444,37 @@ input,textarea{font-family:inherit;color:#1C1917}
             <button onClick="{{ addHeroImg }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar imagen</button>
           </div>
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;grid-column:1 / -1">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Imágenes por rubro de negocio</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Se muestran en "Trabajamos con todo tipo de negocio". Sin foto, ese rubro se ve con un ícono simple.</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+              <sc-for list="{{ bizImgRows }}" as="h" hint-placeholder-count="9">
+                <div style="display:flex;flex-direction:column;gap:6px;border:1px solid #E6E0D6;border-radius:8px;padding:10px">
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <sc-if value="{{ h.hasSrc }}">
+                      <img src="{{ h.src }}" style="width:52px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #E6E0D6;flex-shrink:0">
+                    </sc-if>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.label }}</div>
+                      <div style="font-size:11px;color:#6B635A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.statusTxt }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <label style="flex:1;text-align:center;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:5px;padding:7px 10px;font-size:12px;font-weight:600;cursor:pointer">
+                      {{ h.btnTxt }}
+                      <input type="file" accept="image/*" onChange="{{ h.onPick }}" style="display:none">
+                    </label>
+                    <sc-if value="{{ h.hasSrc }}">
+                      <button onClick="{{ h.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:7px 10px;font-size:12px;font-weight:600;flex-shrink:0">Quitar</button>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ h.error }}">
+                    <div style="font-size:12px;color:#A81B10">{{ h.error }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;grid-column:1 / -1">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Preguntas frecuentes</div>
             <div style="font-size:12px;color:#6B635A;margin-top:-10px">Esto se muestra en la tienda, en la sección "Preguntas frecuentes".</div>
             <sc-for list="{{ faqRows }}" as="f" hint-placeholder-count="2">
@@ -850,10 +881,21 @@ const SEED_PRODUCTS = [
   { id: 8002, cat: 'aluminio', name: 'Bandeja aluminio F70 con tapa', pack: 'x 100 u.', min: 3, popular: false, vyc: true, desc: 'Bandeja de aluminio con tapa, apta para horno y freezer. Perfecta para viandas y catering.', price: 0, old: 0, whole: 0, stock: 0, published: true },
   { id: 8015, cat: 'aluminio', name: 'Film PVC 38 cm x 1000 m', pack: 'rollo', min: 3, popular: false, vyc: true, desc: 'Film PVC industrial de 38 cm, rollo de 1000 metros para envolver y conservar alimentos en el mostrador.', price: 0, old: 0, whole: 0, stock: 0, published: true }
 ].map(p => ({ ...p, onOffer: p.old > 0 }));
+const BIZ_TYPES = [
+  { key: 'verdulerias', label: 'Verdulerías' },
+  { key: 'carnicerias', label: 'Carnicerías' },
+  { key: 'almacenes', label: 'Almacenes' },
+  { key: 'kioscos', label: 'Kioscos' },
+  { key: 'casasdecomida', label: 'Casas de comida' },
+  { key: 'bares', label: 'Bares' },
+  { key: 'restaurantes', label: 'Restaurantes' },
+  { key: 'supermercados', label: 'Supermercados' },
+  { key: 'ferreterias', label: 'Ferreterías' }
+];
 const SEED_CONFIG = {
   minPedido: 0, whatsapp: '351 517-3319',
   aviso: 'Venta mayorista y minorista', lowStock: 12,
-  heroImages: ['hero.jpg'],
+  heroImages: ['hero.jpg'], bizImages: {},
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
     { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
@@ -905,8 +947,27 @@ class Component extends DCLogic {
     expandedFaq: null, expandedSuc: null, configDraft: null,
     curPwInput: '', newEmailInput: '', newPwInput: '', credError: '', credSuccess: '',
     priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {},
-    heroUploadingIdx: null, heroUploadErr: {}
+    heroUploadingIdx: null, heroUploadErr: {},
+    bizUploadingKey: null, bizUploadErr: {}
   };
+
+  // Sin Firebase Storage (plan free): la foto se achica en el navegador y se
+  // guarda como data-URL directo en el documento de config de Firestore.
+  compressImage(file) {
+    return createImageBitmap(file).then(bitmap => {
+      const MAX_DIM = 1600;
+      const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+      const w = Math.max(1, Math.round(bitmap.width * scale));
+      const h = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+      if (bitmap.close) bitmap.close();
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+      if (dataUrl.length > 700000) throw new Error('La imagen sigue siendo muy pesada. Probá con otra foto más liviana.');
+      return dataUrl;
+    });
+  }
 
   uploadHeroImage(i, file) {
     if (!file) return;
@@ -915,23 +976,8 @@ class Component extends DCLogic {
       return;
     }
     this.setState(st => ({ heroUploadingIdx: i, heroUploadErr: { ...st.heroUploadErr, [i]: '' } }));
-    // Sin Firebase Storage (plan free): la foto se achica en el navegador y se
-    // guarda como data-URL directo en el documento de config de Firestore.
-    createImageBitmap(file)
-      .then(bitmap => {
-        const MAX_DIM = 1600;
-        const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
-        const w = Math.max(1, Math.round(bitmap.width * scale));
-        const h = Math.max(1, Math.round(bitmap.height * scale));
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
-        if (bitmap.close) bitmap.close();
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
-        if (dataUrl.length > 700000) {
-          this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'La imagen sigue siendo muy pesada. Probá con otra foto más liviana.' } }));
-          return;
-        }
+    this.compressImage(file)
+      .then(dataUrl => {
         this.setState(st => {
           const base = st.configDraft || this.state.config;
           const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice();
@@ -940,8 +986,36 @@ class Component extends DCLogic {
         });
       })
       .catch(e => {
-        this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'No se pudo procesar la imagen: ' + e.message } }));
+        this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: e.message } }));
       });
+  }
+
+  uploadBizImage(key, file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) {
+      this.setState(st => ({ bizUploadErr: { ...st.bizUploadErr, [key]: 'Elegí un archivo de imagen.' } }));
+      return;
+    }
+    this.setState(st => ({ bizUploadingKey: key, bizUploadErr: { ...st.bizUploadErr, [key]: '' } }));
+    this.compressImage(file)
+      .then(dataUrl => {
+        this.setState(st => {
+          const base = st.configDraft || this.state.config;
+          return { configDraft: { ...base, bizImages: { ...(base.bizImages || {}), [key]: dataUrl } }, bizUploadingKey: null };
+        });
+      })
+      .catch(e => {
+        this.setState(st => ({ bizUploadingKey: null, bizUploadErr: { ...st.bizUploadErr, [key]: e.message } }));
+      });
+  }
+
+  removeBizImage(key) {
+    this.setState(st => {
+      const base = st.configDraft || this.state.config;
+      const imgs = { ...(base.bizImages || {}) };
+      delete imgs[key];
+      return { configDraft: { ...base, bizImages: imgs } };
+    });
   }
 
   componentDidMount() {
@@ -1145,6 +1219,19 @@ class Component extends DCLogic {
       this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.push(''); return { configDraft: { ...base, heroImages: imgs } }; });
     };
 
+    const bizImgRows = BIZ_TYPES.map(b => {
+      const src = (cfgDraft.bizImages && cfgDraft.bizImages[b.key]) || '';
+      const uploading = s.bizUploadingKey === b.key;
+      return {
+        key: b.key, label: b.label, src, uploading, hasSrc: !!src,
+        error: (s.bizUploadErr && s.bizUploadErr[b.key]) || '',
+        statusTxt: uploading ? 'Subiendo imagen...' : (src ? 'Imagen cargada' : 'Sin imagen todavía'),
+        btnTxt: uploading ? 'Subiendo...' : (src ? 'Cambiar' : 'Subir'),
+        onPick: e => { const f = e.target.files && e.target.files[0]; this.uploadBizImage(b.key, f); },
+        del: () => this.removeBizImage(b.key)
+      };
+    });
+
     const faqRows = (cfgDraft.faqs || []).map(f => {
       const isOpen = s.expandedFaq === f.id;
       return {
@@ -1264,7 +1351,7 @@ class Component extends DCLogic {
         this.setState({ newCat: '' });
       },
       clientRows, noClients: !clientRows.length,
-      cfg: cfgDraft, cfgSet, sucForms, addSucursal, heroImgRows, addHeroImg, faqRows, addFaq,
+      cfg: cfgDraft, cfgSet, sucForms, addSucursal, heroImgRows, addHeroImg, bizImgRows, faqRows, addFaq,
       curUserEmail: (auth.currentUser && auth.currentUser.email) || '',
       curPwInput: s.curPwInput, onCurPw: e => this.setState({ curPwInput: e.target.value }),
       newEmailInput: s.newEmailInput, onNewEmail: e => this.setState({ newEmailInput: e.target.value }),
