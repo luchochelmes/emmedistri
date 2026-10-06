@@ -22,7 +22,8 @@ body{margin:0;background:#F7F4EE;color:#1C1917;font-family:Barlow,system-ui,sans
 a{color:#D62718;text-decoration:none}
 a:hover{color:#A81B10;text-decoration:underline}
 button{font-family:inherit;cursor:pointer}
-.biz-card:hover{border-color:#D62718}
+.biz-card{transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.biz-card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(28,25,23,.14);border-color:#D62718}
 input{font-family:inherit}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -208,7 +209,8 @@ input{font-family:inherit}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
         <sc-for list="{{ bizTypes }}" as="b" hint-placeholder-count="9">
           <sc-if value="{{ b.hasPhoto }}" hint-placeholder-val="{{ false }}">
-            <div style="position:relative;border-radius:10px;overflow:hidden;min-height:150px;background-image:url('{{ b.photo }}');background-size:cover;background-position:center" class="biz-card">
+            <div onClick="{{ b.pick }}" class="biz-card" style="position:relative;border-radius:10px;overflow:hidden;min-height:150px;cursor:pointer">
+              <img src="{{ b.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
               <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(28,25,23,.78) 0%,rgba(28,25,23,.15) 55%,rgba(28,25,23,.35) 100%)"></div>
               <div style="position:relative;height:100%;display:flex;align-items:flex-end;padding:12px">
                 <span style="color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.3px;line-height:1.15">{{ b.label }}</span>
@@ -216,7 +218,7 @@ input{font-family:inherit}
             </div>
           </sc-if>
           <sc-if value="{{ b.noPhoto }}" hint-placeholder-val="{{ true }}">
-            <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;transition:border-color .15s" class="biz-card">
+            <div onClick="{{ b.pick }}" class="biz-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;cursor:pointer">
               <div style="width:52px;height:52px;border-radius:999px;background:#F6F1E8;border:1px solid #E6E0D6;display:flex;align-items:center;justify-content:center;font-size:24px">{{ b.icon }}</div>
               <span style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:0.3px;color:#1C1917;line-height:1.15">{{ b.label }}</span>
             </div>
@@ -907,7 +909,8 @@ class Component extends DCLogic {
       hasMainSucursal, mainSucursalTxt,
       bizTypes: BIZ_TYPES.map(b => {
         const photo = (config.bizImages && config.bizImages[b.key]) || '';
-        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo };
+        const bizCat = (config.bizCats && config.bizCats[b.key]) || 'all';
+        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat(bizCat) };
       }),
       heroSlides, heroDots, hasMultipleHeroSlides: heroImages.length > 1,
       goCatalog: () => this.scrollToCatalog(),
