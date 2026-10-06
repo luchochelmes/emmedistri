@@ -204,11 +204,13 @@ input{font-family:inherit}
     <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
       <h2 style="margin:0 0 4px;font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase;line-height:1">Trabajamos con todo tipo de negocio</h2>
       <div style="font-size:14px;color:#6B635A;margin-bottom:16px">Armamos tu pedido a medida, sea cual sea tu rubro</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
         <sc-for list="{{ bizTypes }}" as="b" hint-placeholder-count="9">
-          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
-            <span style="font-size:30px">{{ b.icon }}</span>
-            <span style="font-size:13px;font-weight:700;line-height:1.2">{{ b.label }}</span>
+          <div style="position:relative;border-radius:12px;overflow:hidden;min-height:150px;display:flex;flex-direction:column;background:{{ b.bg }};box-shadow:0 2px 6px rgba(0,0,0,.08)">
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:48px">{{ b.icon }}</div>
+            <div style="background:rgba(0,0,0,.22);padding:10px 8px;text-align:center">
+              <span style="color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.3px;line-height:1.15">{{ b.label }}</span>
+            </div>
           </div>
         </sc-for>
       </div>
@@ -696,6 +698,7 @@ input{font-family:inherit}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;promos&quot;,&quot;completo&quot;],&quot;default&quot;:&quot;promos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showMayorista&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Precios&quot;}}">
+const BIZ_COLORS = ['#D62718', '#2D6A3A', '#1C1917', '#B9510B'];
 const BIZ_TYPES = [
   { icon: '🥬', label: 'Verdulerías' },
   { icon: '🥩', label: 'Carnicerías' },
@@ -706,7 +709,7 @@ const BIZ_TYPES = [
   { icon: '🍽️', label: 'Restaurantes' },
   { icon: '🛒', label: 'Supermercados' },
   { icon: '🔧', label: 'Ferreterías' }
-];
+].map((b, i) => ({ ...b, bg: BIZ_COLORS[i % BIZ_COLORS.length] }));
 const relatedFor = (products, p) => {
   const sameCat = products.filter(x => x.cat === p.cat && x.id !== p.id);
   const rest = products.filter(x => x.cat !== p.cat && x.id !== p.id);

@@ -6,7 +6,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="./firebase-init.js"></script>
 <script src="./support.js"></script>
 </head>
@@ -904,19 +903,32 @@ class Component extends DCLogic {
       return;
     }
     this.setState(st => ({ heroUploadingIdx: i, heroUploadErr: { ...st.heroUploadErr, [i]: '' } }));
-    const path = 'hero/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
-    storage.ref(path).put(file)
-      .then(snap => snap.ref.getDownloadURL())
-      .then(url => {
+    // Sin Firebase Storage (plan free): la foto se achica en el navegador y se
+    // guarda como data-URL directo en el documento de config de Firestore.
+    createImageBitmap(file)
+      .then(bitmap => {
+        const MAX_DIM = 1600;
+        const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+        const w = Math.max(1, Math.round(bitmap.width * scale));
+        const h = Math.max(1, Math.round(bitmap.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+        if (bitmap.close) bitmap.close();
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+        if (dataUrl.length > 700000) {
+          this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'La imagen sigue siendo muy pesada. Probá con otra foto más liviana.' } }));
+          return;
+        }
         this.setState(st => {
           const base = st.configDraft || this.state.config;
           const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice();
-          imgs[i] = url;
+          imgs[i] = dataUrl;
           return { configDraft: { ...base, heroImages: imgs }, heroUploadingIdx: null };
         });
       })
       .catch(e => {
-        this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'No se pudo subir la imagen: ' + e.message } }));
+        this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'No se pudo procesar la imagen: ' + e.message } }));
       });
   }
 
