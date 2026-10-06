@@ -368,6 +368,9 @@ input,textarea{font-family:inherit;color:#1C1917}
                     <sc-if value="{{ s.inactive }}" hint-placeholder-val="{{ false }}">
                       <span style="flex-shrink:0;background:#EEE9E2;color:#6B635A;font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:999px">Oculta</span>
                     </sc-if>
+                    <sc-if value="{{ s.isMain }}" hint-placeholder-val="{{ false }}">
+                      <span style="flex-shrink:0;background:#FFF4D1;color:#8A5A00;font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:999px">Sede principal</span>
+                    </sc-if>
                   </button>
                   <button onClick="{{ s.toggle }}" style="border:0;background:{{ s.track }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ s.align }};flex-shrink:0">
                     <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
@@ -401,7 +404,16 @@ input,textarea{font-family:inherit;color:#1C1917}
                       <input value="{{ s.wa }}" onChange="{{ s.set.wa }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
                     </label>
                     <div style="font-size:12px;color:#6B635A">{{ s.statusTxt }}</div>
-                    <button onClick="{{ s.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar sucursal</button>
+                    <div style="font-size:12px;color:#6B635A">La sede principal es la que aparece con su dirección en la sección Contacto de la tienda.</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <sc-if value="{{ s.isMain }}" hint-placeholder-val="{{ false }}">
+                        <span style="align-self:flex-start;border:1px solid #FFC72C;background:#FFF4D1;color:#8A5A00;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">★ Es la sede principal</span>
+                      </sc-if>
+                      <sc-if value="{{ s.notMain }}" hint-placeholder-val="{{ true }}">
+                        <button onClick="{{ s.setMain }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Marcar como sede principal</button>
+                      </sc-if>
+                      <button onClick="{{ s.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar sucursal</button>
+                    </div>
                   </div>
                 </sc-if>
               </div>
@@ -843,11 +855,11 @@ const SEED_CONFIG = {
   aviso: 'Venta mayorista y minorista', lowStock: 12,
   heroImages: ['hero.jpg'],
   sucursales: [
-    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'sancarlosminas', name: 'San Carlos Minas', tag: 'Noroeste de Córdoba', zone: 'San Carlos Minas, Córdoba', address: 'José H. Alonso', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3542-461434', active: true },
-    { id: 'sannicolas', name: 'San Nicolás', tag: 'Córdoba', zone: 'San Nicolás, Córdoba', address: 'Dutari Rodríguez 157', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3541663973', active: true }
+    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
+    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
+    { id: 'sancarlosminas', name: 'San Carlos Minas', tag: 'Noroeste de Córdoba', zone: 'San Carlos Minas, Córdoba', address: 'José H. Alonso', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3542-461434', active: true, main: false },
+    { id: 'sannicolas', name: 'San Nicolás', tag: 'Córdoba', zone: 'San Nicolás, Córdoba', address: 'Dutari Rodríguez 157', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3541663973', active: true, main: false }
   ],
   faqs: [
     { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y lo enviás para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
@@ -1108,14 +1120,15 @@ class Component extends DCLogic {
       const isOpen = s.expandedSuc === su.id;
       return { ...su, set, track: su.active ? '#2D6A3A' : '#CFC7BB', align: su.active ? 'flex-end' : 'flex-start',
         statusTxt: su.active ? 'Visible en la tienda y disponible para retiro.' : 'Oculta: no aparece en la tienda ni como opción de retiro.',
-        inactive: !su.active, isOpen, icon: isOpen ? '−' : '+',
+        inactive: !su.active, isOpen, icon: isOpen ? '−' : '+', isMain: !!su.main, notMain: !su.main,
         toggleOpen: () => this.setState(st => ({ expandedSuc: st.expandedSuc === su.id ? null : su.id })),
         toggle: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } }; }),
+        setMain: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => ({ ...x, main: j === i })) } }; }),
         del: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.filter((x, j) => j !== i) } }; }) };
     });
     const addSucursal = () => {
       const id = 'suc' + Date.now();
-      this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: [...base.sucursales, { id, name: 'Nueva sucursal', tag: '', zone: '', address: '', week: '', sat: '', wa: base.whatsapp || '', active: true }] } }; });
+      this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: [...base.sucursales, { id, name: 'Nueva sucursal', tag: '', zone: '', address: '', week: '', sat: '', wa: base.whatsapp || '', active: true, main: false }] } }; });
     };
     const heroImgRows = (cfgDraft.heroImages && cfgDraft.heroImages.length ? cfgDraft.heroImages : ['hero.jpg']).map((src, i) => {
       const uploading = s.heroUploadingIdx === i;

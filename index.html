@@ -720,9 +720,9 @@ const DEFAULT_CONFIG = {
   aviso: 'Venta mayorista y minorista', lowStock: 12,
   heroImages: ['hero.jpg'],
   sucursales: [
-    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true },
-    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true }
+    { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
+    { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false }
   ],
   faqs: [
     { id: 'f1', q: '¿Cómo sé el precio de un producto?', a: 'Los precios varían según seas mayorista, minorista o consumidor final. Armá tu pedido en la web y enviálo para cotizar por WhatsApp o email — te respondemos con el precio según tu perfil.' },
@@ -788,7 +788,7 @@ class Component extends DCLogic {
       pick: () => this.setState({ productOpen: p.id, query: '', queryFocused: false })
     })) : [];
     const showSuggestions = queryFocused && q.length > 0;
-    const mainSuc = SUCURSALES.find(s => s.id === 'malague');
+    const mainSuc = SUCURSALES.find(s => s.main) || SUCURSALES.find(s => s.id === 'malague') || SUCURSALES[0];
     const hasMainSucursal = !!mainSuc;
     const mainSucursalTxt = mainSuc ? `${mainSuc.address}, ${mainSuc.zone}` : '';
 
