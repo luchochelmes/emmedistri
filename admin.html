@@ -6,6 +6,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script src="./firebase-init.js"></script>
 <script src="./support.js"></script>
 </head>
@@ -410,11 +411,23 @@ input,textarea{font-family:inherit;color:#1C1917}
           </div>
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Imágenes del hero</div>
-            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Rotan automáticamente en la portada de la tienda. Escribí el nombre del archivo (ej: hero.jpg) tal como lo subiste al proyecto.</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-10px">Rotan automáticamente en la portada de la tienda. Subí la foto directamente desde tu computadora o celular.</div>
             <sc-for list="{{ heroImgRows }}" as="h" hint-placeholder-count="1">
-              <div style="display:flex;gap:8px;align-items:center">
-                <input value="{{ h.src }}" onChange="{{ h.setSrc }}" placeholder="nombre-de-archivo.jpg" style="flex:1;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                <button onClick="{{ h.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:8px 10px;font-size:12px;font-weight:600;flex-shrink:0">Quitar</button>
+              <div style="display:flex;flex-direction:column;gap:6px;border:1px solid #E6E0D6;border-radius:8px;padding:10px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <sc-if value="{{ h.src }}">
+                    <img src="{{ h.src }}" style="width:72px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #E6E0D6;flex-shrink:0">
+                  </sc-if>
+                  <div style="flex:1;min-width:0;font-size:12px;color:#6B635A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.statusTxt }}</div>
+                  <label style="border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:5px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">
+                    {{ h.btnTxt }}
+                    <input type="file" accept="image/*" onChange="{{ h.onPick }}" style="display:none">
+                  </label>
+                  <button onClick="{{ h.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:8px 10px;font-size:12px;font-weight:600;flex-shrink:0">Quitar</button>
+                </div>
+                <sc-if value="{{ h.error }}">
+                  <div style="font-size:12px;color:#A81B10">{{ h.error }}</div>
+                </sc-if>
               </div>
             </sc-for>
             <button onClick="{{ addHeroImg }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar imagen</button>
@@ -880,8 +893,32 @@ class Component extends DCLogic {
     odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' },
     expandedFaq: null, expandedSuc: null, configDraft: null,
     curPwInput: '', newEmailInput: '', newPwInput: '', credError: '', credSuccess: '',
-    priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {}
+    priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {},
+    heroUploadingIdx: null, heroUploadErr: {}
   };
+
+  uploadHeroImage(i, file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) {
+      this.setState(st => ({ heroUploadErr: { ...st.heroUploadErr, [i]: 'Elegí un archivo de imagen.' } }));
+      return;
+    }
+    this.setState(st => ({ heroUploadingIdx: i, heroUploadErr: { ...st.heroUploadErr, [i]: '' } }));
+    const path = 'hero/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+    storage.ref(path).put(file)
+      .then(snap => snap.ref.getDownloadURL())
+      .then(url => {
+        this.setState(st => {
+          const base = st.configDraft || this.state.config;
+          const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice();
+          imgs[i] = url;
+          return { configDraft: { ...base, heroImages: imgs }, heroUploadingIdx: null };
+        });
+      })
+      .catch(e => {
+        this.setState(st => ({ heroUploadingIdx: null, heroUploadErr: { ...st.heroUploadErr, [i]: 'No se pudo subir la imagen: ' + e.message } }));
+      });
+  }
 
   componentDidMount() {
     this._seedChecked = false;
@@ -1068,11 +1105,17 @@ class Component extends DCLogic {
       const id = 'suc' + Date.now();
       this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: [...base.sucursales, { id, name: 'Nueva sucursal', tag: '', zone: '', address: '', week: '', sat: '', wa: base.whatsapp || '', active: true }] } }; });
     };
-    const heroImgRows = (cfgDraft.heroImages && cfgDraft.heroImages.length ? cfgDraft.heroImages : ['hero.jpg']).map((src, i) => ({
-      src,
-      setSrc: e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs[i] = v; return { configDraft: { ...base, heroImages: imgs } }; }); },
-      del: () => { this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.splice(i, 1); return { configDraft: { ...base, heroImages: imgs.length ? imgs : ['hero.jpg'] } }; }); }
-    }));
+    const heroImgRows = (cfgDraft.heroImages && cfgDraft.heroImages.length ? cfgDraft.heroImages : ['hero.jpg']).map((src, i) => {
+      const uploading = s.heroUploadingIdx === i;
+      return {
+        src, uploading,
+        error: (s.heroUploadErr && s.heroUploadErr[i]) || '',
+        statusTxt: uploading ? 'Subiendo imagen...' : (src ? 'Imagen cargada' : 'Sin imagen todavía'),
+        btnTxt: uploading ? 'Subiendo...' : (src ? 'Cambiar imagen' : 'Subir imagen'),
+        onPick: e => { const f = e.target.files && e.target.files[0]; this.uploadHeroImage(i, f); },
+        del: () => { this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.splice(i, 1); return { configDraft: { ...base, heroImages: imgs.length ? imgs : ['hero.jpg'] } }; }); }
+      };
+    });
     const addHeroImg = () => {
       this.setState(st => { const base = st.configDraft || config; const imgs = (base.heroImages && base.heroImages.length ? base.heroImages : ['hero.jpg']).slice(); imgs.push(''); return { configDraft: { ...base, heroImages: imgs } }; });
     };
