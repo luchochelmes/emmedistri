@@ -337,43 +337,73 @@ input,textarea{font-family:inherit;color:#1C1917}
               <input value="{{ cfg.lowStock }}" onChange="{{ cfgSet.lowStock }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
             </label>
           </div>
-          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px">
             <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Usuario y contraseña</div>
-            <div style="font-size:13px;color:#6B635A;line-height:1.5">El acceso al panel ahora se maneja desde Firebase (más seguro). Para cambiar la contraseña o agregar otro administrador, entrá a la consola de Firebase → Authentication → Users.</div>
+            <div style="font-size:12px;color:#6B635A;margin-top:-6px">Email actual: {{ curUserEmail }}</div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Contraseña actual (para confirmar el cambio)
+              <input type="password" value="{{ curPwInput }}" onChange="{{ onCurPw }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Nuevo email (opcional)
+              <input value="{{ newEmailInput }}" onChange="{{ onNewEmail }}" placeholder="Dejalo vacío para no cambiarlo" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Nueva contraseña (opcional)
+              <input type="password" value="{{ newPwInput }}" onChange="{{ onNewPw }}" placeholder="Dejalo vacío para no cambiarla, mínimo 6 caracteres" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            </label>
+            <sc-if value="{{ hasCredError }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:13px;color:#A81B10;font-weight:600">{{ credError }}</div>
+            </sc-if>
+            <sc-if value="{{ hasCredSuccess }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:13px;color:#2D6A3A;font-weight:600">{{ credSuccess }}</div>
+            </sc-if>
+            <button onClick="{{ saveCredentials }}" style="align-self:flex-start;border:0;background:#1C1917;color:#FFFFFF;border-radius:6px;padding:10px 18px;font-weight:700;font-size:13px">Actualizar acceso</button>
           </div>
-          <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase">Sucursales</div>
             <sc-for list="{{ sucForms }}" as="s" hint-placeholder-count="3">
-              <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-                  <input value="{{ s.name }}" onChange="{{ s.set.name }}" style="border:0;background:transparent;font-family:'Barlow Condensed';font-weight:700;font-size:20px;text-transform:uppercase;padding:0;outline:none;min-width:0;flex:1" style-focus="text-decoration:underline">
+              <div style="border:1px solid #E6E0D6;border-radius:8px;overflow:hidden">
+                <div style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px">
+                  <button onClick="{{ s.toggleOpen }}" style="flex:1;min-width:0;border:0;background:transparent;display:flex;align-items:center;gap:8px;text-align:left;padding:0;font-size:14px;font-weight:700;color:#1C1917">
+                    <span style="flex-shrink:0;width:22px;height:22px;border-radius:999px;background:#F1ECE3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">{{ s.icon }}</span>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</span>
+                    <sc-if value="{{ s.inactive }}" hint-placeholder-val="{{ false }}">
+                      <span style="flex-shrink:0;background:#EEE9E2;color:#6B635A;font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:999px">Oculta</span>
+                    </sc-if>
+                  </button>
                   <button onClick="{{ s.toggle }}" style="border:0;background:{{ s.track }};width:42px;height:24px;border-radius:999px;padding:3px;display:flex;justify-content:{{ s.align }};flex-shrink:0">
                     <span style="width:18px;height:18px;border-radius:50%;background:#FFFFFF;display:block"></span>
                   </button>
                 </div>
-                <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
-                  <input value="{{ s.address }}" onChange="{{ s.set.address }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                </label>
-                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Zona / localidad
-                    <input value="{{ s.zone }}" onChange="{{ s.set.zone }}" placeholder="Para ubicar en el mapa" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                  </label>
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Etiqueta (badge)
-                    <input value="{{ s.tag }}" onChange="{{ s.set.tag }}" placeholder="Ej: Córdoba capital" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                  </label>
-                </div>
-                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Lunes a viernes
-                    <input value="{{ s.week }}" onChange="{{ s.set.week }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                  </label>
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Sábados
-                    <input value="{{ s.sat }}" onChange="{{ s.set.sat }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                  </label>
-                </div>
-                <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">WhatsApp de la sucursal
-                  <input value="{{ s.wa }}" onChange="{{ s.set.wa }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-                </label>
-                <div style="font-size:12px;color:#6B635A">{{ s.statusTxt }}</div>
-                <button onClick="{{ s.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar sucursal</button>
+                <sc-if value="{{ s.isOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:0 14px 16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid #F3EEE6;margin-top:0;padding-top:12px">
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Nombre
+                      <input value="{{ s.name }}" onChange="{{ s.set.name }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;font-weight:600;outline:none" style-focus="border-color:#1C1917">
+                    </label>
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
+                      <input value="{{ s.address }}" onChange="{{ s.set.address }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                    </label>
+                    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Zona / localidad
+                        <input value="{{ s.zone }}" onChange="{{ s.set.zone }}" placeholder="Para ubicar en el mapa" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                      </label>
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Etiqueta (badge)
+                        <input value="{{ s.tag }}" onChange="{{ s.set.tag }}" placeholder="Ej: Córdoba capital" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                      </label>
+                    </div>
+                    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Lunes a viernes
+                        <input value="{{ s.week }}" onChange="{{ s.set.week }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                      </label>
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Sábados
+                        <input value="{{ s.sat }}" onChange="{{ s.set.sat }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                      </label>
+                    </div>
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">WhatsApp de la sucursal
+                      <input value="{{ s.wa }}" onChange="{{ s.set.wa }}" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+                    </label>
+                    <div style="font-size:12px;color:#6B635A">{{ s.statusTxt }}</div>
+                    <button onClick="{{ s.del }}" style="align-self:flex-start;border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600">Eliminar sucursal</button>
+                  </div>
+                </sc-if>
               </div>
             </sc-for>
             <button onClick="{{ addSucursal }}" style="align-self:flex-start;border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 16px;font-weight:700;font-size:13px">+ Agregar sucursal</button>
@@ -848,7 +878,8 @@ class Component extends DCLogic {
     openOrder: null, draft: null, draftIsNew: false, draftErr: false,
     confirmDel: null, bulk: null, newCat: '', toast: '',
     odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' },
-    expandedFaq: null, configDraft: null,
+    expandedFaq: null, expandedSuc: null, configDraft: null,
+    curPwInput: '', newEmailInput: '', newPwInput: '', credError: '', credSuccess: '',
     priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {}
   };
 
@@ -1025,8 +1056,11 @@ class Component extends DCLogic {
     const sucForms = cfgDraft.sucursales.map((su, i) => {
       const set = {};
       ['name', 'address', 'zone', 'tag', 'week', 'sat', 'wa'].forEach(f => { set[f] = e => { const v = e.target.value; this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, [f]: v } : x) } }; }); }; });
+      const isOpen = s.expandedSuc === su.id;
       return { ...su, set, track: su.active ? '#2D6A3A' : '#CFC7BB', align: su.active ? 'flex-end' : 'flex-start',
         statusTxt: su.active ? 'Visible en la tienda y disponible para retiro.' : 'Oculta: no aparece en la tienda ni como opción de retiro.',
+        inactive: !su.active, isOpen, icon: isOpen ? '−' : '+',
+        toggleOpen: () => this.setState(st => ({ expandedSuc: st.expandedSuc === su.id ? null : su.id })),
         toggle: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.map((x, j) => j === i ? { ...x, active: !x.active } : x) } }; }),
         del: () => this.setState(st => { const base = st.configDraft || config; return { configDraft: { ...base, sucursales: base.sucursales.filter((x, j) => j !== i) } }; }) };
     });
@@ -1163,6 +1197,34 @@ class Component extends DCLogic {
       },
       clientRows, noClients: !clientRows.length,
       cfg: cfgDraft, cfgSet, sucForms, addSucursal, heroImgRows, addHeroImg, faqRows, addFaq,
+      curUserEmail: (auth.currentUser && auth.currentUser.email) || '',
+      curPwInput: s.curPwInput, onCurPw: e => this.setState({ curPwInput: e.target.value }),
+      newEmailInput: s.newEmailInput, onNewEmail: e => this.setState({ newEmailInput: e.target.value }),
+      newPwInput: s.newPwInput, onNewPw: e => this.setState({ newPwInput: e.target.value }),
+      credError: s.credError, hasCredError: !!s.credError,
+      credSuccess: s.credSuccess, hasCredSuccess: !!s.credSuccess,
+      saveCredentials: () => {
+        const curPw = s.curPwInput;
+        const newEmail = s.newEmailInput.trim();
+        const newPw = s.newPwInput;
+        if (!curPw) return this.setState({ credError: 'Ingresá tu contraseña actual para confirmar.', credSuccess: '' });
+        if (!newEmail && !newPw) return this.setState({ credError: 'Completá un nuevo email o una nueva contraseña.', credSuccess: '' });
+        if (newPw && newPw.length < 6) return this.setState({ credError: 'La nueva contraseña debe tener al menos 6 caracteres.', credSuccess: '' });
+        const user = auth.currentUser;
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, curPw);
+        user.reauthenticateWithCredential(cred)
+          .then(() => {
+            const tasks = [];
+            if (newEmail && newEmail !== user.email) tasks.push(user.updateEmail(newEmail));
+            if (newPw) tasks.push(user.updatePassword(newPw));
+            return Promise.all(tasks);
+          })
+          .then(() => this.setState({ credError: '', credSuccess: 'Listo, se actualizaron tus datos de acceso.', curPwInput: '', newEmailInput: '', newPwInput: '' }))
+          .catch(e => {
+            const msg = e.code === 'auth/wrong-password' ? 'La contraseña actual es incorrecta.' : 'No se pudo actualizar: ' + e.message;
+            this.setState({ credError: msg, credSuccess: '' });
+          });
+      },
       saveConfig: () => {
         db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
       },
