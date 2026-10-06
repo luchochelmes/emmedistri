@@ -22,6 +22,7 @@ body{margin:0;background:#F7F4EE;color:#1C1917;font-family:Barlow,system-ui,sans
 a{color:#D62718;text-decoration:none}
 a:hover{color:#A81B10;text-decoration:underline}
 button{font-family:inherit;cursor:pointer}
+.biz-card:hover{border-color:#D62718}
 input{font-family:inherit}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -206,11 +207,9 @@ input{font-family:inherit}
       <div style="font-size:14px;color:#6B635A;margin-bottom:16px">Armamos tu pedido a medida, sea cual sea tu rubro</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
         <sc-for list="{{ bizTypes }}" as="b" hint-placeholder-count="9">
-          <div style="position:relative;border-radius:12px;overflow:hidden;min-height:150px;display:flex;flex-direction:column;background:{{ b.bg }};box-shadow:0 2px 6px rgba(0,0,0,.08)">
-            <div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:48px">{{ b.icon }}</div>
-            <div style="background:rgba(0,0,0,.22);padding:10px 8px;text-align:center">
-              <span style="color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.3px;line-height:1.15">{{ b.label }}</span>
-            </div>
+          <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;transition:border-color .15s" class="biz-card">
+            <div style="width:52px;height:52px;border-radius:999px;background:#F6F1E8;border:1px solid #E6E0D6;display:flex;align-items:center;justify-content:center;font-size:24px">{{ b.icon }}</div>
+            <span style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:0.3px;color:#1C1917;line-height:1.15">{{ b.label }}</span>
           </div>
         </sc-for>
       </div>
