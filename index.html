@@ -203,42 +203,80 @@ input{font-family:inherit}
       </div>
     </section>
 
-    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
-      <h2 style="margin:0 0 4px;font-family:'Barlow Condensed';font-weight:800;font-size:32px;text-transform:uppercase;line-height:1">Trabajamos con todo tipo de negocio</h2>
-      <div style="font-size:14px;color:#6B635A;margin-bottom:16px">Armamos tu pedido a medida, sea cual sea tu rubro</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+    <section style="max-width:1320px;margin:0 auto;padding:56px 24px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:22px">
+        <div style="max-width:620px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#D62718;margin-bottom:8px">Productos por rubro</div>
+          <h2 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:40px;line-height:0.95;text-transform:uppercase;text-wrap:balance">Lo que tu negocio usa todos los días, en un solo pedido</h2>
+        </div>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#5A524A;max-width:340px">Elegí tu rubro y te mostramos los productos que más piden negocios como el tuyo.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
         <sc-for list="{{ bizTypes }}" as="b" hint-placeholder-count="9">
-          <sc-if value="{{ b.hasPhoto }}" hint-placeholder-val="{{ false }}">
-            <div onClick="{{ b.pick }}" class="biz-card" style="position:relative;border-radius:10px;overflow:hidden;min-height:150px;cursor:pointer">
+          <button onClick="{{ b.pick }}" class="biz-card" style="position:relative;border:0;padding:0;border-radius:12px;overflow:hidden;background:{{ b.bg }};aspect-ratio:4/3.4;text-align:left;cursor:pointer">
+            <sc-if value="{{ b.hasPhoto }}" hint-placeholder-val="{{ false }}">
               <img src="{{ b.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-              <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(28,25,23,.78) 0%,rgba(28,25,23,.15) 55%,rgba(28,25,23,.35) 100%)"></div>
-              <div style="position:relative;height:100%;display:flex;align-items:flex-end;padding:12px">
-                <span style="color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.3px;line-height:1.15">{{ b.label }}</span>
-              </div>
+            </sc-if>
+            <sc-if value="{{ b.noPhoto }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:54px;opacity:.5">{{ b.icon }}</div>
+            </sc-if>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,25,23,0) 35%,rgba(28,25,23,.88) 100%);pointer-events:none"></div>
+            <sc-if value="{{ b.hasCount }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;top:12px;left:12px;background:#FFFFFF;color:#1C1917;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;pointer-events:none">{{ b.countTxt }}</div>
+            </sc-if>
+            <div style="position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;pointer-events:none">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:1;text-transform:uppercase;color:#FFFFFF">{{ b.label }}</div>
+              <div style="font-size:13px;line-height:1.35;color:#EDE6DC">{{ b.items }}</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#FFC72C">Ver productos <span>→</span></div>
             </div>
-          </sc-if>
-          <sc-if value="{{ b.noPhoto }}" hint-placeholder-val="{{ true }}">
-            <div onClick="{{ b.pick }}" class="biz-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;cursor:pointer">
-              <div style="width:52px;height:52px;border-radius:999px;background:#F6F1E8;border:1px solid #E6E0D6;display:flex;align-items:center;justify-content:center;font-size:24px">{{ b.icon }}</div>
-              <span style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:0.3px;color:#1C1917;line-height:1.15">{{ b.label }}</span>
-            </div>
-          </sc-if>
+          </button>
         </sc-for>
       </div>
+      <div style="margin-top:14px;font-size:14px;color:#5A524A">¿No ves tu rubro? <a href="https://wa.me/5493515173319?text={{ waGenericText }}" target="_blank" rel="noopener" style="font-weight:700">Escribinos y armamos tu lista</a></div>
     </section>
 
-    <section style="max-width:1320px;margin:0 auto;padding:40px 24px 0">
-      <div style="background:#1C1917;border-radius:10px;padding:32px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
-          <span style="background:#FFC72C;color:#1C1917;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">¡Oportunidad!</span>
-          <span style="background:#D62718;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">¡Oferta!</span>
-          <span style="background:#FFC72C;color:#1C1917;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">Ahorrá</span>
-          <span style="background:#D62718;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">Te solucionamos todo</span>
-          <span style="background:#2D6A3A;color:#FFFFFF;font-weight:800;font-size:12px;letter-spacing:0.5px;padding:5px 12px;border-radius:999px;text-transform:uppercase">🚚 Envío sin cargo</span>
+    <section style="max-width:1320px;margin:0 auto;padding:56px 24px 0">
+      <div style="position:relative;background:#D62718;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
+        <div style="background:#1C1917;color:#FFC72C;grid-column:1/-1;display:flex;gap:28px;padding:11px 28px;overflow-x:auto;white-space:nowrap;font-family:'Barlow Condensed';font-weight:700;font-size:19px;text-transform:uppercase;letter-spacing:1px">
+          <span>¡Oportunidad!</span><span style="color:#D62718">●</span>
+          <span>Ahorrá comprando por bulto</span><span style="color:#D62718">●</span>
+          <span>Envío sin cargo</span><span style="color:#D62718">●</span>
+          <span>Te solucionamos todo</span><span style="color:#D62718">●</span>
+          <span>¡Oportunidad!</span><span style="color:#D62718">●</span>
+          <span>Ahorrá comprando por bulto</span>
         </div>
-        <h2 style="margin:0;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:800;font-size:38px;text-transform:uppercase;line-height:1;text-wrap:balance">¿Tenés negocio? ¡Escribinos!</h2>
-        <p style="margin:0;color:#D8D0C4;font-size:16px;max-width:560px;line-height:1.5">Armá tu carrito y te armamos el presupuesto a tu medida. ¡Aprovechá!</p>
-        <a href="https://wa.me/5493515173319?text={{ waGenericText }}" target="_blank" rel="noopener" style="background:#FFC72C;color:#1C1917;padding:13px 24px;border-radius:6px;font-weight:800;font-size:15px;text-decoration:none;text-transform:uppercase">Armar presupuesto por WhatsApp</a>
+
+        <div style="padding:44px 40px;color:#FFFFFF;display:flex;flex-direction:column;gap:18px;justify-content:center">
+          <div style="display:inline-flex;align-self:flex-start;background:#FFC72C;color:#1C1917;font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;border-radius:4px;transform:rotate(-2deg)">Para comercios</div>
+          <h2 style="margin:0;font-family:'Barlow Condensed';font-weight:800;font-size:60px;line-height:0.88;text-transform:uppercase">¿Tenés<br>negocio?<br><span style="color:#FFC72C">Escribinos.</span></h2>
+          <p style="margin:0;font-size:17px;line-height:1.5;max-width:420px;color:#FFE9E5">Armá tu carrito o mandanos tu lista. Te pasamos un presupuesto a medida en el día.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <a href="https://wa.me/5493515173319?text={{ waGenericText }}" target="_blank" rel="noopener" style="background:#FFC72C;color:#1C1917;padding:15px 22px;border-radius:6px;font-weight:800;font-size:15px;text-decoration:none;white-space:nowrap">Pedir presupuesto por WhatsApp</a>
+            <a href="#catalogo" style="color:#FFFFFF;font-weight:700;font-size:14px;text-decoration:underline;white-space:nowrap">Ver catálogo</a>
+          </div>
+        </div>
+
+        <div style="padding:36px 40px 40px;display:flex;align-items:center;justify-content:center">
+          <div style="background:#FFFFFF;color:#1C1917;border-radius:10px;width:100%;max-width:440px;box-shadow:0 18px 40px rgba(80,10,5,0.35);transform:rotate(1.5deg)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 22px 14px;border-bottom:2px dashed #E6E0D6">
+              <span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;text-transform:uppercase">Comprando en Emme</span>
+              <span style="font-size:12px;color:#6B635A;font-weight:600">Mayorista y minorista</span>
+            </div>
+            <sc-for list="{{ beneficios }}" as="b" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 22px;border-bottom:1px solid #F1ECE3;align-items:start">
+                <div style="width:36px;height:36px;border-radius:8px;background:{{ b.bg }};color:{{ b.fg }};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:800;font-size:18px">{{ b.n }}</div>
+                <div>
+                  <div style="font-weight:700;font-size:16px">{{ b.t }}</div>
+                  <div style="font-size:13.5px;color:#6B635A;margin-top:2px;line-height:1.4">{{ b.d }}</div>
+                </div>
+              </div>
+            </sc-for>
+            <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;background:#FFF4D1;border-radius:0 0 10px 10px">
+              <span style="font-size:13px;font-weight:600">Respondemos de lunes a sábado</span>
+              <span style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;color:#D62718">351 517-3319</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -708,15 +746,15 @@ input{font-family:inherit}
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;promos&quot;,&quot;completo&quot;],&quot;default&quot;:&quot;promos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showMayorista&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Precios&quot;}}">
 const BIZ_COLORS = ['#D62718', '#2D6A3A', '#1C1917', '#B9510B'];
 const BIZ_TYPES = [
-  { key: 'verdulerias', icon: '🥬', label: 'Verdulerías' },
-  { key: 'carnicerias', icon: '🥩', label: 'Carnicerías' },
-  { key: 'almacenes', icon: '🏪', label: 'Almacenes' },
-  { key: 'kioscos', icon: '🏬', label: 'Kioscos' },
-  { key: 'casasdecomida', icon: '🍲', label: 'Casas de comida' },
-  { key: 'bares', icon: '🍹', label: 'Bares' },
-  { key: 'restaurantes', icon: '🍽️', label: 'Restaurantes' },
-  { key: 'supermercados', icon: '🛒', label: 'Supermercados' },
-  { key: 'ferreterias', icon: '🔧', label: 'Ferreterías' }
+  { key: 'verdulerias', icon: '🥬', label: 'Verdulerías', items: 'Bolsas camiseta, bandejas de expandido, film y etiquetas' },
+  { key: 'carnicerias', icon: '🥩', label: 'Carnicerías', items: 'Bandejas, film PVC, papel manteca y guantes' },
+  { key: 'almacenes', icon: '🏪', label: 'Almacenes', items: 'Bolsas, papel para envolver, limpieza y descartables' },
+  { key: 'kioscos', icon: '🏬', label: 'Kioscos', items: 'Vasos, sorbetes, servilletas y bolsas chicas' },
+  { key: 'casasdecomida', icon: '🍲', label: 'Casas de comida', items: 'Contenedores con tapa, aluminio, cajas y cubiertos' },
+  { key: 'bares', icon: '🍹', label: 'Bares', items: 'Vasos térmicos, tapas, removedores y servilletas' },
+  { key: 'restaurantes', icon: '🍽️', label: 'Restaurantes', items: 'Delivery, limpieza profesional, rollos y film' },
+  { key: 'supermercados', icon: '🛒', label: 'Supermercados', items: 'Bolsas por mayor, bandejas, etiquetas y limpieza' },
+  { key: 'ferreterias', icon: '🔧', label: 'Ferreterías', items: 'Guantes, bolsas de residuos, cinta y limpieza' }
 ].map((b, i) => ({ ...b, bg: BIZ_COLORS[i % BIZ_COLORS.length] }));
 const relatedFor = (products, p) => {
   const sameCat = products.filter(x => x.cat === p.cat && x.id !== p.id);
@@ -907,9 +945,16 @@ class Component extends DCLogic {
       bizTypes: BIZ_TYPES.map(b => {
         const photo = (config.bizImages && config.bizImages[b.key]) || '';
         const bizCat = (config.bizCats && config.bizCats[b.key]) || 'all';
-        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat(bizCat) };
+        const count = bizCat === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === bizCat).length;
+        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat(bizCat), hasCount: count > 0, countTxt: count + (count === 1 ? ' producto' : ' productos') };
       }),
       heroSlides, heroDots, hasMultipleHeroSlides: heroImages.length > 1,
+      beneficios: [
+        { n: '%', t: 'Precio mayorista automático', d: 'Llevando por bulto, el precio baja solo en el carrito.', bg: '#FDE3DF', fg: '#D62718' },
+        { n: '0$', t: 'Envío sin cargo', d: 'Siempre, sin monto mínimo, a cualquier zona.', bg: '#FFF1C2', fg: '#7A4E00' },
+        { n: '24h', t: 'Presupuesto en el día', d: 'Mandanos tu lista por WhatsApp y te respondemos.', bg: '#FDE3DF', fg: '#D62718' },
+        { n: '✓', t: 'Te solucionamos todo', d: 'Si no lo tenemos, te lo conseguimos.', bg: '#FFF1C2', fg: '#7A4E00' }
+      ],
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
       pickVyc: () => this.pickCat('vyc'),
