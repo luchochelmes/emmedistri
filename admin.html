@@ -960,18 +960,29 @@ class Component extends DCLogic {
   // Sin Firebase Storage (plan free): la foto se achica en el navegador y se
   // guarda como data-URL directo en el documento de config de Firestore.
   compressImage(file) {
+    // Varias fotos conviven en el mismo documento de Firestore (límite duro de
+    // 1 MB), así que cada una se achica fuerte: se prueba con dimensiones y
+    // calidad decrecientes hasta entrar en un tope chico por imagen.
+    const STEPS = [[1200, 0.72], [900, 0.6], [700, 0.5], [500, 0.4]];
+    const CAP = 180000;
     return createImageBitmap(file).then(bitmap => {
-      const MAX_DIM = 1600;
-      const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
-      const w = Math.max(1, Math.round(bitmap.width * scale));
-      const h = Math.max(1, Math.round(bitmap.height * scale));
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
-      if (bitmap.close) bitmap.close();
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
-      if (dataUrl.length > 700000) throw new Error('La imagen sigue siendo muy pesada. Probá con otra foto más liviana.');
-      return dataUrl;
+      try {
+        let best = null;
+        for (const [maxDim, quality] of STEPS) {
+          const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+          const w = Math.max(1, Math.round(bitmap.width * scale));
+          const h = Math.max(1, Math.round(bitmap.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          best = dataUrl;
+          if (dataUrl.length <= CAP) return dataUrl;
+        }
+        throw new Error('La imagen sigue siendo muy pesada. Probá con otra foto más liviana.');
+      } finally {
+        if (bitmap.close) bitmap.close();
+      }
     });
   }
 
@@ -1390,7 +1401,16 @@ class Component extends DCLogic {
           });
       },
       saveConfig: () => {
-        db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
+        const approxSize = JSON.stringify(cfgDraft).length;
+        if (approxSize > 900000) {
+          this.flash('Demasiadas fotos para guardar juntas. Sacá alguna imagen (hero o rubro) y volvé a intentar.');
+          return;
+        }
+        try {
+          db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
+        } catch (e) {
+          this.flash('Error al guardar: ' + e.message);
+        }
       },
       orderOpen: !!oo, od, closeOrder: () => this.setState({ openOrder: null }),
       draftOpen: !!s.draft, d, dSet, draftIsEdit: !!s.draft && !s.draftIsNew,
