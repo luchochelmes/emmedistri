@@ -51,7 +51,7 @@ input{font-family:inherit}
   .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
-  .header-logo{height:38px!important}
+  .header-logo{height:46px!important}
   .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .cart-label{display:none}
 }
@@ -83,12 +83,12 @@ input{font-family:inherit}
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
       <a href="#" style="flex-shrink:0;display:flex;align-items:center">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:52px;width:auto;display:block;border-radius:4px">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:72px;width:auto;display:block;border-radius:4px">
       </a>
       <div style="flex:1;min-width:0;position:relative">
-        <div style="display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
-          <input value="{{ query }}" onChange="{{ onQuery }}" onFocus="{{ onQueryFocus }}" onBlur="{{ onQueryBlur }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:11px 14px;font-size:15px;min-width:0;background:transparent"></input>
-          <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 18px;font-weight:600;font-size:14px;flex-shrink:0">Buscar</button>
+        <div style="display:flex;border:1.5px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
+          <input value="{{ query }}" onChange="{{ onQuery }}" onFocus="{{ onQueryFocus }}" onBlur="{{ onQueryBlur }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:8px 14px;font-size:14px;min-width:0;background:transparent"></input>
+          <button onClick="{{ goCatalog }}" style="border:0;background:#1C1917;color:#FFFFFF;padding:0 16px;font-weight:600;font-size:13px;flex-shrink:0">Buscar</button>
         </div>
         <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;background:#FFFFFF;border:1px solid #D8D0C4;border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.14);z-index:30;max-height:380px;overflow-y:auto">
@@ -832,6 +832,7 @@ class Component extends DCLogic {
     let list = PRODUCTS;
     if (cat === 'populares') list = list.filter(p => p.popular);
     else if (cat === 'vyc') list = list.filter(p => p.vyc);
+    else if (cat.indexOf('biz:') === 0) { const bk = cat.slice(4); list = list.filter(p => p.bizTags && p.bizTags.includes(bk)); }
     else if (cat !== 'all') list = list.filter(p => p.cat === cat);
     if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q));
 
@@ -912,7 +913,7 @@ class Component extends DCLogic {
     const cartEmailBody = encodeURIComponent(orderBody);
 
     const tabDefs = [{ id: 'all', name: 'Todos' }, { id: 'populares', name: 'Más pedidos' }, ...CATS.slice(0, 4), { id: 'limpieza', name: 'Limpieza' }];
-    const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
+    const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : cat.indexOf('biz:') === 0 ? ((BIZ_TYPES.find(b => b.key === cat.slice(4)) || {}).label || 'Productos') : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
 
     const dp = PRODUCTS.find(x => x.id === productOpen);
     let pd = {};
@@ -935,9 +936,8 @@ class Component extends DCLogic {
       hasMainSucursal, mainSucursalTxt,
       bizTypes: BIZ_TYPES.map(b => {
         const photo = (config.bizImages && config.bizImages[b.key]) || '';
-        const bizCat = (config.bizCats && config.bizCats[b.key]) || 'all';
-        const count = bizCat === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === bizCat).length;
-        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat(bizCat), hasCount: count > 0, countTxt: count + (count === 1 ? ' producto' : ' productos') };
+        const count = PRODUCTS.filter(p => p.bizTags && p.bizTags.includes(b.key)).length;
+        return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat('biz:' + b.key), hasCount: count > 0, countTxt: count + (count === 1 ? ' producto' : ' productos') };
       }),
       heroSlides, heroDots, hasMultipleHeroSlides: heroImages.length > 1,
       beneficios: [
