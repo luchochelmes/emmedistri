@@ -51,8 +51,7 @@ input{font-family:inherit}
   .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
-  .header-top{padding-top:10px!important;padding-bottom:10px!important;gap:12px!important}
-  .header-logo{height:46px!important}
+  .header-logo{height:38px!important}
   .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .cart-label{display:none}
 }
@@ -81,20 +80,11 @@ input{font-family:inherit}
     </div>
   </div>
 
-  <header style="background:#FFFFFF;border-bottom:1px solid #E6E0D6">
-    <div class="header-top" style="max-width:1320px;margin:0 auto;padding:14px 24px;display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap">
-      <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:108px;width:auto;display:block;border-radius:4px">
-      </a>
-      <div style="display:flex;align-items:center;gap:8px;background:#E2F0E4;border:1.5px solid #2D6A3A;border-radius:999px;padding:8px 16px">
-        <span style="font-size:18px">🚚</span>
-        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:0.4px;color:#1D4A28">Envío sin cargo en todos tus pedidos</span>
-      </div>
-    </div>
-  </header>
-
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
+      <a href="#" style="flex-shrink:0;display:flex;align-items:center">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:52px;width:auto;display:block;border-radius:4px">
+      </a>
       <div style="flex:1;min-width:0;position:relative">
         <div style="display:flex;border:2px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
           <input value="{{ query }}" onChange="{{ onQuery }}" onFocus="{{ onQueryFocus }}" onBlur="{{ onQueryBlur }}" placeholder="Buscá por producto o código (ej: vaso térmico, 1042)" style="flex:1;border:0;outline:none;padding:11px 14px;font-size:15px;min-width:0;background:transparent"></input>
