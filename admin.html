@@ -117,7 +117,10 @@ input,textarea{font-family:inherit;color:#1C1917}
         <input value="{{ q }}" onChange="{{ onQ }}" placeholder="{{ searchPh }}" style="flex:0 1 320px;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none;background:#FFFFFF" style-focus="border-color:#1C1917">
       </sc-if>
       <sc-if value="{{ isProductos }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <sc-if value="{{ showImportWa }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ importWaCatalog }}" style="border:1px solid #2D6A3A;background:#E2F0E4;color:#1D4A28;border-radius:6px;padding:10px 14px;font-weight:700;font-size:14px;white-space:nowrap">Importar catálogo WhatsApp</button>
+          </sc-if>
           <button onClick="{{ openBulk }}" style="border:1px solid #1C1917;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:10px 14px;font-weight:700;font-size:14px;white-space:nowrap">Aumento masivo</button>
           <button onClick="{{ newProduct }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:10px 16px;font-weight:700;font-size:14px;white-space:nowrap" style-hover="background:#A81B10">+ Nuevo producto</button>
         </div>
@@ -900,6 +903,88 @@ const BIZ_TYPES = [
   { key: 'supermercados', label: 'Supermercados' },
   { key: 'ferreterias', label: 'Ferreterías' }
 ];
+// Catálogo importado desde WhatsApp Business el 2026-10-07. Sin precios
+// (no se mostraban en el catálogo): se cargan en $0 para que el admin los
+// complete desde Productos. IDs 9001+ para no chocar con el seed original.
+const waMk = (id, cat, name, pack, min, desc) => ({ id, cat, name, pack, min, popular: false, vyc: false, desc: desc || '', price: 0, old: 0, whole: 0, stock: 0, published: true, bizTags: [] });
+const WA_IMPORT_CATS = [
+  { id: 'hilos', name: 'Hilos', img: '' },
+  { id: 'bazar', name: 'Bazar y varios', img: '' }
+];
+const WA_IMPORT_PRODUCTS = [
+  waMk(9001, 'envases', 'Bandeja 101', 'x 100 u.', 5),
+  waMk(9002, 'envases', 'Bandeja 105', 'x 100 u.', 5),
+  waMk(9003, 'envases', 'Bandeja 103', 'x 100 u.', 5),
+  waMk(9004, 'envases', 'Oblea 619', 'x 100 u.', 5),
+  waMk(9005, 'envases', 'Bandeja 628 negra', 'x 100 u.', 5),
+  waMk(9006, 'envases', 'Bandeja 625 negra', 'x 100 u.', 5),
+  waMk(9007, 'envases', 'Pote degustación 60 cc', 'x 50 u.', 5),
+  waMk(9008, 'envases', 'Pote bisagra 480 gr', 'x 50 u.', 5),
+  waMk(9009, 'envases', 'Pote bisagra 350 gr', 'x 50 u.', 5),
+  waMk(9010, 'vasos', 'Vaso plástico 110 cc', 'x 50 u.', 10),
+  waMk(9011, 'vasos', 'Vaso plástico 1000 cc', 'x 25 u.', 10),
+  waMk(9012, 'vasos', 'Vaso plástico 800 cc', 'x 25 u.', 10),
+  waMk(9013, 'vasos', 'Vaso polipapel con tapa 12 oz', 'x 25 u.', 10),
+  waMk(9014, 'vasos', 'Vaso térmico 300 cc', 'x 25 u.', 10),
+  waMk(9016, 'utensilios', 'Sorbetes de colores', 'x 100 u.', 10),
+  waMk(9017, 'utensilios', 'Sorbetes ensobrados', 'x 1000 u.', 2),
+  waMk(9018, 'utensilios', 'Caja de sorbetes negra', 'x 1000 u.', 2),
+  waMk(9019, 'utensilios', 'Plato descartable 17 cm', 'x 100 u.', 5),
+  waMk(9020, 'utensilios', 'Plato descartable 22 cm', 'x 100 u.', 5),
+  waMk(9021, 'utensilios', 'Cuchara sundae/postre', 'x 100 u.', 10),
+  waMk(9022, 'utensilios', 'Cuchillo New Kolor x 3', 'pack x 3 u.', 10),
+  waMk(9023, 'papel', 'Bobina kraft panadería 60 cm', 'rollo', 1),
+  waMk(9024, 'papel', 'Bobina kraft panadería 40 cm', 'rollo', 1),
+  waMk(9025, 'papel', 'Rollo sulfito 60 cm', 'rollo', 1),
+  waMk(9026, 'papel', 'Papel parafinado aluminio', 'x kg', 1),
+  waMk(9027, 'papel', 'Papel parafinado cuadrillé', 'x kg', 1),
+  waMk(9028, 'papel', 'Papel parafinado impreso', 'x kg', 1),
+  waMk(9029, 'papel', 'Papel higiénico cono chico', 'x und', 10),
+  waMk(9030, 'papel', 'Pañuelitos Elegante', 'caja x 6 u.', 5),
+  waMk(9031, 'papel', 'Papel higiénico suelto x 50 m', 'x und', 10),
+  waMk(9032, 'papel', 'Papel manteca x 1 kg', 'rollo', 5),
+  waMk(9033, 'papel', 'Molde bizcochuelo 20 cm', 'x und', 10),
+  waMk(9034, 'papel', 'Molde rosca 22 cm', 'x und', 10),
+  waMk(9035, 'papel', 'Molde pan dulce 1 kg', 'x und', 10),
+  waMk(9036, 'aluminio', 'Folex en rollo', 'x kg', 1),
+  waMk(9037, 'aluminio', 'Folex 20x25 fina', 'x 1000 u.', 1),
+  waMk(9038, 'aluminio', 'Folex 25x37', 'x kg', 1),
+  waMk(9039, 'aluminio', 'Film strech 50 cm virgen / negro', 'rollo', 1),
+  waMk(9040, 'aluminio', 'Film strech 10 cm virgen / negro', 'rollo', 1),
+  waMk(9041, 'aluminio', 'Film strech 50 cm sin mango', 'x 4,5 kg', 1),
+  waMk(9042, 'aluminio', 'Papel film 38 cm x 500 m', 'rollo', 1),
+  waMk(9043, 'aluminio', 'Papel film 38 cm x 300 m', 'rollo', 1),
+  waMk(9044, 'cajas', 'Caja porción de torta', 'x und', 10),
+  waMk(9045, 'cajas', 'Caja visor 18x18', 'x und', 10),
+  waMk(9046, 'cajas', 'Caja alfajor por docena / media docena', 'x und', 10),
+  waMk(9047, 'cajas', 'Caja 1/2 pizza blanca', 'x 100 u.', 2),
+  waMk(9048, 'cajas', 'Caja 1/2 pizza kraft', 'x 100 u.', 2),
+  waMk(9049, 'cajas', 'Caja pizza grande', 'x 100 u.', 2),
+  waMk(9050, 'cajas', 'Caja para papas fritas', 'x und', 20),
+  waMk(9051, 'bolsas', 'Bolsa para consorcio 60x90', 'rollo x 50 u.', 5),
+  waMk(9052, 'bolsas', 'Bolsa de residuo 45x60', 'paquete x 10 u.', 10),
+  waMk(9053, 'bolsas', 'Bolsa compactadora 80x1 m', 'paquete x 10 u.', 10),
+  waMk(9054, 'bolsas', 'Bolsas embolsadas surtidas', 'rollo x 100 u.', 5, 'Medidas: 15x20 / 15x25 / 20x30 / 25x35.'),
+  waMk(9055, 'bolsas', 'Bolsa camiseta color eco', 'x und', 10, 'Medidas: 30x40 / 40x50 / 45x60.'),
+  waMk(9056, 'bolsas', 'Bolsa camiseta blanca eco', 'x und', 10, 'Medidas: 30x40 / 40x50 / 45x60 / 60x80.'),
+  waMk(9057, 'bolsas', 'Bolsa de papel con manija', 'x und', 10, 'Medidas: 14x20 / 22x30 / 30x40 / 32x38.'),
+  waMk(9058, 'limpieza', 'Guantes de polietileno', 'x caja', 5),
+  waMk(9059, 'limpieza', 'Guantes de nitrilo S/M/L', 'x caja', 5),
+  waMk(9060, 'limpieza', 'Guantes de látex S/M/L', 'x caja', 5),
+  waMk(9061, 'limpieza', 'Perfumina', 'bidón 5 L', 2),
+  waMk(9062, 'limpieza', 'Alcohol líquido 70%', 'bidón 5 L', 2),
+  waMk(9063, 'limpieza', 'Suavizante', 'bidón 5 L', 2),
+  waMk(9064, 'limpieza', 'Lavandina', 'bidón 5 L', 2),
+  waMk(9065, 'limpieza', 'Dispenser de jabón líquido', 'x und', 1),
+  waMk(9066, 'limpieza', 'Secador doble goma premium', 'x und', 5),
+  waMk(9067, 'limpieza', 'Embudo plástico 17 cm grande', 'x und', 5),
+  waMk(9068, 'hilos', 'Hilo PPP (plástico)', 'x und', 1),
+  waMk(9069, 'hilos', 'Hilo de yute 30 m', 'x und', 1),
+  waMk(9070, 'hilos', 'Hilo choricero grande', 'x und', 1),
+  waMk(9071, 'bazar', 'Ganchos adhesivos x 3 (silicona)', 'x und', 5),
+  waMk(9072, 'bazar', 'Dip aderezo de porcelana', 'x und', 5, 'Medidas: 6 a 8 cm.'),
+  waMk(9073, 'bazar', 'Pinta pelo en aerosol', 'x und', 5)
+];
 const SEED_CONFIG = {
   minPedido: 0, whatsapp: '351 517-3319',
   aviso: 'Venta mayorista y minorista', lowStock: 12,
@@ -1080,6 +1165,14 @@ class Component extends DCLogic {
   updOrder(id, patch) { db.collection('orders').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
   updProd(id, patch) { db.collection('products').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
   editProd(p) { this.setState({ draft: { ...p, old: p.old || '', onOffer: p.onOffer ?? (+p.old > 0), bizTags: p.bizTags || [] }, draftIsNew: false, draftErr: false }); }
+  importWaCatalog() {
+    const batch = db.batch();
+    WA_IMPORT_CATS.forEach(c => { if (!this.state.cats.some(x => x.id === c.id)) batch.set(db.collection('cats').doc(c.id), c); });
+    WA_IMPORT_PRODUCTS.forEach(p => batch.set(db.collection('products').doc(String(p.id)), p));
+    batch.commit()
+      .then(() => this.flash(`Catálogo importado: ${WA_IMPORT_PRODUCTS.length} productos. Faltan cargar precios.`))
+      .catch(e => this.flash('Error al importar: ' + e.message));
+  }
 
   orderVM(o) {
     const st = ST[o.status], f = flow(o.delivery), idx = f.indexOf(o.status);
@@ -1482,6 +1575,7 @@ class Component extends DCLogic {
           .then(() => this.flash('Pedido creado')).catch(e => this.flash('Error: ' + e.message));
         this.setState({ odraft: null });
       },
+      showImportWa: !products.some(p => p.id === 9001), importWaCatalog: () => this.importWaCatalog(),
       bulkOpen: !!s.bulk, bulk, openBulk: () => this.setState({ bulk: { cat: s.prodCat, pct: '10' } }), closeBulk: () => this.setState({ bulk: null }),
       bulkCats: [{ id: 'all', name: 'Todos los productos' }, ...cats].map(c => ({ ...c, ...pick(c.id === bulk.cat), pick: () => this.setState(st => ({ bulk: { ...st.bulk, cat: c.id } })) })),
       onBulkPct: e => { const v = e.target.value; this.setState(st => ({ bulk: { ...st.bulk, pct: v } })); },
