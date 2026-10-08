@@ -84,7 +84,7 @@ input{font-family:inherit}
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
       <a href="#" style="flex-shrink:0;display:flex;align-items:center">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:116px;width:auto;display:block;border-radius:4px">
+        <img src="./logo.jpeg" alt="Emme Distribuidora" class="header-logo" style="height:116px;width:auto;display:block;border-radius:4px">
       </a>
       <div style="flex:1;min-width:0;position:relative">
         <div style="display:flex;border:1.5px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
@@ -95,8 +95,10 @@ input{font-family:inherit}
           <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;background:#FFFFFF;border:1px solid #D8D0C4;border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.14);z-index:30;max-height:380px;overflow-y:auto">
             <sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="4">
               <button onClick="{{ sg.pick }}" style="width:100%;border:0;background:#FFFFFF;display:flex;align-items:center;gap:10px;padding:9px 14px;text-align:left;border-bottom:1px solid #F3EEE6" style-hover="background:#FBF8F3">
-                <div style="width:36px;height:36px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
-                  <image-slot id="prod-{{ sg.id }}" shape="rect" placeholder="Foto: {{ sg.name }}"></image-slot>
+                <div style="position:relative;width:36px;height:36px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
+                  <sc-if value="{{ sg.photo }}">
+                    <img src="{{ sg.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                  </sc-if>
                 </div>
                 <span style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600">{{ sg.name }}</span>
                 <span style="font-size:11px;color:#6B635A;font-family:'JetBrains Mono';flex-shrink:0">{{ sg.pack }}</span>
@@ -286,7 +288,9 @@ input{font-family:inherit}
           <sc-for list="{{ offerProducts }}" as="p" hint-placeholder-count="2">
             <article class="carousel-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start">
               <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
-                <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                <sc-if value="{{ p.photo }}">
+                  <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                </sc-if>
                 <div style="position:absolute;top:10px;left:10px;background:#D62718;color:#FFFFFF;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Oferta</div>
               </div>
               <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
@@ -347,7 +351,9 @@ input{font-family:inherit}
             <article class="carousel-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start">
               <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
                 <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
-                  <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                  <sc-if value="{{ p.photo }}">
+                    <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                  </sc-if>
                 </div>
               </button>
               <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
@@ -393,7 +399,9 @@ input{font-family:inherit}
             <article class="{{ p.cardClass }}" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;{{ p.cardExtra }}">
             <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
               <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
-                <image-slot id="prod-{{ p.id }}" shape="rect" placeholder="Foto: {{ p.name }}"></image-slot>
+                <sc-if value="{{ p.photo }}">
+                  <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                </sc-if>
                 <sc-if value="{{ p.popular }}" hint-placeholder-val="{{ false }}">
                   <div style="position:absolute;top:10px;left:10px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
                 </sc-if>
@@ -557,7 +565,7 @@ input{font-family:inherit}
   <footer style="background:#1C1917;color:#E9E3DA">
     <div style="max-width:1320px;margin:0 auto;padding:48px 24px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px">
       <div>
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" style="height:64px;width:auto;display:block;border-radius:4px">
+        <img src="./logo.jpeg" alt="Emme Distribuidora" style="height:64px;width:auto;display:block;border-radius:4px">
         <p style="font-size:14px;line-height:1.55;color:#B8AFA3;margin:14px 0 0;max-width:280px">Distribuidora de descartables, envases, bolsas y artículos de limpieza en Córdoba.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
@@ -616,8 +624,10 @@ input{font-family:inherit}
           </sc-if>
           <sc-for list="{{ cartItems }}" as="i" hint-placeholder-count="2">
             <div style="display:grid;grid-template-columns:64px 1fr auto;gap:12px;padding:14px 0;border-bottom:1px solid #EFE9DF;align-items:start">
-              <div style="width:64px;height:64px;border-radius:6px;overflow:hidden;background:#F1ECE3">
-                <image-slot id="prod-{{ i.id }}" shape="rect" placeholder="Foto: {{ i.name }}"></image-slot>
+              <div style="position:relative;width:64px;height:64px;border-radius:6px;overflow:hidden;background:#F1ECE3">
+                <sc-if value="{{ i.photo }}">
+                  <img src="{{ i.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                </sc-if>
               </div>
               <div style="min-width:0">
                 <div style="font-weight:600;font-size:14px;line-height:1.25">{{ i.name }}</div>
@@ -681,7 +691,9 @@ input{font-family:inherit}
         </div>
         <div class="product-page-grid" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding-top:32px;align-items:start">
           <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3;border-radius:10px;overflow:hidden">
-            <image-slot id="prod-{{ pd.id }}" shape="rect" placeholder="Foto: {{ pd.name }}" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+            <sc-if value="{{ pd.photo }}">
+              <img src="{{ pd.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            </sc-if>
             <sc-if value="{{ pd.popular }}" hint-placeholder-val="{{ false }}">
               <div style="position:absolute;top:14px;left:14px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:5px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
             </sc-if>
@@ -714,8 +726,10 @@ input{font-family:inherit}
           <div class="mini-row">
             <sc-for list="{{ pd.related }}" as="r" hint-placeholder-count="4">
               <button onClick="{{ r.open }}" class="mini-card" style="border:1px solid #E6E0D6;background:#FFFFFF;border-radius:8px;overflow:hidden;text-align:left;display:flex;flex-direction:column;cursor:pointer">
-                <div style="aspect-ratio:1/1;background:#F1ECE3">
-                  <image-slot id="prod-{{ r.id }}" shape="rect" placeholder="{{ r.name }}"></image-slot>
+                <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
+                  <sc-if value="{{ r.photo }}">
+                    <img src="{{ r.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                  </sc-if>
                 </div>
                 <div style="padding:8px 9px">
                   <div style="font-size:12px;font-weight:600;line-height:1.25">{{ r.name }}</div>
