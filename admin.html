@@ -1507,8 +1507,14 @@ class Component extends DCLogic {
           this.flash('Demasiadas fotos juntas para guardar. Sacá o volvé a subir (se comprimen más chicas): ' + (heaviest || 'alguna imagen') + '.');
           return;
         }
+        // Solo se sube lo que realmente cambió: un .set() del documento entero
+        // reenvía TODAS las fotos en cada guardado, aunque solo se haya
+        // tocado un texto — con fotos pesadas eso hace el guardado lento.
+        const payload = {};
+        Object.keys(cfgDraft).forEach(k => { if (JSON.stringify(cfgDraft[k]) !== JSON.stringify(config[k])) payload[k] = cfgDraft[k]; });
+        if (!Object.keys(payload).length) { this.flash('No hay cambios para guardar'); return; }
         try {
-          db.collection('config').doc('site').set(cfgDraft).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
+          db.collection('config').doc('site').update(payload).then(() => this.flash('Configuración guardada')).catch(e => this.flash('Error: ' + e.message));
         } catch (e) {
           this.flash('Error al guardar: ' + e.message);
         }
