@@ -51,7 +51,7 @@ input{font-family:inherit}
   .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
-  .header-logo{height:46px!important}
+  .header-logo{height:56px!important}
   .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .cart-label{display:none}
 }
@@ -83,7 +83,7 @@ input{font-family:inherit}
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
       <a href="#" style="flex-shrink:0;display:flex;align-items:center">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:72px;width:auto;display:block;border-radius:4px">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:92px;width:auto;display:block;border-radius:4px">
       </a>
       <div style="flex:1;min-width:0;position:relative">
         <div style="display:flex;border:1.5px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
@@ -113,11 +113,13 @@ input{font-family:inherit}
       </button>
     </div>
     <nav style="background:#D62718">
-      <div style="max-width:1320px;margin:0 auto;padding:0 24px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none">
-        <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
-          <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 14px;white-space:nowrap" style-hover="background:#A81B10">{{ c.name }}</button>
-        </sc-for>
-        <button onClick="{{ pickPopulares }}" style="border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 16px;white-space:nowrap;margin-left:auto">Más pedidos</button>
+      <div style="max-width:1320px;margin:0 auto;padding:0 0 0 24px;display:flex;align-items:stretch">
+        <div style="flex:1;min-width:0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none">
+          <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
+            <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 14px;white-space:nowrap" style-hover="background:#A81B10">{{ c.name }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ pickPopulares }}" style="flex-shrink:0;border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.6px;padding:12px 16px;white-space:nowrap">Más pedidos</button>
       </div>
     </nav>
   </div>
@@ -745,7 +747,8 @@ const BIZ_TYPES = [
   { key: 'bares', icon: '🍹', label: 'Bares', items: 'Vasos térmicos, tapas, removedores y servilletas' },
   { key: 'restaurantes', icon: '🍽️', label: 'Restaurantes', items: 'Delivery, limpieza profesional, rollos y film' },
   { key: 'supermercados', icon: '🛒', label: 'Supermercados', items: 'Bolsas por mayor, bandejas, etiquetas y limpieza' },
-  { key: 'ferreterias', icon: '🔧', label: 'Ferreterías', items: 'Guantes, bolsas de residuos, cinta y limpieza' }
+  { key: 'ferreterias', icon: '🔧', label: 'Ferreterías', items: 'Guantes, bolsas de residuos, cinta y limpieza' },
+  { key: 'estaciones', icon: '⛽', label: 'Estaciones de servicio', items: 'Vasos, servilletas, bolsas y productos de limpieza' }
 ].map((b, i) => ({ ...b, bg: BIZ_COLORS[i % BIZ_COLORS.length] }));
 const relatedFor = (products, p) => {
   const sameCat = products.filter(x => x.cat === p.cat && x.id !== p.id);
@@ -758,7 +761,7 @@ const DEFAULT_CONFIG = {
   heroImages: ['hero.jpg'],
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
-    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Ciudad de Malagueño, Córdoba — a 10 min de Córdoba capital y Carlos Paz', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
     { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false }
   ],
   faqs: [

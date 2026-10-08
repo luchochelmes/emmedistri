@@ -901,7 +901,8 @@ const BIZ_TYPES = [
   { key: 'bares', label: 'Bares' },
   { key: 'restaurantes', label: 'Restaurantes' },
   { key: 'supermercados', label: 'Supermercados' },
-  { key: 'ferreterias', label: 'Ferreterías' }
+  { key: 'ferreterias', label: 'Ferreterías' },
+  { key: 'estaciones', label: 'Estaciones de servicio' }
 ];
 // Catálogo importado desde WhatsApp Business el 2026-10-07. Sin precios
 // (no se mostraban en el catálogo): se cargan en $0 para que el admin los
@@ -991,7 +992,7 @@ const SEED_CONFIG = {
   heroImages: ['hero.jpg'], bizImages: {},
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
-    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Barrio Malagueño, ciudad de Córdoba', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
+    { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Ciudad de Malagueño, Córdoba — a 10 min de Córdoba capital y Carlos Paz', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
     { id: 'altagracia', name: 'Alta Gracia', tag: 'Valle de Paravachasca', zone: 'Alta Gracia, Córdoba', address: 'Av. H. Yrigoyen 1918', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
     { id: 'sancarlosminas', name: 'San Carlos Minas', tag: 'Noroeste de Córdoba', zone: 'San Carlos Minas, Córdoba', address: 'José H. Alonso', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3542-461434', active: true, main: false },
     { id: 'sannicolas', name: 'San Nicolás', tag: 'Córdoba', zone: 'San Nicolás, Córdoba', address: 'Dutari Rodríguez 157', week: 'Consultar horarios', sat: 'Consultar horarios', wa: '3541663973', active: true, main: false }
@@ -1051,7 +1052,7 @@ class Component extends DCLogic {
     // 1 MB), así que cada una se achica fuerte: se prueba con dimensiones y
     // calidad decrecientes hasta entrar en un tope chico por imagen.
     const STEPS = [[1200, 0.72], [900, 0.6], [700, 0.5], [500, 0.4]];
-    const CAP = 180000;
+    const CAP = 130000;
     return createImageBitmap(file).then(bitmap => {
       try {
         let best = null;
@@ -1495,7 +1496,15 @@ class Component extends DCLogic {
       saveConfig: () => {
         const approxSize = JSON.stringify(cfgDraft).length;
         if (approxSize > 900000) {
-          this.flash('Demasiadas fotos para guardar juntas. Sacá alguna imagen (hero o rubro) y volvé a intentar.');
+          const weigh = [];
+          (cfgDraft.heroImages || []).forEach((src, i) => { if (src) weigh.push({ label: 'Imagen de hero #' + (i + 1), size: src.length }); });
+          Object.keys(cfgDraft.bizImages || {}).forEach(k => {
+            const src = cfgDraft.bizImages[k];
+            if (src) weigh.push({ label: 'Foto de ' + ((BIZ_TYPES.find(b => b.key === k) || {}).label || k), size: src.length });
+          });
+          weigh.sort((a, b) => b.size - a.size);
+          const heaviest = weigh.slice(0, 2).map(w => w.label).join(' y ');
+          this.flash('Demasiadas fotos juntas para guardar. Sacá o volvé a subir (se comprimen más chicas): ' + (heaviest || 'alguna imagen') + '.');
           return;
         }
         try {
