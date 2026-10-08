@@ -338,45 +338,6 @@ input{font-family:inherit}
       </div>
     </section>
 
-    <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
-      <div style="background:#1C1917;color:#FFFFFF;border-radius:10px 10px 0 0;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.5px">Verdulería y Carnicería</div>
-        <button onClick="{{ pickVyc }}" style="border:0;background:transparent;color:#FFC72C;font-weight:700;font-size:13px;padding:0">Ver todo →</button>
-      </div>
-      <div class="carousel-track" style="background:#FFFFFF;border:1px solid #E6E0D6;border-top:0;border-radius:0 0 10px 10px;padding-top:6px">
-        <button onClick="{{ vycLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
-        <button onClick="{{ vycRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
-        <div id="vyc-carousel" class="carousel-row">
-          <sc-for list="{{ vycProducts }}" as="p" hint-placeholder-count="6">
-            <article class="carousel-card" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;scroll-snap-align:start">
-              <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
-                <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
-                  <sc-if value="{{ p.photo }}">
-                    <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-                  </sc-if>
-                </div>
-              </button>
-              <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">
-                  <span>Cód. {{ p.code }}</span>
-                  <span>{{ p.pack }}</span>
-                </div>
-                <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</button>
-                <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
-                  <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
-                    <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
-                    <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
-                    <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
-                  </div>
-                  <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
-                </div>
-              </div>
-            </article>
-          </sc-for>
-        </div>
-      </div>
-    </section>
-
     <section id="catalogo" style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;flex-wrap:wrap">
         <div>
@@ -652,8 +613,8 @@ input{font-family:inherit}
         </div>
         <div style="border-top:1px solid #E6E0D6;padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px">
           <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Entrega</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-            <sc-for list="{{ deliveryOpts }}" as="d" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <sc-for list="{{ deliveryOpts }}" as="d" hint-placeholder-count="2">
               <button onClick="{{ d.pick }}" style="border:1.5px solid {{ d.bd }};background:{{ d.bg }};border-radius:6px;padding:8px 6px;font-size:12px;font-weight:600;line-height:1.2;color:#1C1917">{{ d.label }}</button>
             </sc-for>
           </div>
@@ -668,8 +629,10 @@ input{font-family:inherit}
           <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A;margin-top:6px">Tus datos</div>
           <input value="{{ checkoutName }}" onChange="{{ onCheckoutName }}" placeholder="Nombre y apellido" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
           <input value="{{ checkoutPhone }}" onChange="{{ onCheckoutPhone }}" placeholder="Teléfono de contacto" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
+          <input value="{{ checkoutBiz }}" onChange="{{ onCheckoutBiz }}" placeholder="Tipo de negocio (ej: rotisería, kiosco)" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
           <sc-if value="{{ needsAddress }}" hint-placeholder-val="{{ false }}">
             <input value="{{ checkoutAddress }}" onChange="{{ onCheckoutAddress }}" placeholder="Dirección de entrega" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
+            <input value="{{ checkoutCity }}" onChange="{{ onCheckoutCity }}" placeholder="Ciudad" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%"></input>
           </sc-if>
           <a href="https://wa.me/5493515173319?text={{ waCartText }}" target="_blank" rel="noopener" onClick="{{ checkout }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;height:50px;font-weight:700;font-size:15px;text-decoration:none;display:flex;align-items:center;justify-content:center" style-hover="background:#A81B10">Enviar pedido por WhatsApp</a>
           <a href="mailto:info@centrixgroupsas.com?subject={{ cartEmailSubject }}&body={{ cartEmailBody }}" onClick="{{ checkout }}" style="border:1.5px solid #1C1917;color:#1C1917;border-radius:6px;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px">Enviar pedido por email</a>
@@ -786,7 +749,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', openFaq: null, heroIndex: 0
+    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0
   };
 
   componentDidMount() {
@@ -815,7 +778,7 @@ class Component extends DCLogic {
   pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, openFaq, heroIndex } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -873,7 +836,6 @@ class Component extends DCLogic {
       };
     };
     const products = list.map(p => makeCard(p, { cardClass: isCarousel ? 'carousel-card' : '', cardExtra: isCarousel ? 'scroll-snap-align:start' : '' }));
-    const vycProducts = PRODUCTS.filter(p => p.vyc).map(p => makeCard(p, {}));
 
     const offerProducts = offersList.map(o => {
       const qty = qtys[o.id] || 1;
@@ -916,11 +878,13 @@ class Component extends DCLogic {
     const cartLines = cartItems.map(i => `• ${i.qty} × ${i.name} (${i.pack})${i.price ? ' — $' + Number(i.price).toLocaleString('es-AR') + ' c/u' : ''}`).join('\n');
     const sucName = (SUCURSALES.find(s => s.id === checkoutSuc) || {}).name || '';
     const needsAddress = delivery !== 'retiro';
-    const deliveryTxt = delivery === 'retiro' ? `Retiro en sucursal ${sucName}` : delivery === 'cba' ? 'Envío a Córdoba capital' : 'Envío a Traslasierra';
+    const deliveryTxt = delivery === 'retiro' ? `Retiro en sucursal ${sucName}` : 'Envío sin cargo';
     const contactLines = [
       checkoutName.trim() ? `Nombre: ${checkoutName.trim()}` : '',
       checkoutPhone.trim() ? `Teléfono: ${checkoutPhone.trim()}` : '',
-      needsAddress && checkoutAddress.trim() ? `Dirección: ${checkoutAddress.trim()}` : ''
+      checkoutBiz.trim() ? `Negocio: ${checkoutBiz.trim()}` : '',
+      needsAddress && checkoutAddress.trim() ? `Dirección: ${checkoutAddress.trim()}` : '',
+      needsAddress && checkoutCity.trim() ? `Ciudad: ${checkoutCity.trim()}` : ''
     ].filter(Boolean).join('\n');
     const orderBody = cartItems.length
       ? `Hola! Quiero cotizar este pedido:\n${cartLines}\n\nEntrega: ${deliveryTxt}${contactLines ? '\n' + contactLines : ''}\n\n¿Me pasás precio y disponibilidad?`
@@ -965,10 +929,6 @@ class Component extends DCLogic {
       ],
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
-      pickVyc: () => this.pickCat('vyc'),
-      vycProducts,
-      vycLeft: () => { const el = document.getElementById('vyc-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
-      vycRight: () => { const el = document.getElementById('vyc-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
       offerProducts, hasOffers: offerProducts.length > 0,
       offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
@@ -989,20 +949,35 @@ class Component extends DCLogic {
       carouselRight: () => { const el = document.getElementById('featured-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
       sucursales: SUCURSALES,
       cartCount: count, cartItems, cartEmpty: cartItems.length === 0, waCartText, cartEmailSubject, cartEmailBody,
-      needsAddress, needsSucPick: delivery === 'retiro', checkoutName, checkoutPhone, checkoutAddress,
+      needsAddress, needsSucPick: delivery === 'retiro', checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity,
       onCheckoutName: e => this.setState({ checkoutName: e.target.value }),
       onCheckoutPhone: e => this.setState({ checkoutPhone: e.target.value }),
       onCheckoutAddress: e => this.setState({ checkoutAddress: e.target.value }),
+      onCheckoutBiz: e => this.setState({ checkoutBiz: e.target.value }),
+      onCheckoutCity: e => this.setState({ checkoutCity: e.target.value }),
       checkoutSucOpts: SUCURSALES.map(s => { const on = s.id === checkoutSuc; return { label: s.name, bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4', pick: () => this.setState({ checkoutSuc: s.id }) }; }),
       deliveryOpts: [
         { id: 'retiro', label: 'Retiro en sucursal' },
-        { id: 'cba', label: 'Envío Córdoba' },
-        { id: 'traslasierra', label: 'Envío Traslasierra' }
+        { id: 'envio', label: 'Envío sin cargo' }
       ].map(d => { const on = d.id === delivery; return { ...d, bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D8D0C4', pick: () => this.setState({ delivery: d.id }) }; }),
       cartOpen, openCart: () => this.setState({ cartOpen: true, toast: '' }), closeCart: () => this.setState({ cartOpen: false, orderSent: false }),
       orderSent, showCartBody: !orderSent,
       closeOrderSent: () => this.setState({ cartOpen: false, orderSent: false }),
-      checkout: () => { this.setState({ orderSent: true, cart: {} }); },
+      checkout: () => {
+        // Se manda también a la base de datos para que el pedido aparezca en
+        // el panel, además del mensaje por WhatsApp/email de siempre.
+        if (cartItems.length) {
+          const order = {
+            id: Date.now(), createdAt: new Date().toISOString(),
+            client: { name: checkoutName.trim(), biz: checkoutBiz.trim(), phone: checkoutPhone.trim(), addr: needsAddress ? checkoutAddress.trim() : '', city: needsAddress ? checkoutCity.trim() : '' },
+            delivery, suc: checkoutSuc,
+            items: cartItems.map(i => ({ pid: i.id, name: i.name, pack: i.pack, qty: i.qty, unit: i.price || 0 })),
+            ship: 0, pay: '', paid: false, status: 'nuevo', note: ''
+          };
+          db.collection('orders').doc(String(order.id)).set(order).catch(e => console.error('order write failed', e));
+        }
+        this.setState({ orderSent: true, cart: {} });
+      },
       detailOpen: !!dp, pd, closeDetail: () => this.setState({ productOpen: null }),
       hasToast: !!toast && !cartOpen, toast,
       contactName, contactEmail, contactMsg,

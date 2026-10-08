@@ -747,6 +747,9 @@ input,textarea{font-family:inherit;color:#1C1917}
           <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Dirección
             <input value="{{ nd.clientAddr }}" onChange="{{ ndSet.clientAddr }}" placeholder="Calle y número" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
           </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A">Ciudad
+            <input value="{{ nd.clientCity }}" onChange="{{ ndSet.clientCity }}" placeholder="Ej: Córdoba" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+          </label>
         </div>
 
         <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Entrega</div>
@@ -761,9 +764,7 @@ input,textarea{font-family:inherit;color:#1C1917}
           </sc-for>
         </div>
         <sc-if value="{{ ndNeedsShip }}" hint-placeholder-val="{{ false }}">
-          <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:#6B635A;max-width:180px">Costo de envío ($)
-            <input value="{{ nd.ship }}" onChange="{{ ndSet.ship }}" inputmode="numeric" style="border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-          </label>
+          <div style="font-size:12px;color:#6B635A">🚚 Envío sin cargo, siempre.</div>
         </sc-if>
 
         <div style="border-top:1px solid #EFE9DF;padding-top:16px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6B635A">Productos</div>
@@ -1031,8 +1032,7 @@ const ST = {
   cancelado: { label: 'Cancelado', bg: '#EEE9E2', fg: '#6B635A' }
 };
 const NEXT_LABEL = { preparando: 'Empezar a preparar', listo: 'Marcar listo para retirar', enviado: 'Despachar pedido', entregado: 'Marcar entregado' };
-const DELIV = { retiro: 'Retiro en sucursal', cba: 'Envío Córdoba', traslasierra: 'Envío Traslasierra' };
-const SUCN = { nono: 'Nono', malague: 'Malagueño', altagracia: 'Alta Gracia' };
+const DELIV = { retiro: 'Retiro en sucursal', envio: 'Envío sin cargo' };
 const flow = d => d === 'retiro' ? ['nuevo', 'preparando', 'listo', 'entregado'] : ['nuevo', 'preparando', 'enviado', 'entregado'];
 
 const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -1211,12 +1211,13 @@ class Component extends DCLogic {
       .catch(e => this.flash('Error al importar: ' + e.message));
   }
 
+  sucName(id) { return ((this.state.config.sucursales || []).find(su => su.id === id) || {}).name || ''; }
   orderVM(o) {
     const st = ST[o.status], f = flow(o.delivery), idx = f.indexOf(o.status);
     const next = idx >= 0 && idx < f.length - 1 ? f[idx + 1] : null;
     return {
       id: o.id, dateTxt: dayTxt(o), clientName: o.client.name, clientBiz: o.client.biz, phone: o.client.phone,
-      deliveryTxt: DELIV[o.delivery], sucTxt: SUCN[o.suc], itemCount: o.items.reduce((a, x) => a + x.qty, 0),
+      deliveryTxt: DELIV[o.delivery] || o.delivery, sucTxt: this.sucName(o.suc), itemCount: o.items.reduce((a, x) => a + x.qty, 0),
       totalTxt: fmt(orderTotal(o)), pay: o.pay, paidTxt: o.paid ? 'Cobrado' : 'Pendiente de cobro', paidColor: o.paid ? '#2D6A3A' : '#A81B10',
       stLabel: st.label, stBg: st.bg, stFg: st.fg, hasNext: !!next, nextLabel: next ? NEXT_LABEL[next] : '',
       advance: () => { if (next) { this.updOrder(o.id, { status: next }); this.flash(`Pedido #${o.id}: ${ST[next].label}`); } },
@@ -1405,8 +1406,8 @@ class Component extends DCLogic {
       const vm = this.orderVM(oo);
       const sub = oo.items.reduce((a, x) => a + x.unit * x.qty, 0);
       const opts = [...flow(oo.delivery), 'cancelado'];
-      od = { ...vm, subTxt: fmt(sub), shipTxt: oo.delivery === 'retiro' ? 'Retiro sin cargo' : oo.ship ? fmt(oo.ship) : 'Gratis',
-        addrTxt: oo.delivery === 'retiro' ? `Retira en sucursal ${SUCN[oo.suc]}` : oo.client.addr,
+      od = { ...vm, subTxt: fmt(sub), shipTxt: 'Gratis',
+        addrTxt: oo.delivery === 'retiro' ? `Retira en sucursal ${this.sucName(oo.suc)}` : [oo.client.addr, oo.client.city].filter(Boolean).join(', '),
         note: s.noteDraft[oo.id] !== undefined ? s.noteDraft[oo.id] : oo.note,
         lines: oo.items.map(x => ({ ...x, unitTxt: fmt(x.unit) + ' c/u', lineTxt: fmt(x.unit * x.qty) })),
         statusBtns: opts.map(id => { const on = id === oo.status, t = ST[id]; return { label: t.label, bg: on ? t.bg : '#FFFFFF', fg: on ? t.fg : '#1C1917', bd: on ? t.fg : '#D8D0C4', pick: () => this.updOrder(oo.id, { status: id }) }; }),
@@ -1438,7 +1439,7 @@ class Component extends DCLogic {
     const od2 = s.odraft;
     let nd = {}, ndSet = {}, ndDeliveryOpts = [], ndSucOpts = [], ndPayOpts = [], ndTotalTxt = '$0', ndHasLines = false;
     if (od2) {
-      ['clientName', 'clientBiz', 'clientPhone', 'clientAddr', 'note', 'ship'].forEach(f => {
+      ['clientName', 'clientBiz', 'clientPhone', 'clientAddr', 'clientCity', 'note'].forEach(f => {
         ndSet[f] = e => { const v = e.target.value; this.setState(st => ({ odraft: { ...st.odraft, [f]: v } })); };
       });
       nd = {
@@ -1449,9 +1450,9 @@ class Component extends DCLogic {
         }))
       };
       ndHasLines = od2.lines.length > 0;
-      ndTotalTxt = fmt(od2.lines.reduce((a, l) => a + l.unit * l.qty, 0) + (od2.delivery === 'retiro' ? 0 : (+od2.ship || 0)));
+      ndTotalTxt = fmt(od2.lines.reduce((a, l) => a + l.unit * l.qty, 0));
       ndDeliveryOpts = [
-        { id: 'retiro', label: 'Retiro en sucursal' }, { id: 'cba', label: 'Envío Córdoba' }, { id: 'traslasierra', label: 'Envío Traslasierra' }
+        { id: 'retiro', label: 'Retiro en sucursal' }, { id: 'envio', label: 'Envío sin cargo' }
       ].map(dd => ({ ...dd, ...pick(dd.id === od2.delivery), pick: () => this.setState(st => ({ odraft: { ...st.odraft, delivery: dd.id } })) }));
       ndSucOpts = config.sucursales.map(su => ({ id: su.id, label: su.name, ...pick(su.id === od2.suc), pick: () => this.setState(st => ({ odraft: { ...st.odraft, suc: su.id } })) }));
       ndPayOpts = ['Efectivo', 'Transferencia', 'Mercado Pago'].map(p => ({ label: p, ...pick(p === od2.pay), pick: () => this.setState(st => ({ odraft: { ...st.odraft, pay: p } })) }));
@@ -1609,7 +1610,7 @@ class Component extends DCLogic {
       allProducts: products,
       newOrder: () => this.setState({
         odraftErr: false,
-        odraft: { clientName: '', clientBiz: '', clientPhone: '', clientAddr: '', delivery: 'retiro', suc: (config.sucursales[0] || {}).id || 'nono', pay: 'Efectivo', paid: false, note: '', ship: '0', lines: [] },
+        odraft: { clientName: '', clientBiz: '', clientPhone: '', clientAddr: '', clientCity: '', delivery: 'retiro', suc: (config.sucursales[0] || {}).id || 'nono', pay: 'Efectivo', paid: false, note: '', lines: [] },
         oline: { pid: '', qty: '1', unit: '' }
       }),
       closeOrderDraft: () => this.setState({ odraft: null }),
@@ -1619,10 +1620,10 @@ class Component extends DCLogic {
         const newId = Math.max(...s.orders.map(o => o.id), 10200) + 1;
         const order = {
           id: newId, createdAt: new Date().toISOString(),
-          client: { name: dft.clientName.trim(), biz: dft.clientBiz.trim(), phone: dft.clientPhone.trim(), addr: dft.clientAddr.trim() },
+          client: { name: dft.clientName.trim(), biz: dft.clientBiz.trim(), phone: dft.clientPhone.trim(), addr: dft.clientAddr.trim(), city: dft.clientCity.trim() },
           delivery: dft.delivery, suc: dft.suc,
           items: dft.lines.map(l => ({ pid: l.pid, name: l.name, pack: l.pack, qty: l.qty, unit: l.unit })),
-          ship: dft.delivery === 'retiro' ? 0 : (+dft.ship || 0),
+          ship: 0,
           pay: dft.pay, paid: dft.paid, status: 'nuevo', note: dft.note.trim()
         };
         db.collection('orders').doc(String(newId)).set(order)
