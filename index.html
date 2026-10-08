@@ -113,13 +113,11 @@ input{font-family:inherit}
       </button>
     </div>
     <nav style="background:#D62718">
-      <div style="max-width:1320px;margin:0 auto;padding:0 0 0 24px;display:flex;align-items:stretch">
-        <div style="flex:1;min-width:0;display:flex;gap:0;overflow-x:auto;scrollbar-width:none">
-          <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
-            <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:0.3px;padding:11px 8px;white-space:nowrap;flex-shrink:0" style-hover="background:#A81B10">{{ c.name }}</button>
-          </sc-for>
-        </div>
-        <button onClick="{{ pickPopulares }}" style="flex-shrink:0;border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:0.3px;padding:11px 12px;white-space:nowrap">Más pedidos</button>
+      <div style="max-width:1320px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap">
+        <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 13px;white-space:nowrap" style-hover="background:#A81B10">{{ c.name }}</button>
+        </sc-for>
+        <button onClick="{{ pickPopulares }}" style="border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 15px;white-space:nowrap;margin-left:auto">Más pedidos</button>
       </div>
     </nav>
   </div>
