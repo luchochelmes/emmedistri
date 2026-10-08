@@ -51,8 +51,9 @@ input{font-family:inherit}
   .product-page-grid{grid-template-columns:1fr!important;gap:24px!important}
   .topbar-extra{display:none!important}
   .topbar>div{padding-top:6px!important;padding-bottom:6px!important;gap:12px!important}
-  .header-logo{height:56px!important}
+  .header-logo{height:64px!important}
   .header-sticky{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .nav-scroll{flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none}
   .cart-label{display:none}
 }
 </style>
@@ -83,7 +84,7 @@ input{font-family:inherit}
   <div class="header-sticky" style="position:sticky;top:0;z-index:20;background:#FFFFFF;border-bottom:1px solid #E6E0D6">
     <div style="max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;gap:12px;align-items:center">
       <a href="#" style="flex-shrink:0;display:flex;align-items:center">
-        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:92px;width:auto;display:block;border-radius:4px">
+        <img src="./logo-emme.jpg" alt="Emme Distribuidora" class="header-logo" style="height:116px;width:auto;display:block;border-radius:4px">
       </a>
       <div style="flex:1;min-width:0;position:relative">
         <div style="display:flex;border:1.5px solid #1C1917;border-radius:6px;overflow:hidden;background:#FFFFFF">
@@ -113,11 +114,13 @@ input{font-family:inherit}
       </button>
     </div>
     <nav style="background:#D62718">
-      <div style="max-width:1320px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap">
-        <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
-          <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 13px;white-space:nowrap" style-hover="background:#A81B10">{{ c.name }}</button>
-        </sc-for>
-        <button onClick="{{ pickPopulares }}" style="border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 15px;white-space:nowrap;margin-left:auto">Más pedidos</button>
+      <div style="max-width:1320px;margin:0 auto;padding:0 0 0 24px;display:flex;align-items:stretch">
+        <div class="nav-scroll" style="flex:1;min-width:0;display:flex;flex-wrap:wrap">
+          <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
+            <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 13px;white-space:nowrap;flex-shrink:0" style-hover="background:#A81B10">{{ c.name }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ pickPopulares }}" style="flex-shrink:0;border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 15px;white-space:nowrap">Más pedidos</button>
       </div>
     </nav>
   </div>

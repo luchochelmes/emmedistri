@@ -323,6 +323,9 @@ input,textarea{font-family:inherit;color:#1C1917}
         </div>
       </sc-if>
 
+      <sc-if value="{{ isConfigLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:40px 0;text-align:center;color:#6B635A;font-size:14px">Cargando configuración...</div>
+      </sc-if>
       <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;align-items:start">
           <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px">
@@ -1032,7 +1035,7 @@ const pick = (on) => ({ bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D
 
 class Component extends DCLogic {
   state = {
-    products: [], orders: [], cats: [], config: SEED_CONFIG,
+    products: [], orders: [], cats: [], config: SEED_CONFIG, configReady: false,
     authReady: false, loggedIn: false, loginEmailInput: '', loginPasswordInput: '', loginError: '',
     view: 'resumen', q: '', orderTab: 'todos', orderSuc: 'todas', prodCat: 'all',
     openOrder: null, draft: null, draftIsNew: false, draftErr: false,
@@ -1141,7 +1144,7 @@ class Component extends DCLogic {
       }, err => console.error('cats snapshot', err)),
       db.collection('config').doc('site').onSnapshot(doc => {
         const cfg = doc.exists ? doc.data() : SEED_CONFIG;
-        this.setState({ config: cfg });
+        this.setState({ config: cfg, configReady: true });
       }, err => console.error('config snapshot', err))
     ];
   }
@@ -1206,7 +1209,7 @@ class Component extends DCLogic {
       const on = n.id === view;
       return { ...n, hasBadge: !!n.badge, bg: on ? '#2E2926' : 'transparent', fg: on ? '#FFC72C' : '#E9E3DA',
         badgeBg: n.hot ? '#D62718' : '#3A3430', badgeFg: '#FFFFFF',
-        pick: () => this.setState(st => ({ view: n.id, q: '', configDraft: n.id === 'config' ? st.config : st.configDraft })) };
+        pick: () => this.setState(st => ({ view: n.id, q: '', configDraft: n.id === 'config' ? null : st.configDraft })) };
     });
     const titles = {
       resumen: ['Resumen', 'Actividad de hoy, ' + new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })],
@@ -1451,7 +1454,7 @@ class Component extends DCLogic {
       searchPh: view === 'pedidos' ? 'Buscar por N° o cliente' : view === 'productos' ? 'Buscar por nombre o código' : 'Buscar cliente',
       q: s.q, onQ: e => this.setState({ q: e.target.value }),
       isResumen: view === 'resumen', isPedidos: view === 'pedidos', isProductos: view === 'productos',
-      isCategorias: view === 'categorias', isClientes: view === 'clientes', isConfig: view === 'config',
+      isCategorias: view === 'categorias', isClientes: view === 'clientes', isConfig: view === 'config' && s.configReady, isConfigLoading: view === 'config' && !s.configReady,
       kpis, pendingOrders, noPending: !pendingOrders.length, lowStockList, noLowStock: !lowStockList.length, lowStock: low,
       goPedidos: () => this.setState({ view: 'pedidos' }),
       orderTabs, sucTabs, orderRows: ol.map(o => this.orderVM(o)), noOrders: !ol.length,
