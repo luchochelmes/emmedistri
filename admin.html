@@ -1066,13 +1066,12 @@ class Component extends DCLogic {
   };
 
   // Sin Firebase Storage (plan free): la foto se achica en el navegador y se
-  // guarda como data-URL directo en el documento de config de Firestore.
-  compressImage(file) {
-    // Varias fotos conviven en el mismo documento de Firestore (límite duro de
-    // 1 MB), así que cada una se achica fuerte: se prueba con dimensiones y
-    // calidad decrecientes hasta entrar en un tope chico por imagen.
-    const STEPS = [[1200, 0.72], [900, 0.6], [700, 0.5], [500, 0.4]];
-    const CAP = 130000;
+  // guarda como data-URL directo en un documento de Firestore (límite duro de
+  // 1 MB por documento). `cap` ajusta cuánto margen hay según si la foto
+  // comparte documento con otras (hero) o vive sola (rubro, producto).
+  compressImage(file, cap) {
+    const CAP = cap || 130000;
+    const STEPS = [[1920, 0.85], [1600, 0.78], [1200, 0.7], [900, 0.6], [700, 0.5], [500, 0.4]];
     return createImageBitmap(file).then(bitmap => {
       try {
         let best = null;
@@ -1101,7 +1100,7 @@ class Component extends DCLogic {
       return;
     }
     this.setState(st => ({ heroUploadingIdx: i, heroUploadErr: { ...st.heroUploadErr, [i]: '' } }));
-    this.compressImage(file)
+    this.compressImage(file, 250000)
       .then(dataUrl => {
         this.setState(st => {
           const base = st.configDraft || this.state.config;
@@ -1122,7 +1121,7 @@ class Component extends DCLogic {
       return;
     }
     this.setState(st => ({ bizUploadingKey: key, bizUploadErr: { ...st.bizUploadErr, [key]: '' } }));
-    this.compressImage(file)
+    this.compressImage(file, 650000)
       .then(dataUrl => db.collection('bizImages').doc(key).set({ key, photo: dataUrl }))
       .then(() => this.setState({ bizUploadingKey: null }))
       .catch(e => {
@@ -1141,7 +1140,7 @@ class Component extends DCLogic {
       return;
     }
     this.setState({ prodPhotoUploading: true, prodPhotoErr: '' });
-    this.compressImage(file)
+    this.compressImage(file, 650000)
       .then(dataUrl => {
         this.setState(st => ({ draft: { ...st.draft, photo: dataUrl }, prodPhotoUploading: false }));
       })
