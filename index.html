@@ -749,7 +749,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0
+    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}
   };
 
   componentDidMount() {
@@ -762,7 +762,12 @@ class Component extends DCLogic {
       }, err => console.error('cats snapshot', err)),
       db.collection('config').doc('site').onSnapshot(doc => {
         if (doc.exists) this.setState({ config: doc.data() });
-      }, err => console.error('config snapshot', err))
+      }, err => console.error('config snapshot', err)),
+      db.collection('bizImages').onSnapshot(snap => {
+        const map = {};
+        snap.docs.forEach(d => { map[d.id] = d.data().photo || ''; });
+        this.setState({ bizImages: map });
+      }, err => console.error('bizImages snapshot', err))
     ];
     this._heroTimer = setInterval(() => {
       this.setState(s => {
@@ -778,7 +783,7 @@ class Component extends DCLogic {
   pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -916,7 +921,7 @@ class Component extends DCLogic {
       showSuggestions, suggestions, noSuggestions: suggestions.length === 0,
       hasMainSucursal, mainSucursalTxt,
       bizTypes: BIZ_TYPES.map(b => {
-        const photo = (config.bizImages && config.bizImages[b.key]) || '';
+        const photo = (bizImages && bizImages[b.key]) || '';
         const count = PRODUCTS.filter(p => p.bizTags && p.bizTags.includes(b.key)).length;
         return { ...b, photo, hasPhoto: !!photo, noPhoto: !photo, pick: () => this.pickCat('biz:' + b.key), hasCount: count > 0, countTxt: count + (count === 1 ? ' producto' : ' productos') };
       }),

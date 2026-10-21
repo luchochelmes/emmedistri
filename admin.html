@@ -1009,7 +1009,7 @@ const WA_IMPORT_PRODUCTS = [
 const SEED_CONFIG = {
   minPedido: 0, whatsapp: '351 517-3319',
   aviso: 'Venta mayorista y minorista', lowStock: 12,
-  heroImages: ['hero.jpg'], bizImages: {},
+  heroImages: ['hero.jpg'],
   sucursales: [
     { id: 'nono', name: 'Nono', tag: 'Traslasierra', zone: 'Nono, Valle de Traslasierra, Córdoba', address: 'Recalde 64', week: '8:30 a 13 y 16:30 a 20 h', sat: '9 a 13 h', wa: '351 517-3319', active: true, main: false },
     { id: 'malague', name: 'Malagueño', tag: 'Córdoba capital', zone: 'Ciudad de Malagueño, Córdoba — a 10 min de Córdoba capital y Carlos Paz', address: 'Neuquén esq. Almirante Brown', week: '8 a 18 h corrido', sat: '8:30 a 13 h', wa: '351 517-3319', active: true, main: true },
@@ -1051,7 +1051,7 @@ const pick = (on) => ({ bg: on ? '#FFF4D1' : '#FFFFFF', bd: on ? '#D62718' : '#D
 
 class Component extends DCLogic {
   state = {
-    products: [], orders: [], cats: [], config: SEED_CONFIG, configReady: false,
+    products: [], orders: [], cats: [], config: SEED_CONFIG, configReady: false, bizImages: {},
     authReady: false, loggedIn: false, loginEmailInput: '', loginPasswordInput: '', loginError: '',
     view: 'resumen', q: '', orderTab: 'todos', orderSuc: 'todas', prodCat: 'all',
     openOrder: null, draft: null, draftIsNew: false, draftErr: false,
@@ -1123,24 +1123,15 @@ class Component extends DCLogic {
     }
     this.setState(st => ({ bizUploadingKey: key, bizUploadErr: { ...st.bizUploadErr, [key]: '' } }));
     this.compressImage(file)
-      .then(dataUrl => {
-        this.setState(st => {
-          const base = st.configDraft || this.state.config;
-          return { configDraft: { ...base, bizImages: { ...(base.bizImages || {}), [key]: dataUrl } }, bizUploadingKey: null };
-        });
-      })
+      .then(dataUrl => db.collection('bizImages').doc(key).set({ key, photo: dataUrl }))
+      .then(() => this.setState({ bizUploadingKey: null }))
       .catch(e => {
         this.setState(st => ({ bizUploadingKey: null, bizUploadErr: { ...st.bizUploadErr, [key]: e.message } }));
       });
   }
 
   removeBizImage(key) {
-    this.setState(st => {
-      const base = st.configDraft || this.state.config;
-      const imgs = { ...(base.bizImages || {}) };
-      delete imgs[key];
-      return { configDraft: { ...base, bizImages: imgs } };
-    });
+    db.collection('bizImages').doc(key).delete().catch(e => this.flash('Error: ' + e.message));
   }
 
   uploadProdPhoto(file) {
@@ -1178,8 +1169,23 @@ class Component extends DCLogic {
       db.collection('config').doc('site').onSnapshot(doc => {
         const cfg = doc.exists ? doc.data() : SEED_CONFIG;
         this.setState({ config: cfg, configReady: true });
-      }, err => console.error('config snapshot', err))
+        this.migrateLegacyBizImages(cfg);
+      }, err => console.error('config snapshot', err)),
+      db.collection('bizImages').onSnapshot(snap => {
+        const map = {};
+        snap.docs.forEach(d => { map[d.id] = d.data().photo || ''; });
+        this.setState({ bizImages: map });
+      }, err => console.error('bizImages snapshot', err))
     ];
+  }
+  migrateLegacyBizImages(cfg) {
+    const legacy = cfg && cfg.bizImages;
+    if (!legacy || !Object.keys(legacy).length || this._bizMigrating) return;
+    this._bizMigrating = true;
+    const batch = db.batch();
+    Object.keys(legacy).forEach(k => { if (legacy[k]) batch.set(db.collection('bizImages').doc(k), { key: k, photo: legacy[k] }); });
+    batch.update(db.collection('config').doc('site'), { bizImages: firebase.firestore.FieldValue.delete() });
+    batch.commit().catch(e => console.error('bizImages migration failed', e)).then(() => { this._bizMigrating = false; });
   }
   componentWillUnmount() {
     (this._unsubs || []).forEach(u => u());
@@ -1370,7 +1376,7 @@ class Component extends DCLogic {
     };
 
     const bizImgRows = BIZ_TYPES.map(b => {
-      const src = (cfgDraft.bizImages && cfgDraft.bizImages[b.key]) || '';
+      const src = (s.bizImages && s.bizImages[b.key]) || '';
       const uploading = s.bizUploadingKey === b.key;
       return {
         key: b.key, label: b.label, src, uploading, hasSrc: !!src,
@@ -1535,10 +1541,6 @@ class Component extends DCLogic {
         if (approxSize > 900000) {
           const weigh = [];
           (cfgDraft.heroImages || []).forEach((src, i) => { if (src) weigh.push({ label: 'Imagen de hero #' + (i + 1), size: src.length }); });
-          Object.keys(cfgDraft.bizImages || {}).forEach(k => {
-            const src = cfgDraft.bizImages[k];
-            if (src) weigh.push({ label: 'Foto de ' + ((BIZ_TYPES.find(b => b.key === k) || {}).label || k), size: src.length });
-          });
           weigh.sort((a, b) => b.size - a.size);
           const heaviest = weigh.slice(0, 2).map(w => w.label).join(' y ');
           this.flash('Demasiadas fotos juntas para guardar. Sacá o volvé a subir (se comprimen más chicas): ' + (heaviest || 'alguna imagen') + '.');
