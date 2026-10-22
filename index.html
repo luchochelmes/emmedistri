@@ -793,7 +793,8 @@ class Component extends DCLogic {
       dirHref: 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(s.address + ', ' + s.zone),
       waHref: 'https://wa.me/549' + (s.wa || config.whatsapp || '').replace(/\D/g, '') + '?text=' + encodeURIComponent(`Hola! Te escribo por la sucursal ${s.name}.`)
     }));
-    const heroImages = (config.heroImages && config.heroImages.length) ? config.heroImages : ['hero.jpg'];
+    const heroImagesFilled = (config.heroImages || []).filter(Boolean);
+    const heroImages = heroImagesFilled.length ? heroImagesFilled : ['hero.jpg'];
     const curHeroIndex = heroIndex % heroImages.length;
     const heroSlides = heroImages.map((src, i) => ({ i, src, opacity: i === curHeroIndex ? 1 : 0 }));
     const heroDots = heroImages.map((src, i) => ({
@@ -801,7 +802,7 @@ class Component extends DCLogic {
       pick: () => this.setState({ heroIndex: i })
     }));
     const faqList = config.faqs || [];
-    const offersList = PRODUCTS.filter(p => +p.old > +p.price).map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old }));
+    const offersList = PRODUCTS.filter(p => +p.old > +p.price).map(p => ({ id: p.id, name: p.name, pack: p.pack, price: p.price, oldPrice: p.old, photo: p.photo }));
     const showMayorista = this.props.showMayorista ?? true;
     const heroLayout = this.props.heroLayout ?? 'promos';
     const q = query.trim().toLowerCase();
