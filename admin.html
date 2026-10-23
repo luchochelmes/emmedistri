@@ -284,22 +284,41 @@ input,textarea{font-family:inherit;color:#1C1917}
 
       <sc-if value="{{ isCategorias }}" hint-placeholder-val="{{ false }}">
         <div style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;max-width:760px">
-          <div style="display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid #EFE9DF">
-            <input value="{{ newCat }}" onChange="{{ onNewCat }}" placeholder="Nombre del nuevo rubro" style="flex:1;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;min-width:0;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
-            <button onClick="{{ addCat }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:0 16px;font-weight:700;font-size:14px">Agregar rubro</button>
+          <div style="display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid #EFE9DF;flex-wrap:wrap">
+            <input value="{{ newCat }}" onChange="{{ onNewCat }}" placeholder="Nombre del nuevo rubro" style="flex:1;min-width:160px;border:1px solid #D8D0C4;border-radius:6px;padding:10px 12px;width:100%;font-size:14px;outline:none" style-focus="border-color:#1C1917">
+            <button onClick="{{ addCat }}" style="border:0;background:#D62718;color:#FFFFFF;border-radius:6px;padding:0 16px;font-weight:700;font-size:14px;white-space:nowrap">Agregar rubro</button>
+            <button onClick="{{ importSubcats }}" style="border:1px solid #D8D0C4;background:#FFFFFF;color:#1C1917;border-radius:6px;padding:0 16px;font-weight:700;font-size:14px;white-space:nowrap">Importar subcategorías</button>
           </div>
           <sc-for list="{{ catRows }}" as="c" hint-placeholder-count="8">
-            <div style="display:flex;gap:12px;align-items:center;padding:10px 20px;border-bottom:1px solid #F3EEE6">
-              <div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
-                <image-slot id="cat-{{ c.id }}" shape="rect" placeholder=" " style="width:300%;height:300%;transform:scale(0.3334);transform-origin:0 0;display:block"></image-slot>
+            <div style="border-bottom:1px solid #F3EEE6">
+              <div style="display:flex;gap:12px;align-items:center;padding:10px 20px">
+                <div style="width:44px;height:44px;border-radius:6px;overflow:hidden;background:#F1ECE3;flex-shrink:0">
+                  <image-slot id="cat-{{ c.id }}" shape="rect" placeholder=" " style="width:300%;height:300%;transform:scale(0.3334);transform-origin:0 0;display:block"></image-slot>
+                </div>
+                <input value="{{ c.name }}" onChange="{{ c.rename }}" onBlur="{{ c.blurRename }}" style="flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:8px 10px;font-size:15px;font-weight:600;outline:none;background:transparent" style-hover="border-color:#D8D0C4" style-focus="border-color:#1C1917;background:#FFFFFF">
+                <span style="font-size:13px;color:#6B635A;white-space:nowrap">{{ c.count }} productos</span>
+                <button onClick="{{ c.toggleExpand }}" style="border:1px solid #D8D0C4;background:#FFFFFF;color:#1C1917;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600;white-space:nowrap">{{ c.expandLabel }}</button>
+                <button onClick="{{ c.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Eliminar</button>
               </div>
-              <input value="{{ c.name }}" onChange="{{ c.rename }}" onBlur="{{ c.blurRename }}" style="flex:1;min-width:0;border:1px solid transparent;border-radius:5px;padding:8px 10px;font-size:15px;font-weight:600;outline:none;background:transparent" style-hover="border-color:#D8D0C4" style-focus="border-color:#1C1917;background:#FFFFFF">
-              <span style="font-size:13px;color:#6B635A;white-space:nowrap">{{ c.count }} productos</span>
-              <button onClick="{{ c.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600">Eliminar</button>
+              <sc-if value="{{ c.expanded }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:4px 20px 16px 76px;display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ c.subcats }}" as="sub" hint-placeholder-count="4">
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input value="{{ sub.name }}" onChange="{{ sub.rename }}" onBlur="{{ sub.blurRename }}" style="flex:1;min-width:0;border:1px solid #D8D0C4;border-radius:5px;padding:7px 10px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#1C1917">
+                      <span style="font-size:12px;color:#6B635A;white-space:nowrap">{{ sub.count }} productos</span>
+                      <button onClick="{{ sub.del }}" style="border:1px solid #F2C9C3;background:#FFFFFF;color:#A81B10;border-radius:5px;padding:5px 9px;font-size:11px;font-weight:600">Eliminar</button>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;gap:8px">
+                    <input value="{{ c.newSubcatVal }}" onChange="{{ c.onNewSubcat }}" placeholder="Nombre de la subcategoría" style="flex:1;min-width:0;border:1px solid #D8D0C4;border-radius:5px;padding:7px 10px;font-size:13px;outline:none" style-focus="border-color:#1C1917">
+                    <button onClick="{{ c.addSubcat }}" style="border:0;background:#1C1917;color:#FFFFFF;border-radius:5px;padding:0 14px;font-size:12px;font-weight:700;white-space:nowrap">Agregar</button>
+                  </div>
+                </div>
+              </sc-if>
             </div>
           </sc-for>
         </div>
-        <div style="font-size:13px;color:#6B635A;max-width:760px">Solo se pueden eliminar rubros sin productos. El nombre se actualiza en la tienda al guardar.</div>
+        <div style="font-size:13px;color:#6B635A;max-width:760px">Solo se pueden eliminar rubros o subcategorías sin productos. El nombre se actualiza en la tienda al guardar.</div>
       </sc-if>
 
       <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
@@ -639,6 +658,16 @@ input,textarea{font-family:inherit;color:#1C1917}
             </sc-for>
           </div>
         </div>
+        <sc-if value="{{ hasDraftSubcats }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:12px;font-weight:600;color:#6B635A">Subcategoría</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ draftSubcats }}" as="sub" hint-placeholder-count="6">
+                <button onClick="{{ sub.pick }}" style="border:1.5px solid {{ sub.bd }};background:{{ sub.bg }};border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#1C1917;white-space:nowrap">{{ sub.name }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
         <div style="display:flex;flex-direction:column;gap:6px">
           <span style="font-size:12px;font-weight:600;color:#6B635A">Aparece al tocar estos rubros de negocio, en la tienda</span>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -896,6 +925,113 @@ const SEED_CATS = [
   { id: 'limpieza', name: 'Limpieza', img: 'limpieza.jpg' },
   { id: 'aluminio', name: 'Aluminio y film', img: 'aluminio.jpg' }
 ];
+const SUBCAT_IMPORT = [
+  { id: 'aluminio', name: 'Aluminio y film', subcats: [
+    { id: 'film-gastronomico', name: 'Film Gastronómico' },
+    { id: 'papel-aluminio', name: 'Papel Aluminio' },
+    { id: 'papel-manteca', name: 'Papel Manteca' },
+    { id: 'film-embalar', name: 'Film Embalar' },
+    { id: 'parafinados', name: 'Parafinados' }
+  ] },
+  { id: 'bolsas', name: 'Bolsas', subcats: [
+    { id: 'camisetas', name: 'Camisetas' },
+    { id: 'pre-corte', name: 'Pre-Corte' },
+    { id: 'emblocadas', name: 'Emblocadas' },
+    { id: 'rinon', name: 'Riñón' },
+    { id: 'polipropileno', name: 'Polipropileno' },
+    { id: 'kraft', name: 'Kraft' },
+    { id: 'kraft-manija', name: 'Kraft c/manija' }
+  ] },
+  { id: 'frascos', name: 'Frascos, botellas y potes', subcats: [
+    { id: 'frascos-vidrio', name: 'Frascos de vidrio' },
+    { id: 'frascos-plastico', name: 'Frascos de plástico' },
+    { id: 'botellas-tapas', name: 'Botellas - Tapas' },
+    { id: 'potes-naturales', name: 'Potes Naturales' },
+    { id: 'potes-bisagras', name: 'Potes Bisagras' },
+    { id: 'pote-degustacion', name: 'Pote degustación' }
+  ] },
+  { id: 'cotillon', name: 'Cotillón', subcats: [
+    { id: 'topper', name: 'Topper' },
+    { id: 'globos', name: 'Globos' },
+    { id: 'velas', name: 'Velas' },
+    { id: 'bengalas-humo', name: 'Bengalas de Humo' },
+    { id: 'globos-metalizados', name: 'Globos Metalizados' },
+    { id: 'banderines', name: 'Banderines' },
+    { id: 'cortinas', name: 'Cortinas' },
+    { id: 'carioca-carnaval', name: 'Carioca/carnaval' }
+  ] },
+  { id: 'cajas', name: 'Cajas cartón', subcats: [
+    { id: 'cajas-gastronomicas', name: 'Cajas Gastronómicas' },
+    { id: 'cajas-delivery-micro', name: 'Cajas delivery Micro' },
+    { id: 'noqueras', name: 'Ñoqueras' },
+    { id: 'cajas-desayuno', name: 'Cajas desayuno' },
+    { id: 'cajas-cartulina', name: 'Cajas cartulina' }
+  ] },
+  { id: 'envases', name: 'Envases y bandejas', subcats: [
+    { id: 'bandejas-plasticas', name: 'Bandejas Plásticas' },
+    { id: 'bandejas-carton', name: 'Bandejas Cartón' },
+    { id: 'bandejas-laminadas', name: 'Bandejas Laminadas' },
+    { id: 'bandejas-expandido', name: 'Bandejas Expandido' },
+    { id: 'bandejas-aluminio', name: 'Bandejas Aluminio' },
+    { id: 'moldes-budin', name: 'Moldes Budín' },
+    { id: 'moldes-pan-dulce', name: 'Moldes Pan dulce' },
+    { id: 'moldes-bizcochuelo', name: 'Moldes Bizcochuelo' }
+  ] },
+  { id: 'hilos', name: 'Hilos', subcats: [
+    { id: 'hilo-algodon', name: 'Hilo Algodón' },
+    { id: 'hilo-choricero', name: 'Hilo Choricero' },
+    { id: 'hilo-plastico', name: 'Hilo Plástico' }
+  ] },
+  { id: 'limpieza', name: 'Limpieza', subcats: [
+    { id: 'liquidos', name: 'Líquidos' },
+    { id: 'unilever', name: 'Unilever' },
+    { id: 'varios-limpieza', name: 'Varios' }
+  ] },
+  { id: 'bazar', name: 'Bazar y varios', subcats: [
+    { id: 'vasos-bazar', name: 'Vasos' },
+    { id: 'platos', name: 'Platos' },
+    { id: 'cubiertos-bazar', name: 'Cubiertos' },
+    { id: 'utensilios-bazar', name: 'Utensilios' },
+    { id: 'bateria-cocina', name: 'Batería de cocina' },
+    { id: 'sartenes', name: 'Sartenes' },
+    { id: 'asaderas-moldes-fuentes', name: 'Asaderas/moldes y Fuentes' },
+    { id: 'tablas', name: 'Tablas' },
+    { id: 'ensaladera', name: 'Ensaladera' }
+  ] },
+  { id: 'libreria', name: 'Librería', subcats: [
+    { id: 'tijera', name: 'Tijera' },
+    { id: 'trinchetas', name: 'Trinchetas' },
+    { id: 'abrochadora', name: 'Abrochadora' }
+  ] },
+  { id: 'varios', name: 'Varios', subcats: [
+    { id: 'blanditas-elasticas', name: 'Blanditas Elásticas' },
+    { id: 'escarbadientes', name: 'Escarbadientes' },
+    { id: 'cinta', name: 'Cinta' },
+    { id: 'bobinas-papel', name: 'Bobinas Papel' },
+    { id: 'pinchos-brochettes', name: 'Pinchos/Brochettes' },
+    { id: 'removedores', name: 'Removedores' }
+  ] },
+  { id: 'papel', name: 'Servilletas y papel', subcats: [
+    { id: 'rollos-cocina', name: 'Rollos Cocina' },
+    { id: 'papel-higienico', name: 'Papel higiénico' },
+    { id: 'cajas-servilletas', name: 'Cajas Servilletas' },
+    { id: 'toallas-intercaladas', name: 'Toallas Intercaladas' },
+    { id: 'rollos-limpieza', name: 'Rollos Limpieza' }
+  ] },
+  { id: 'utensilios', name: 'Cubiertos y sorbetes', subcats: [
+    { id: 'tenedores', name: 'Tenedores' },
+    { id: 'cuchillos', name: 'Cuchillos' },
+    { id: 'cuchara-sundae', name: 'Cuchara Sundae' },
+    { id: 'cuchara-sopera', name: 'Cuchara Sopera' },
+    { id: 'sorbetes', name: 'Sorbetes' }
+  ] },
+  { id: 'vasos', name: 'Vasos y copas', subcats: [
+    { id: 'vasos-plasticos', name: 'Vasos plásticos' },
+    { id: 'vasos-trago-largo', name: 'Vasos trago largo' },
+    { id: 'copas', name: 'Copas' },
+    { id: 'vasos-batido', name: 'Vasos p/batido' }
+  ] }
+];
 const SEED_PRODUCTS = [
   { id: 1042, cat: 'vasos', name: 'Vaso térmico 240 cc blanco', pack: 'x 25 u.', min: 10, popular: true, vyc: false, desc: 'Vaso térmico de poliestireno expandido, ideal para bebidas calientes y frías. No transmite temperatura y mantiene el pulso firme en el mostrador.', price: 3450, old: 3990, whole: 2980, stock: 64, published: true },
   { id: 1057, cat: 'vasos', name: 'Vaso plástico cristal 330 cc', pack: 'x 50 u.', min: 10, popular: false, vyc: false, desc: 'Vaso de plástico cristal transparente, resistente para bebidas frías, gaseosas y tragos. Apilable para ahorrar espacio en el local.', price: 0, old: 0, whole: 0, stock: 0, published: true },
@@ -1058,6 +1194,7 @@ class Component extends DCLogic {
     confirmDel: null, bulk: null, newCat: '', toast: '',
     odraft: null, odraftErr: false, oline: { pid: '', qty: '1', unit: '' },
     expandedFaq: null, expandedSuc: null, configDraft: null,
+    expandedCat: null, subcatNameDraft: {}, newSubcatInput: {},
     curPwInput: '', newEmailInput: '', newPwInput: '', credError: '', credSuccess: '',
     priceDraft: {}, stockDraft: {}, noteDraft: {}, catNameDraft: {},
     heroUploadingIdx: null, heroUploadErr: {},
@@ -1206,13 +1343,37 @@ class Component extends DCLogic {
   flash(t) { this.setState({ toast: t }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2400); }
   updOrder(id, patch) { db.collection('orders').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
   updProd(id, patch) { db.collection('products').doc(String(id)).update(patch).catch(e => this.flash('Error al guardar: ' + e.message)); }
-  editProd(p) { this.setState({ draft: { ...p, old: p.old || '', onOffer: p.onOffer ?? (+p.old > 0), bizTags: p.bizTags || [], photo: p.photo || '' }, draftIsNew: false, draftErr: false, prodPhotoErr: '' }); }
+  editProd(p) { this.setState({ draft: { ...p, old: p.old || '', onOffer: p.onOffer ?? (+p.old > 0), bizTags: p.bizTags || [], photo: p.photo || '', subcat: p.subcat || '' }, draftIsNew: false, draftErr: false, prodPhotoErr: '' }); }
   importWaCatalog() {
     const batch = db.batch();
     WA_IMPORT_CATS.forEach(c => { if (!this.state.cats.some(x => x.id === c.id)) batch.set(db.collection('cats').doc(c.id), c); });
     WA_IMPORT_PRODUCTS.forEach(p => batch.set(db.collection('products').doc(String(p.id)), p));
     batch.commit()
       .then(() => this.flash(`Catálogo importado: ${WA_IMPORT_PRODUCTS.length} productos. Faltan cargar precios.`))
+      .catch(e => this.flash('Error al importar: ' + e.message));
+  }
+
+  importSubcats() {
+    const batch = db.batch();
+    let newCats = 0, updatedCats = 0;
+    SUBCAT_IMPORT.forEach(group => {
+      const existing = this.state.cats.find(c => c.id === group.id);
+      if (existing) {
+        const have = new Set((existing.subcats || []).map(sub => sub.id));
+        const merged = [...(existing.subcats || [])];
+        group.subcats.forEach(sub => { if (!have.has(sub.id)) merged.push(sub); });
+        if (merged.length !== (existing.subcats || []).length) {
+          batch.update(db.collection('cats').doc(group.id), { subcats: merged });
+          updatedCats++;
+        }
+      } else {
+        batch.set(db.collection('cats').doc(group.id), { id: group.id, name: group.name, img: '', subcats: group.subcats });
+        newCats++;
+      }
+    });
+    if (!newCats && !updatedCats) { this.flash('Las subcategorías ya estaban todas cargadas'); return; }
+    batch.commit()
+      .then(() => this.flash(`Subcategorías importadas: ${newCats} rubros nuevos, ${updatedCats} actualizados.`))
       .catch(e => this.flash('Error al importar: ' + e.message));
   }
 
@@ -1314,8 +1475,46 @@ class Component extends DCLogic {
     const catRows = cats.map(c => {
       const count = products.filter(p => p.cat === c.id).length;
       const nameVal = s.catNameDraft[c.id] !== undefined ? s.catNameDraft[c.id] : c.name;
+      const expanded = s.expandedCat === c.id;
+      const subcats = (c.subcats || []).map(sub => {
+        const key = c.id + '|' + sub.id;
+        const subNameVal = s.subcatNameDraft[key] !== undefined ? s.subcatNameDraft[key] : sub.name;
+        const subCount = products.filter(p => p.cat === c.id && p.subcat === sub.id).length;
+        return {
+          ...sub, name: subNameVal, count: subCount,
+          rename: e => { const v = e.target.value; this.setState(st => ({ subcatNameDraft: { ...st.subcatNameDraft, [key]: v } })); },
+          blurRename: () => {
+            if (s.subcatNameDraft[key] === undefined) return;
+            const v = s.subcatNameDraft[key].trim();
+            if (v) {
+              const next = (c.subcats || []).map(x => x.id === sub.id ? { ...x, name: v } : x);
+              db.collection('cats').doc(c.id).update({ subcats: next }).catch(e2 => this.flash('Error: ' + e2.message));
+            }
+            this.setState(st => { const d = { ...st.subcatNameDraft }; delete d[key]; return { subcatNameDraft: d }; });
+          },
+          del: () => {
+            if (subCount) return this.flash('Primero mové o eliminá sus productos');
+            const next = (c.subcats || []).filter(x => x.id !== sub.id);
+            db.collection('cats').doc(c.id).update({ subcats: next }).then(() => this.flash('Subcategoría eliminada')).catch(e2 => this.flash('Error: ' + e2.message));
+          }
+        };
+      });
       return {
-        ...c, name: nameVal, count,
+        ...c, name: nameVal, count, expanded, subcats, hasSubcats: subcats.length > 0,
+        expandLabel: expanded ? 'Ocultar subcategorías' : (subcats.length ? `Subcategorías (${subcats.length})` : 'Agregar subcategorías'),
+        toggleExpand: () => this.setState(st => ({ expandedCat: st.expandedCat === c.id ? null : c.id })),
+        newSubcatVal: s.newSubcatInput[c.id] || '',
+        onNewSubcat: e => { const v = e.target.value; this.setState(st => ({ newSubcatInput: { ...st.newSubcatInput, [c.id]: v } })); },
+        addSubcat: () => {
+          const n = (s.newSubcatInput[c.id] || '').trim();
+          if (!n) return;
+          const diacritics = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g');
+          const id = n.toLowerCase().normalize('NFD').replace(diacritics, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('sub' + Date.now());
+          const next = [...(c.subcats || []), { id, name: n }];
+          db.collection('cats').doc(c.id).update({ subcats: next })
+            .then(() => this.setState(st => ({ newSubcatInput: { ...st.newSubcatInput, [c.id]: '' } })))
+            .catch(e2 => this.flash('Error: ' + e2.message));
+        },
         rename: e => { const v = e.target.value; this.setState(st => ({ catNameDraft: { ...st.catNameDraft, [c.id]: v } })); },
         blurRename: () => {
           if (s.catNameDraft[c.id] === undefined) return;
@@ -1499,6 +1698,7 @@ class Component extends DCLogic {
       orderTabs, sucTabs, orderRows: ol.map(o => this.orderVM(o)), noOrders: !ol.length,
       prodCatTabs, productRows, noProducts: !productRows.length,
       catRows, newCat: s.newCat, onNewCat: e => this.setState({ newCat: e.target.value }),
+      importSubcats: () => this.importSubcats(),
       addCat: () => {
         const n = s.newCat.trim(); if (!n) return;
         const id = 'c' + Date.now();
@@ -1565,7 +1765,12 @@ class Component extends DCLogic {
       draftTitle: s.draftIsNew ? 'Nuevo producto' : 'Editar producto', saveLabel: s.draftIsNew ? 'Crear producto' : 'Guardar cambios',
       nameBd: s.draftErr && !String(d.name || '').trim() ? '#D62718' : '#D8D0C4',
       priceBd: s.draftErr && !(+d.price > 0) ? '#D62718' : '#D8D0C4', draftError: s.draftErr,
-      draftCats: cats.map(c => ({ ...c, ...pick(c.id === d.cat), pick: () => this.setState(st => ({ draft: { ...st.draft, cat: c.id } })) })),
+      draftCats: cats.map(c => ({ ...c, ...pick(c.id === d.cat), pick: () => this.setState(st => ({ draft: { ...st.draft, cat: c.id, subcat: '' } })) })),
+      draftSubcats: ((cats.find(c => c.id === d.cat) || {}).subcats || []).map(sub => {
+        const on = d.subcat === sub.id;
+        return { ...sub, ...pick(on), pick: () => this.setState(st => ({ draft: { ...st.draft, subcat: on ? '' : sub.id } })) };
+      }),
+      hasDraftSubcats: !!((cats.find(c => c.id === d.cat) || {}).subcats || []).length,
       draftBizTags: BIZ_TYPES.map(b => {
         const on = (d.bizTags || []).includes(b.key);
         return { key: b.key, name: b.label, ...pick(on), pick: () => this.setState(st => { const tags = st.draft.bizTags || []; const next = tags.includes(b.key) ? tags.filter(k => k !== b.key) : [...tags, b.key]; return { draft: { ...st.draft, bizTags: next } }; }) };
@@ -1582,10 +1787,10 @@ class Component extends DCLogic {
       dPopularTrack: d.popular ? '#2D6A3A' : '#CFC7BB', dPopularAlign: d.popular ? 'flex-end' : 'flex-start', dPopularLabel: d.popular ? 'Sí, destacado' : 'No',
       dTogglePopular: () => this.setState(st => ({ draft: { ...st.draft, popular: !st.draft.popular } })),
       closeDraft: () => this.setState({ draft: null }),
-      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, prodPhotoErr: '', draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true, vyc: false, popular: false, onOffer: false, bizTags: [], photo: '' } }),
+      newProduct: () => this.setState({ draftIsNew: true, draftErr: false, prodPhotoErr: '', draft: { id: Math.max(...products.map(p => p.id), 1000) + 1, cat: s.prodCat !== 'all' ? s.prodCat : cats[0]?.id, name: '', pack: '', desc: '', price: '', old: '', whole: '', min: '1', stock: '0', published: true, vyc: false, popular: false, onOffer: false, bizTags: [], photo: '', subcat: '' } }),
       saveDraft: () => {
         const x = s.draft; if (!String(x.name).trim() || !(+x.price > 0)) return this.setState({ draftErr: true });
-        const clean = { ...x, name: x.name.trim(), price: +x.price, old: x.onOffer ? (+x.old || 0) : 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0, vyc: !!x.vyc, popular: !!x.popular, onOffer: !!x.onOffer, bizTags: x.bizTags || [], photo: x.photo || '' };
+        const clean = { ...x, name: x.name.trim(), price: +x.price, old: x.onOffer ? (+x.old || 0) : 0, whole: +x.whole || +x.price, min: +x.min || 1, stock: +x.stock || 0, vyc: !!x.vyc, popular: !!x.popular, onOffer: !!x.onOffer, bizTags: x.bizTags || [], photo: x.photo || '', subcat: x.subcat || '' };
         db.collection('products').doc(String(clean.id)).set(clean)
           .then(() => this.flash(s.draftIsNew ? 'Producto creado' : 'Cambios guardados'))
           .catch(e => this.flash('Error: ' + e.message));
