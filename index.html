@@ -38,6 +38,21 @@ input{font-family:inherit}
 .mini-row{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
 .mini-row::-webkit-scrollbar{display:none}
 .mini-card{flex:0 0 132px}
+.rubro-nav{width:230px;flex-shrink:0;background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;overflow:visible;padding:6px 0}
+.rubro-nav-btn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;border:0;background:transparent;text-align:left;padding:10px 14px;font-size:13.5px;font-weight:600;color:#1C1917;cursor:pointer}
+.rubro-nav-btn:hover{background:#F7F4EE}
+.rubro-nav-btn.active{background:#FDE3DF;color:#D62718}
+.rubro-nav-chev{color:#A89C8C;font-size:12px}
+.rubro-flyout{position:absolute;top:0;left:100%;margin-left:10px;width:440px;max-width:min(70vw,440px);background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;box-shadow:0 10px 28px rgba(28,25,23,.16);padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;z-index:20}
+.rubro-flyout-link{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;font-size:13px;font-weight:600;color:#1C1917;border-radius:6px;cursor:pointer}
+.rubro-flyout-link:hover{background:#F7F4EE;color:#D62718}
+@media (max-width:860px){
+  .rubro-sidebar-wrap{flex-direction:column}
+  .rubro-nav{width:100%;display:flex;flex-wrap:wrap;padding:8px}
+  .rubro-nav>div{width:auto}
+  .rubro-nav-btn{width:auto;border-radius:999px;border:1px solid #E6E0D6;padding:7px 12px;margin:3px}
+  .rubro-flyout{position:static;margin-left:0;margin-top:6px;width:100%;max-width:100%;box-shadow:none;border-style:dashed;grid-template-columns:1fr 1fr}
+}
 @media (max-width:640px){
   .carousel-row{padding:4px 34px 8px}
   .carousel-card{flex:0 0 68vw}
@@ -350,59 +365,75 @@ input{font-family:inherit}
           </sc-for>
         </div>
       </div>
-      <sc-if value="{{ hasSubcatTabs }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px">
-          <sc-for list="{{ subcatTabs }}" as="sub" hint-placeholder-count="5">
-            <button onClick="{{ sub.pick }}" style="border:1px solid {{ sub.bd }};background:{{ sub.bg }};color:{{ sub.fg }};border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;white-space:nowrap">{{ sub.name }}</button>
-          </sc-for>
-        </div>
-      </sc-if>
-      <div class="{{ carouselTrackClass }}">
-        <sc-if value="{{ isCarousel }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ carouselLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
-          <button onClick="{{ carouselRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
-        </sc-if>
-        <div id="featured-carousel" class="{{ carouselRowClass }}" style="{{ productsGridStyle }}">
-          <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
-            <article class="{{ p.cardClass }}" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;{{ p.cardExtra }}">
-            <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
-              <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
-                <sc-if value="{{ p.photo }}">
-                  <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+      <div class="rubro-sidebar-wrap" style="display:flex;gap:24px;align-items:flex-start">
+        <nav class="rubro-nav">
+          <sc-for list="{{ sidebarCats }}" as="c" hint-placeholder-count="8">
+            <div style="position:relative">
+              <button onClick="{{ c.pick }}" class="rubro-nav-btn {{ c.activeClass }}">
+                <span>{{ c.name }}</span>
+                <sc-if value="{{ c.hasSubcats }}" hint-placeholder-val="{{ false }}">
+                  <span class="rubro-nav-chev">{{ c.chev }}</span>
                 </sc-if>
-                <sc-if value="{{ p.popular }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;top:10px;left:10px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
-                </sc-if>
-              </div>
-            </button>
-            <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">
-                <span>Cód. {{ p.code }}</span>
-                <span>{{ p.pack }}</span>
-              </div>
-              <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</button>
-              <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;color:#D62718;font-weight:700;font-size:12.5px">Ver detalle →</button>
-              <sc-if value="{{ showMayorista }}" hint-placeholder-val="{{ true }}">
-                <div style="background:#FFF4D1;border-radius:5px;padding:7px 9px;font-size:12.5px;line-height:1.3">
-                  <strong style="color:#A81B10">Precio mayorista</strong> llevando {{ p.min }}+ artículos
+              </button>
+              <sc-if value="{{ c.flyoutOpen }}" hint-placeholder-val="{{ false }}">
+                <div class="rubro-flyout">
+                  <sc-for list="{{ c.subRows }}" as="sub" hint-placeholder-count="6">
+                    <button onClick="{{ sub.pick }}" class="rubro-flyout-link">{{ sub.name }}</button>
+                  </sc-for>
                 </div>
               </sc-if>
-              <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
-                <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
-                  <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
-                  <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
-                  <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
-                </div>
-                <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
-              </div>
             </div>
-          </article>
           </sc-for>
+        </nav>
+        <div style="flex:1;min-width:0">
+          <div class="{{ carouselTrackClass }}">
+            <sc-if value="{{ isCarousel }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ carouselLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
+              <button onClick="{{ carouselRight }}" aria-label="Siguiente" class="carousel-arrow right">›</button>
+            </sc-if>
+            <div id="featured-carousel" class="{{ carouselRowClass }}" style="{{ productsGridStyle }}">
+              <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+                <article class="{{ p.cardClass }}" style="background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;{{ p.cardExtra }}">
+                <button onClick="{{ p.openDetail }}" aria-label="Ver detalle de {{ p.name }}" style="border:0;background:transparent;padding:0;display:block;width:100%;cursor:pointer;text-align:left">
+                  <div style="position:relative;aspect-ratio:1/1;background:#F1ECE3">
+                    <sc-if value="{{ p.photo }}">
+                      <img src="{{ p.photo }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                    </sc-if>
+                    <sc-if value="{{ p.popular }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;top:10px;left:10px;background:#FFC72C;color:#1C1917;font-weight:800;font-size:11px;padding:4px 8px;border-radius:4px;pointer-events:none;text-transform:uppercase;letter-spacing:0.4px">Más pedido</div>
+                    </sc-if>
+                  </div>
+                </button>
+                <div style="padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B635A;font-family:'JetBrains Mono';text-transform:uppercase">
+                    <span>Cód. {{ p.code }}</span>
+                    <span>{{ p.pack }}</span>
+                  </div>
+                  <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;font-size:15px;line-height:1.25;min-height:38px;text-wrap:pretty;color:#1C1917">{{ p.name }}</button>
+                  <button onClick="{{ p.openDetail }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;color:#D62718;font-weight:700;font-size:12.5px">Ver detalle →</button>
+                  <sc-if value="{{ showMayorista }}" hint-placeholder-val="{{ true }}">
+                    <div style="background:#FFF4D1;border-radius:5px;padding:7px 9px;font-size:12.5px;line-height:1.3">
+                      <strong style="color:#A81B10">Precio mayorista</strong> llevando {{ p.min }}+ artículos
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;gap:8px;margin-top:auto;padding-top:6px">
+                    <div style="display:flex;align-items:center;border:1px solid #D8D0C4;border-radius:5px">
+                      <button onClick="{{ p.dec }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">−</button>
+                      <span style="min-width:24px;text-align:center;font-weight:700;font-size:14px">{{ p.qty }}</span>
+                      <button onClick="{{ p.inc }}" style="border:0;background:transparent;width:32px;height:38px;font-size:18px;color:#1C1917">+</button>
+                    </div>
+                    <button onClick="{{ p.add }}" style="flex:1;border:0;background:#D62718;color:#FFFFFF;border-radius:5px;font-weight:700;font-size:14px;height:40px" style-hover="background:#A81B10">{{ p.addLabel }}</button>
+                  </div>
+                </div>
+              </article>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:48px;text-align:center;background:#FFFFFF;border:1px dashed #D8D0C4;border-radius:10px;color:#6B635A">No encontramos productos para esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.</div>
+          </sc-if>
         </div>
       </div>
-      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:48px;text-align:center;background:#FFFFFF;border:1px dashed #D8D0C4;border-radius:10px;color:#6B635A">No encontramos productos para esa búsqueda. Probá con otra palabra o escribinos por WhatsApp.</div>
-      </sc-if>
     </section>
 
     <section style="max-width:1320px;margin:0 auto;padding:48px 24px 0">
@@ -756,7 +787,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', subcat: '', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}
+    cart: {}, qtys: {}, cat: 'all', subcat: '', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}, activeFlyout: ''
   };
 
   componentDidMount() {
@@ -787,10 +818,21 @@ class Component extends DCLogic {
 
   setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
   scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
-  pickCat(id) { this.setState({ cat: id, subcat: '' }); this.scrollToCatalog(); }
+  pickCat(id) { this.setState({ cat: id, subcat: '', activeFlyout: '' }); this.scrollToCatalog(); }
+  pickSidebarCat(c) {
+    this.setState(st => ({
+      cat: c.id, subcat: '',
+      activeFlyout: (c.subcats && c.subcats.length) ? (st.activeFlyout === c.id ? '' : c.id) : ''
+    }));
+    this.scrollToCatalog();
+  }
+  pickSidebarSubcat(catId, subId) {
+    this.setState({ cat: catId, subcat: subId, activeFlyout: '' });
+    this.scrollToCatalog();
+  }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages, subcat } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages, subcat, activeFlyout } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -911,10 +953,15 @@ class Component extends DCLogic {
     const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : cat.indexOf('biz:') === 0 ? ((BIZ_TYPES.find(b => b.key === cat.slice(4)) || {}).label || 'Productos') : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
     const activeCatSubs = ((CATS.find(c => c.id === cat) || {}).subcats) || [];
     const activeSubName = subcat ? ((activeCatSubs.find(sub => sub.id === subcat) || {}).name || '') : '';
-    const subcatTabs = activeCatSubs.length ? [{ id: '', name: 'Todas' }, ...activeCatSubs].map(sub => {
-      const on = sub.id === subcat;
-      return { ...sub, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ subcat: sub.id }) };
-    }) : [];
+    const sidebarCats = CATS.map(c => {
+      const subs = c.subcats || [];
+      return {
+        ...c, activeClass: c.id === cat ? 'active' : '', hasSubcats: subs.length > 0,
+        chev: activeFlyout === c.id ? '▾' : '▸', flyoutOpen: activeFlyout === c.id,
+        subRows: subs.map(sub => ({ ...sub, pick: () => this.pickSidebarSubcat(c.id, sub.id) })),
+        pick: () => this.pickSidebarCat(c)
+      };
+    });
 
     const dp = PRODUCTS.find(x => x.id === productOpen);
     let pd = {};
@@ -930,7 +977,7 @@ class Component extends DCLogic {
       heroPromos: heroLayout === 'promos', heroFull: heroLayout === 'completo',
       waGenericText, waComboText,
       faqs: faqList.map(f => ({ ...f, open: f.id === openFaq, icon: f.id === openFaq ? '−' : '+', toggle: () => this.setState(s => ({ openFaq: s.openFaq === f.id ? null : f.id })) })),
-      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all', subcat: '' }),
+      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all', subcat: '', activeFlyout: '' }),
       onQueryFocus: () => this.setState({ queryFocused: true }),
       onQueryBlur: () => { clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ queryFocused: false }), 180); },
       showSuggestions, suggestions, noSuggestions: suggestions.length === 0,
@@ -949,14 +996,14 @@ class Component extends DCLogic {
       ],
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
-      subcatTabs, hasSubcatTabs: subcatTabs.length > 0,
+      sidebarCats,
       offerProducts, hasOffers: offerProducts.length > 0,
       offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
       pickAll: () => this.pickCat('all'),
       navCats: CATS.map(c => ({ ...c, count: COUNTS[c.id], pick: () => this.pickCat(c.id) })),
       footerCats: CATS.slice(0, 6),
-      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id, subcat: '' }) }; }),
+      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id, subcat: '', activeFlyout: '' }) }; }),
       catalogTitle: q ? `Resultados para “${query}”` : (activeSubName ? `${catName} — ${activeSubName}` : catName),
       resultsTxt: `${products.length} productos · consultanos el precio según tu perfil`,
       products, noResults: products.length === 0,
