@@ -49,6 +49,7 @@ input{font-family:inherit}
 .nav-dropdown{position:absolute;top:100%;left:0;margin-top:1px;min-width:260px;max-width:360px;background:#FFFFFF;border:1px solid #E6E0D6;border-radius:0 0 8px 8px;box-shadow:0 10px 26px rgba(28,25,23,.2);padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;z-index:30}
 .nav-dropdown-link{display:block;width:100%;text-align:left;border:0;background:transparent;padding:7px 9px;font-size:13px;font-weight:600;color:#1C1917;border-radius:6px;cursor:pointer}
 .nav-dropdown-link:hover{background:#F7F4EE;color:#D62718}
+.nav-dropdown-mobile{display:none}
 @media (max-width:860px){
   .rubro-sidebar-wrap{flex-direction:column}
   .rubro-nav{width:100%;display:flex;flex-wrap:wrap;padding:8px}
@@ -56,6 +57,8 @@ input{font-family:inherit}
   .rubro-nav-btn{width:auto;border-radius:999px;border:1px solid #E6E0D6;padding:7px 12px;margin:3px}
   .rubro-flyout{position:static;margin-left:0;margin-top:6px;width:100%;max-width:100%;box-shadow:none;border-style:dashed;grid-template-columns:1fr 1fr}
   .nav-dropdown{display:none}
+  .nav-dropdown-mobile{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;background:#A81B10;padding:12px 16px 14px;max-width:1320px;margin:0 auto}
+  .nav-dropdown-mobile-link{display:block;width:100%;text-align:left;border:0;background:rgba(255,255,255,.14);color:#FFFFFF;padding:9px 10px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
 }
 @media (max-width:640px){
   .carousel-row{padding:4px 34px 8px}
@@ -157,6 +160,13 @@ input{font-family:inherit}
         </div>
         <button onClick="{{ pickPopulares }}" style="flex-shrink:0;border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 15px;white-space:nowrap">Más pedidos</button>
       </div>
+      <sc-if value="{{ hasNavActiveFlyout }}" hint-placeholder-val="{{ false }}">
+        <div class="nav-dropdown-mobile">
+          <sc-for list="{{ navActiveSubRows }}" as="sub" hint-placeholder-count="6">
+            <button onClick="{{ sub.pick }}" class="nav-dropdown-mobile-link">{{ sub.name }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
     </nav>
   </div>
 
@@ -982,6 +992,8 @@ class Component extends DCLogic {
     const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : cat.indexOf('biz:') === 0 ? ((BIZ_TYPES.find(b => b.key === cat.slice(4)) || {}).label || 'Productos') : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
     const activeCatSubs = ((CATS.find(c => c.id === cat) || {}).subcats) || [];
     const activeSubName = subcat ? ((activeCatSubs.find(sub => sub.id === subcat) || {}).name || '') : '';
+    const navActiveCat = CATS.find(c => c.id === activeNavFlyout);
+    const navActiveSubRows = navActiveCat ? (navActiveCat.subcats || []).map(sub => ({ ...sub, pick: () => this.pickNavSubcat(navActiveCat.id, sub.id) })) : [];
     const sidebarCats = CATS.map(c => {
       const subs = c.subcats || [];
       return {
@@ -1026,6 +1038,7 @@ class Component extends DCLogic {
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
       sidebarCats,
+      hasNavActiveFlyout: navActiveSubRows.length > 0, navActiveSubRows,
       offerProducts, hasOffers: offerProducts.length > 0,
       offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
