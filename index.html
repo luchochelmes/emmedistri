@@ -46,12 +46,16 @@ input{font-family:inherit}
 .rubro-flyout{position:absolute;top:0;left:100%;margin-left:10px;width:440px;max-width:min(70vw,440px);background:#FFFFFF;border:1px solid #E6E0D6;border-radius:10px;box-shadow:0 10px 28px rgba(28,25,23,.16);padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;z-index:20}
 .rubro-flyout-link{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;font-size:13px;font-weight:600;color:#1C1917;border-radius:6px;cursor:pointer}
 .rubro-flyout-link:hover{background:#F7F4EE;color:#D62718}
+.nav-dropdown{position:absolute;top:100%;left:0;margin-top:1px;min-width:260px;max-width:360px;background:#FFFFFF;border:1px solid #E6E0D6;border-radius:0 0 8px 8px;box-shadow:0 10px 26px rgba(28,25,23,.2);padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;z-index:30}
+.nav-dropdown-link{display:block;width:100%;text-align:left;border:0;background:transparent;padding:7px 9px;font-size:13px;font-weight:600;color:#1C1917;border-radius:6px;cursor:pointer}
+.nav-dropdown-link:hover{background:#F7F4EE;color:#D62718}
 @media (max-width:860px){
   .rubro-sidebar-wrap{flex-direction:column}
   .rubro-nav{width:100%;display:flex;flex-wrap:wrap;padding:8px}
   .rubro-nav>div{width:auto}
   .rubro-nav-btn{width:auto;border-radius:999px;border:1px solid #E6E0D6;padding:7px 12px;margin:3px}
   .rubro-flyout{position:static;margin-left:0;margin-top:6px;width:100%;max-width:100%;box-shadow:none;border-style:dashed;grid-template-columns:1fr 1fr}
+  .nav-dropdown{display:none}
 }
 @media (max-width:640px){
   .carousel-row{padding:4px 34px 8px}
@@ -134,7 +138,21 @@ input{font-family:inherit}
       <div style="max-width:1320px;margin:0 auto;padding:0 0 0 24px;display:flex;align-items:stretch">
         <div class="nav-scroll" style="flex:1;min-width:0;display:flex;flex-wrap:wrap">
           <sc-for list="{{ navCats }}" as="c" hint-placeholder-count="8">
-            <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 13px;white-space:nowrap;flex-shrink:0" style-hover="background:#A81B10">{{ c.name }}</button>
+            <div style="position:relative;flex-shrink:0">
+              <button onClick="{{ c.pick }}" style="border:0;background:transparent;color:#FFFFFF;font-family:'Barlow Condensed';font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 13px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:4px" style-hover="background:#A81B10">
+                <span>{{ c.name }}</span>
+                <sc-if value="{{ c.hasSubcats }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:10px;opacity:.85">{{ c.chev }}</span>
+                </sc-if>
+              </button>
+              <sc-if value="{{ c.flyoutOpen }}" hint-placeholder-val="{{ false }}">
+                <div class="nav-dropdown">
+                  <sc-for list="{{ c.subRows }}" as="sub" hint-placeholder-count="6">
+                    <button onClick="{{ sub.pick }}" class="nav-dropdown-link">{{ sub.name }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
           </sc-for>
         </div>
         <button onClick="{{ pickPopulares }}" style="flex-shrink:0;border:0;background:#FFC72C;color:#1C1917;font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.4px;padding:11px 15px;white-space:nowrap">Más pedidos</button>
@@ -787,7 +805,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', subcat: '', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}, activeFlyout: ''
+    cart: {}, qtys: {}, cat: 'all', subcat: '', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}, activeFlyout: '', activeNavFlyout: ''
   };
 
   componentDidMount() {
@@ -818,21 +836,32 @@ class Component extends DCLogic {
 
   setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
   scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
-  pickCat(id) { this.setState({ cat: id, subcat: '', activeFlyout: '' }); this.scrollToCatalog(); }
+  pickCat(id) { this.setState({ cat: id, subcat: '', activeFlyout: '', activeNavFlyout: '' }); this.scrollToCatalog(); }
   pickSidebarCat(c) {
     this.setState(st => ({
-      cat: c.id, subcat: '',
+      cat: c.id, subcat: '', activeNavFlyout: '',
       activeFlyout: (c.subcats && c.subcats.length) ? (st.activeFlyout === c.id ? '' : c.id) : ''
     }));
     this.scrollToCatalog();
   }
   pickSidebarSubcat(catId, subId) {
-    this.setState({ cat: catId, subcat: subId, activeFlyout: '' });
+    this.setState({ cat: catId, subcat: subId, activeFlyout: '', activeNavFlyout: '' });
+    this.scrollToCatalog();
+  }
+  pickNavCat(c) {
+    this.setState(st => ({
+      cat: c.id, subcat: '', activeFlyout: '',
+      activeNavFlyout: (c.subcats && c.subcats.length) ? (st.activeNavFlyout === c.id ? '' : c.id) : ''
+    }));
+    this.scrollToCatalog();
+  }
+  pickNavSubcat(catId, subId) {
+    this.setState({ cat: catId, subcat: subId, activeNavFlyout: '', activeFlyout: '' });
     this.scrollToCatalog();
   }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages, subcat, activeFlyout } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages, subcat, activeFlyout, activeNavFlyout } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -977,7 +1006,7 @@ class Component extends DCLogic {
       heroPromos: heroLayout === 'promos', heroFull: heroLayout === 'completo',
       waGenericText, waComboText,
       faqs: faqList.map(f => ({ ...f, open: f.id === openFaq, icon: f.id === openFaq ? '−' : '+', toggle: () => this.setState(s => ({ openFaq: s.openFaq === f.id ? null : f.id })) })),
-      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all', subcat: '', activeFlyout: '' }),
+      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all', subcat: '', activeFlyout: '', activeNavFlyout: '' }),
       onQueryFocus: () => this.setState({ queryFocused: true }),
       onQueryBlur: () => { clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ queryFocused: false }), 180); },
       showSuggestions, suggestions, noSuggestions: suggestions.length === 0,
@@ -1001,9 +1030,18 @@ class Component extends DCLogic {
       offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
       pickAll: () => this.pickCat('all'),
-      navCats: CATS.map(c => ({ ...c, count: COUNTS[c.id], pick: () => this.pickCat(c.id) })),
+      navCats: CATS.map(c => {
+        const subs = c.subcats || [];
+        return {
+          ...c, count: COUNTS[c.id], hasSubcats: subs.length > 0,
+          chev: '▾',
+          flyoutOpen: activeNavFlyout === c.id,
+          subRows: subs.map(sub => ({ ...sub, pick: () => this.pickNavSubcat(c.id, sub.id) })),
+          pick: () => this.pickNavCat(c)
+        };
+      }),
       footerCats: CATS.slice(0, 6),
-      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id, subcat: '', activeFlyout: '' }) }; }),
+      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id, subcat: '', activeFlyout: '', activeNavFlyout: '' }) }; }),
       catalogTitle: q ? `Resultados para “${query}”` : (activeSubName ? `${catName} — ${activeSubName}` : catName),
       resultsTxt: `${products.length} productos · consultanos el precio según tu perfil`,
       products, noResults: products.length === 0,
