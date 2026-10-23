@@ -350,13 +350,6 @@ input{font-family:inherit}
           </sc-for>
         </div>
       </div>
-      <sc-if value="{{ hasSubcatTabs }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px">
-          <sc-for list="{{ subcatTabs }}" as="sub" hint-placeholder-count="5">
-            <button onClick="{{ sub.pick }}" style="border:1px solid {{ sub.bd }};background:{{ sub.bg }};color:{{ sub.fg }};border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;white-space:nowrap">{{ sub.name }}</button>
-          </sc-for>
-        </div>
-      </sc-if>
       <div class="{{ carouselTrackClass }}">
         <sc-if value="{{ isCarousel }}" hint-placeholder-val="{{ false }}">
           <button onClick="{{ carouselLeft }}" aria-label="Anterior" class="carousel-arrow left">‹</button>
@@ -756,7 +749,7 @@ const DEFAULT_CONFIG = {
 class Component extends DCLogic {
   state = {
     products: [], cats: [], config: DEFAULT_CONFIG, dataReady: false,
-    cart: {}, qtys: {}, cat: 'all', subcat: '', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}
+    cart: {}, qtys: {}, cat: 'all', query: '', queryFocused: false, delivery: 'retiro', checkoutSuc: 'malague', cartOpen: false, orderSent: false, productOpen: null, toast: '', contactName: '', contactEmail: '', contactMsg: '', checkoutName: '', checkoutPhone: '', checkoutAddress: '', checkoutBiz: '', checkoutCity: '', openFaq: null, heroIndex: 0, bizImages: {}
   };
 
   componentDidMount() {
@@ -787,10 +780,10 @@ class Component extends DCLogic {
 
   setCartQty(id, q) { this.setState(s => { const cart = { ...s.cart }; if (q <= 0) delete cart[id]; else cart[id] = q; return { cart }; }); }
   scrollToCatalog() { const el = document.getElementById('catalogo'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: 'smooth' }); }
-  pickCat(id) { this.setState({ cat: id, subcat: '' }); this.scrollToCatalog(); }
+  pickCat(id) { this.setState({ cat: id }); this.scrollToCatalog(); }
 
   renderVals() {
-    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages, subcat } = this.state;
+    const { products: productsRaw, cats, config, dataReady, cart, qtys, cat, query, queryFocused, delivery, checkoutSuc, cartOpen, orderSent, productOpen, toast, contactName, contactEmail, contactMsg, checkoutName, checkoutPhone, checkoutAddress, checkoutBiz, checkoutCity, openFaq, heroIndex, bizImages } = this.state;
     const PRODUCTS = productsRaw;
     const CATS = cats;
     const COUNTS = {}; CATS.forEach(c => { COUNTS[c.id] = PRODUCTS.filter(p => p.cat === c.id).length; });
@@ -827,7 +820,6 @@ class Component extends DCLogic {
     else if (cat === 'vyc') list = list.filter(p => p.vyc);
     else if (cat.indexOf('biz:') === 0) { const bk = cat.slice(4); list = list.filter(p => p.bizTags && p.bizTags.includes(bk)); }
     else if (cat !== 'all') list = list.filter(p => p.cat === cat);
-    if (subcat) list = list.filter(p => p.subcat === subcat);
     if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || String(p.id).includes(q));
 
     const isCarousel = cat === 'all' && !q;
@@ -909,12 +901,6 @@ class Component extends DCLogic {
 
     const tabDefs = [{ id: 'all', name: 'Todos' }, { id: 'populares', name: 'Más pedidos' }, ...CATS.slice(0, 4), { id: 'limpieza', name: 'Limpieza' }];
     const catName = cat === 'all' ? 'Productos destacados' : cat === 'populares' ? 'Los más pedidos' : cat === 'vyc' ? 'Verdulería y Carnicería' : cat.indexOf('biz:') === 0 ? ((BIZ_TYPES.find(b => b.key === cat.slice(4)) || {}).label || 'Productos') : ((CATS.find(c => c.id === cat) || {}).name || 'Productos');
-    const activeCatSubs = ((CATS.find(c => c.id === cat) || {}).subcats) || [];
-    const activeSubName = subcat ? ((activeCatSubs.find(sub => sub.id === subcat) || {}).name || '') : '';
-    const subcatTabs = activeCatSubs.length ? [{ id: '', name: 'Todas' }, ...activeCatSubs].map(sub => {
-      const on = sub.id === subcat;
-      return { ...sub, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ subcat: sub.id }) };
-    }) : [];
 
     const dp = PRODUCTS.find(x => x.id === productOpen);
     let pd = {};
@@ -930,7 +916,7 @@ class Component extends DCLogic {
       heroPromos: heroLayout === 'promos', heroFull: heroLayout === 'completo',
       waGenericText, waComboText,
       faqs: faqList.map(f => ({ ...f, open: f.id === openFaq, icon: f.id === openFaq ? '−' : '+', toggle: () => this.setState(s => ({ openFaq: s.openFaq === f.id ? null : f.id })) })),
-      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all', subcat: '' }),
+      query, onQuery: e => this.setState({ query: e.target.value, cat: 'all' }),
       onQueryFocus: () => this.setState({ queryFocused: true }),
       onQueryBlur: () => { clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ queryFocused: false }), 180); },
       showSuggestions, suggestions, noSuggestions: suggestions.length === 0,
@@ -949,15 +935,14 @@ class Component extends DCLogic {
       ],
       goCatalog: () => this.scrollToCatalog(),
       pickPopulares: () => this.pickCat('populares'),
-      subcatTabs, hasSubcatTabs: subcatTabs.length > 0,
       offerProducts, hasOffers: offerProducts.length > 0,
       offersLeft: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: -(el.clientWidth * 0.8), behavior: 'smooth' }); },
       offersRight: () => { const el = document.getElementById('offers-carousel'); if (el) el.scrollBy({ left: el.clientWidth * 0.8, behavior: 'smooth' }); },
       pickAll: () => this.pickCat('all'),
       navCats: CATS.map(c => ({ ...c, count: COUNTS[c.id], pick: () => this.pickCat(c.id) })),
       footerCats: CATS.slice(0, 6),
-      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id, subcat: '' }) }; }),
-      catalogTitle: q ? `Resultados para “${query}”` : (activeSubName ? `${catName} — ${activeSubName}` : catName),
+      tabs: tabDefs.map(t => { const on = t.id === cat; return { ...t, bg: on ? '#1C1917' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1C1917', bd: on ? '#1C1917' : '#D8D0C4', pick: () => this.setState({ cat: t.id }) }; }),
+      catalogTitle: q ? `Resultados para “${query}”` : catName,
       resultsTxt: `${products.length} productos · consultanos el precio según tu perfil`,
       products, noResults: products.length === 0,
       isCarousel,
